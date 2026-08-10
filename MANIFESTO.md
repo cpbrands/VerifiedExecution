@@ -1,1 +1,1 @@
-# Manifesto
+# Core Specification
