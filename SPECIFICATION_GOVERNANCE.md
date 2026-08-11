@@ -119,6 +119,130 @@ Every significant proposal MUST answer:
 5. Can another engineering team implement it independently from the specification?
 6. **Does it reduce the total conceptual complexity of the system? If not, it does not belong.**
 
+# 7A. Architectural Maturity
+
+Not every architectural idea deserves immediate inclusion in the Core Specification.
+
+Verified Execution distinguishes between observations, hypotheses, invariants, and axioms.
+
+This prevents promising ideas from becoming permanent architecture before they have earned that status.
+
+## 7A.1 Observation
+
+An Observation is a fact discovered during analysis, implementation, review, or specification work.
+
+Observations describe what appears to be true.
+
+They do not explain why.
+
+Observations MUST NOT become normative architecture by themselves.
+
+Example:
+
+> The first four core primitives appear to describe semantic meaning, while the remaining two interact directly with external execution.
+
+---
+
+## 7A.2 Hypothesis
+
+A Hypothesis proposes an explanation for one or more observations.
+
+Hypotheses SHOULD possess explanatory power.
+
+They SHOULD make predictions.
+
+They remain subject to active attempts at refutation.
+
+Hypotheses MUST NOT be promoted directly into VE-000.
+
+Example:
+
+> The Semantic Layer defines what is true. The Execution Layer determines how those truths are realized without changing their meaning.
+
+---
+
+## 7A.3 Invariant
+
+An Invariant is a hypothesis that has repeatedly survived review, specification development, implementation experience, and deliberate attempts at refutation.
+
+An Invariant describes a property expected to remain true across all conforming implementations.
+
+Before becoming an Invariant, a hypothesis SHOULD demonstrate:
+
+- explanatory value,
+- predictive value,
+- stability across multiple domains,
+- consistency with the Founding Principles,
+- consistency with all approved specifications,
+- resistance to credible counterexamples.
+
+---
+
+## 7A.4 Axiom
+
+An Axiom is a foundational architectural principle accepted into the Core Specification.
+
+An Axiom represents one of the smallest possible set of assumptions required to understand the standard.
+
+Every normative statement in VE-000 SHOULD either define a core primitive or state an architectural axiom.
+
+Axiom status carries the highest burden of proof.
+
+Changing an Axiom is presumed to be a breaking architectural change unless demonstrated otherwise.
+
+---
+
+## 7A.5 Promotion Criteria
+
+Architectural ideas progress through the following maturity model.
+
+```text
+Observation
+        │
+        ▼
+Hypothesis
+        │
+        ▼
+Invariant
+        │
+        ▼
+Axiom
+```
+
+Promotion is never automatic.
+
+Each transition requires explicit review.
+
+---
+
+## 7A.6 Burden of Proof
+
+The burden of proof increases at each maturity level.
+
+Observation requires evidence.
+
+Hypothesis requires explanation.
+
+Invariant requires repeated survival under scrutiny.
+
+Axiom requires long-term architectural necessity.
+
+The preferred architectural principle is not the newest.
+
+It is the one that has survived the greatest number of credible attempts to prove it wrong.
+
+---
+
+## 7A.7 Principle of Architectural Humility
+
+Verified Execution prefers delayed certainty over premature certainty.
+
+Elegant ideas are not accepted because they are elegant.
+
+They are accepted because they continue to explain the architecture after repeated attempts to invalidate them.
+
+Architectural maturity is earned through sustained scrutiny, not confidence.
+
 ## 8. Complexity Budget
 
 Complexity is a permanent cost.
