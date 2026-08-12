@@ -1,4 +1,4 @@
-# RS-006 — Rejected Action
+# RS-007 — Rejected Action
 
 ## What it stresses
 
