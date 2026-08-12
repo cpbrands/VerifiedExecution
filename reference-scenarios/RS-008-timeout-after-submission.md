@@ -1,4 +1,4 @@
-# RS-007 — Timeout After Submission
+# RS-008 — Timeout After Submission
 
 ## What it stresses
 
