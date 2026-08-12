@@ -1,4 +1,4 @@
-# RS-006 — Robot Command
+# RS-005 — Robotic Arm Command
 
 ## What it stresses
 
