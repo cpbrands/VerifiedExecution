@@ -16,6 +16,8 @@ Next validation:
 RS-003 — Bank Transfer (Uncertain Outcome)
 RS-004 — Software Deployment
 
+
+
 GAP-001
 
 Status: Investigated
@@ -32,4 +34,18 @@ Evidence:
 RS-003
 
 Maturity:
+Observation
+
+
+New Observation — Automatic Recovery Boundary
+OBS-003
+
+Automatic recovery that is already included within authorized target execution semantics may remain part of one Action. Independently chosen corrective execution requires a new Action.
+
+Evidence:
+
+RS-004
+
+Maturity:
+
 Observation
