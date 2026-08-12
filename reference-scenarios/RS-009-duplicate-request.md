@@ -1,4 +1,4 @@
-# RS-008 — Duplicate Request
+# RS-009 — Duplicate Request
 
 ## What it stresses
 
