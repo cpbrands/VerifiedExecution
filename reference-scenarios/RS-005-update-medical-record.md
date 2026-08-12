@@ -1,4 +1,4 @@
-# RS-004 — Update Medical Record
+# RS-005 — Update Medical Record
 
 ## What it stresses
 
