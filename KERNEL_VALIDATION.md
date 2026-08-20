@@ -2,7 +2,7 @@
 
 **Project:** Verified Execution\
 **Document:** Kernel Validation Record\
-**Version:** 0.6\
+**Version:** 0.7\
 **Status:** Draft / Active Validation\
 **Date:** 2026-08-19
 
@@ -2107,3 +2107,438 @@ authority, bootstrap roots, and recursive proof systems?
 
 **Status:** OPEN.
 
+
+
+------------------------------------------------------------------------
+
+## 29. Pressure Test: Minimum Interoperable Action Schema Mechanism
+
+### Question
+
+What is the minimum interoperable `Action Schema` mechanism—schema
+identifier, version/digest, canonical encoding, field semantics, and
+applicability predicate language—such that two independent VE
+implementations deterministically agree on applicability without VE
+becoming a universal ontology or general-purpose programming language?
+
+### Result
+
+**PASS — a small content-addressed schema contract plus a deliberately
+restricted selector language is sufficient.**
+
+No new semantic primitive is justified.
+
+The minimum protocol mechanism has five parts:
+
+1. **Schema identity**
+2. **Canonical Action encoding**
+3. **Structural field contract**
+4. **Deterministic field comparison semantics**
+5. **Restricted applicability selector**
+
+### 29.1 Schema identity
+
+Every Action used in applicability decisions MUST identify the schema
+under which its fields are interpreted.
+
+The normative schema identity SHOULD be content-addressed:
+
+```text
+schema_digest = H(canonical_schema_descriptor)
+```
+
+A human-readable `schema_id` and semantic `version` MAY exist for
+operational clarity, but neither is sufficient for protocol identity
+without the digest.
+
+Recommended model:
+
+```text
+schema_ref:
+    id: "bank.transfer"
+    version: "1"
+    digest: "..."
+```
+
+The digest is the authoritative identity of the schema contract.
+
+This prevents two implementations from silently using different schema
+definitions that share the same human-readable name or version.
+
+### 29.2 Canonical Action encoding
+
+An Action participating in applicability matching MUST have one
+deterministic canonical byte representation under its schema.
+
+The protocol MUST define or identify a canonical encoding profile.
+
+Canonicalization MUST NOT depend on:
+
+- implementation language;
+- map/object insertion order;
+- locale;
+- floating-point approximation;
+- ambient timezone;
+- platform-specific Unicode behavior;
+- undeclared normalization.
+
+The exact serialization format is protocol machinery, not a semantic
+primitive.
+
+### 29.3 Structural field contract
+
+The Action schema SHOULD define only what deterministic interpretation
+requires:
+
+- field path / name;
+- required vs. optional;
+- structural type;
+- canonical representation;
+- permitted normalization profile, if any;
+- comparison semantics identifier, if non-default.
+
+The schema MUST NOT attempt to define the full real-world ontology of
+the domain.
+
+Example:
+
+```text
+field: source_account
+type: string
+normalization: none
+comparison: exact_bytes
+```
+
+A banking specification may document what `source_account` means, but VE
+does not need a universal semantic theory of bank accounts.
+
+### 29.4 Restricted normalization
+
+A schema MUST NOT embed arbitrary normalization code.
+
+Any normalization used for applicability matching MUST reference a
+finite protocol-defined normalization profile.
+
+Examples might include:
+
+```text
+none
+utf8_nfc
+ascii_lowercase
+canonical_decimal
+canonical_timestamp
+```
+
+The initial protocol SHOULD prefer `none` unless normalization is
+strictly necessary.
+
+Unknown normalization profiles MUST fail closed.
+
+### 29.5 Applicability selector
+
+Applicability MUST NOT use a general-purpose programming language.
+
+The selector language SHOULD be a small declarative data structure over
+canonical Action fields.
+
+Minimum candidate operators:
+
+```text
+all
+any
+not
+exists
+eq
+in
+lt
+lte
+gt
+gte
+prefix
+```
+
+Operators MUST have protocol-defined deterministic semantics.
+
+No operator may:
+
+- invoke external services;
+- read ambient state;
+- execute user-supplied code;
+- recurse without a protocol-defined finite bound;
+- perform unbounded iteration;
+- mutate state;
+- inspect Claims;
+- perform cryptographic verification;
+- call `Evaluate`;
+- interpret arbitrary domain semantics.
+
+### 29.6 Selector is candidate selection, not policy
+
+This distinction is normative in spirit:
+
+> Applicability answers only whether a binding is a candidate for the
+> canonical Action.
+
+It does not answer whether the Action is authorized.
+
+Example:
+
+```text
+selector:
+    all:
+      - eq: [action.schema_ref.digest, "..."]
+      - prefix: [action.source_account, "bank-b://"]
+```
+
+This may select a Rule or authority Claim.
+
+Whether a transfer is permitted because the amount is below a limit,
+the delegation remains valid, or a human approved it belongs in:
+
+```text
+Claims + Rule + Verify + Evaluate
+```
+
+not in selector semantics.
+
+This prevents the applicability mechanism from becoming a second policy
+language.
+
+### 29.7 No hidden external state
+
+Selectors MUST be pure deterministic functions over explicit canonical
+inputs.
+
+The following do not belong in selectors:
+
+```text
+current_time()
+current_balance()
+is_revoked()
+count_prior_actions()
+fetch_registry()
+```
+
+Those values, when relevant, must be represented through explicit
+Claims or other protocol-defined evaluation inputs.
+
+### 29.8 Failure semantics
+
+Applicability MUST fail closed.
+
+If an implementation cannot:
+
+- resolve the identified schema;
+- verify the schema digest;
+- apply the required canonical encoding;
+- understand a required normalization profile;
+- understand a selector operator;
+- deterministically interpret a referenced field;
+
+it MUST NOT treat the selector as matched.
+
+An implementation MAY return a protocol error distinct from
+`selector = false`, but it MUST NOT approximate.
+
+### 29.9 Schema resolution
+
+VE does not require a centralized schema registry.
+
+A schema may be:
+
+- embedded;
+- bundled;
+- fetched from a domain-defined resolver;
+- referenced by content-addressed storage;
+- included in an execution profile.
+
+Regardless of transport, the resolved descriptor MUST match the
+declared digest before use.
+
+### 29.10 Schema evolution
+
+A semantic schema change produces a new schema digest.
+
+Human-readable version labels MAY aid governance, but content identity
+is controlled by the digest.
+
+A selector bound to schema digest `D1` MUST NOT silently apply to `D2`
+unless the selector or protocol explicitly permits both.
+
+### 29.11 Cross-schema selectors
+
+The minimal model SHOULD NOT define automatic semantic compatibility
+between schemas.
+
+If one authority binding intentionally applies to several schemas, it
+must identify them explicitly, for example:
+
+```text
+schema_digest in {D1, D2, D3}
+```
+
+VE MUST NOT infer that `bank.transfer.v1` and `bank.transfer.v2` are
+equivalent because their names are similar.
+
+### 29.12 Why a digest is stronger than version alone
+
+Version identifiers are governance labels.
+
+A digest is a content commitment.
+
+Two teams can accidentally or maliciously publish different schema
+content under the same:
+
+```text
+id = "bank.transfer"
+version = "1"
+```
+
+but they cannot produce the same secure digest for materially different
+canonical descriptors under the selected hash function.
+
+Therefore:
+
+> human-readable schema ID/version is metadata; schema digest is
+> protocol identity.
+
+### 29.13 Minimal object boundary
+
+The resulting protocol stack is:
+
+```text
+Action
+  |
+  +-- schema_ref
+        |
+        +-- id          (optional operational label)
+        +-- version     (optional operational label)
+        +-- digest      (normative identity)
+  |
+  +-- canonical fields
+        |
+        v
+restricted selector
+        |
+        v
+candidate binding(s)
+        |
+        v
+Verify / Evaluate
+```
+
+`Action Schema` is protocol machinery.
+
+`Selector` is protocol machinery.
+
+Neither is promoted to the semantic kernel.
+
+### 29.14 Architectural conclusion
+
+The minimum interoperable mechanism is:
+
+> **A content-addressed Action schema that deterministically defines
+> canonical field representation, combined with a deliberately
+> non-Turing-complete selector language restricted to pure structural
+> predicates over canonical Action data.**
+
+The protocol SHOULD make applicability less expressive than Rule
+evaluation by design.
+
+This preserves deterministic scoping without creating:
+
+- a VE domain ontology;
+- a second policy language;
+- user-supplied executable code;
+- hidden environmental dependencies.
+
+------------------------------------------------------------------------
+
+## 30. New Validated Architectural Findings
+
+### KV-F32 — Schema Digest Is the Normative Schema Identity
+
+Human-readable schema ID and version may exist, but interoperability
+requires a content commitment to the exact schema contract.
+
+**Status:** PASS.
+
+### KV-F33 — Canonical Encoding Is Security-Relevant Protocol Machinery
+
+Action canonicalization is required for deterministic authority and Rule
+selection but does not justify a new semantic primitive.
+
+**Status:** PASS.
+
+### KV-F34 — Field Semantics Must Remain Structural
+
+VE needs deterministic field representation and comparison semantics,
+not a universal ontology of the represented domain.
+
+**Status:** PASS.
+
+### KV-F35 — Applicability Must Be Weaker Than Rule Evaluation
+
+Applicability selectors should perform only pure structural matching over
+canonical Action data. Dynamic authorization semantics remain in
+Claims/Rules/Verify/Evaluate.
+
+**Status:** PASS.
+
+### KV-F36 — Arbitrary Selector Code Is Rejected
+
+Selectors must not permit user-supplied general-purpose code, external
+calls, hidden state, or unbounded computation.
+
+**Status:** PASS.
+
+### KV-F37 — Schema Resolution Does Not Require a Central Registry
+
+Schemas may be transported through multiple mechanisms provided the
+resolved descriptor matches the declared content digest.
+
+**Status:** PASS.
+
+### KV-F38 — Schema Evolution Is Explicit
+
+A semantic schema change changes the schema digest. Compatibility MUST
+NOT be inferred from names or version labels.
+
+**Status:** PASS.
+
+------------------------------------------------------------------------
+
+## 31. Updated Validation Backlog
+
+### HYP-015 — Minimal selector operator set
+
+Is the candidate structural operator set:
+
+```text
+all, any, not, exists, eq, in, lt, lte, gt, gte, prefix
+```
+
+sufficient for cross-domain applicability without introducing regex,
+arbitrary expressions, functions, or domain-specific operators?
+
+**Status:** NEXT PRESSURE TEST CANDIDATE.
+
+### HYP-016 — Canonical Action digest
+
+Should every Action itself carry a canonical digest derived from its
+schema digest plus canonical Action bytes, so that Claims, Rules,
+Receipts, and execution evidence can bind the exact Action without
+depending only on an implementation-assigned `action_id`?
+
+**Status:** OPEN — HIGH PRIORITY.
+
+### HYP-017 — Schema descriptor format
+
+What is the minimum canonical schema-descriptor format needed to express
+field paths, structural types, requiredness, normalization profile, and
+comparison semantics without turning the descriptor into a second schema
+language ecosystem?
+
+**Status:** OPEN.
+
+------------------------------------------------------------------------
