@@ -2,7 +2,7 @@
 
 **Project:** Verified Execution\
 **Document:** Kernel Validation Record\
-**Version:** 0.9\
+**Version:** 0.10\
 **Status:** Draft / Active Validation\
 **Date:** 2026-08-19
 
@@ -3325,5 +3325,555 @@ What minimum digest-suite representation provides algorithm agility
 without unnecessary cryptographic negotiation complexity?
 
 **Status:** OPEN.
+
+------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------
+
+## 38. Pressure Test: Action Envelope vs. Canonical Semantic Payload
+
+### Question
+
+What belongs in the Action envelope versus the canonical semantic
+payload, and which envelope fields must themselves be cryptographically
+bound to the content/instance relationship?
+
+### Result
+
+**PASS — use a two-layer Action commitment.**
+
+The Action SHOULD be modeled as:
+
+```text
+Action Instance
+    |
+    +-- Instance Envelope
+    |
+    +-- Semantic Payload
+```
+
+with two distinct cryptographic identities:
+
+```text
+action_digest
+    = H(schema_digest || canonical_semantic_payload)
+
+instance_digest
+    = H(action_digest || canonical_instance_envelope)
+```
+
+The exact framing, domain separation, and digest-suite identifiers remain
+protocol details to specify normatively.
+
+`action_digest` identifies **what is proposed**.
+
+`instance_digest` identifies **this cryptographically bound occurrence of
+that proposal**.
+
+`action_id` remains the protocol-visible instance identifier and SHOULD
+be bound inside the canonical instance envelope.
+
+### 38.1 Semantic payload inclusion rule
+
+A field MUST be part of the canonical semantic payload if changing that
+field can change:
+
+- the requested external effect;
+- the target or destination of the effect;
+- the quantity, object, capability, method, or operation requested;
+- applicability of Claims, Rules, Trust Context authority, or execution
+  authority;
+- the completion semantics of the Action;
+- any constraint that is part of the proposal itself.
+
+The test is:
+
+> If two Actions differ only in field X, could a rational authority
+> legitimately authorize one but not the other because the proposed
+> execution is different?
+
+If yes, X belongs in the semantic payload.
+
+### 38.2 Candidate semantic payload fields
+
+Depending on the Action schema, examples include:
+
+```text
+operation / action type
+target identifiers
+destination identifiers
+amount / quantity
+currency
+requested capability
+parameters
+payload commitment / message hash
+requested execution constraints
+domain-specific semantic arguments
+```
+
+The semantic payload is schema-defined.
+
+VE does not mandate a universal field list.
+
+### 38.3 Schema identity
+
+`schema_ref.digest` MUST participate in `action_digest`.
+
+Human-readable schema ID and version MAY remain envelope metadata for
+discovery and audit, provided the normative schema digest is bound to
+the content identity.
+
+### 38.4 Instance envelope inclusion rule
+
+A field belongs in the instance envelope when it distinguishes or
+governs the occurrence of a semantic proposal without changing the
+proposal's underlying effect.
+
+Candidate instance-envelope fields include:
+
+```text
+action_id
+created_at, when it records proposal-instance creation
+correlation_id
+parent / causation reference
+retry / attempt reference
+instance nonce, when used for occurrence uniqueness or replay control
+originating protocol version
+```
+
+These fields do not belong in `action_digest` merely to make content
+unique.
+
+### 38.5 Why the envelope still needs cryptographic binding
+
+Leaving the instance envelope entirely unsigned/uncommitted creates
+substitution attacks.
+
+Example:
+
+```text
+semantic Action digest = D
+
+Action instance A1 -> approved once
+Action instance A2 -> not approved
+```
+
+If `action_id` is not cryptographically bound to the occurrence, an
+attacker may be able to associate Claims, Lifecycle history, or Receipts
+with the wrong instance.
+
+Therefore the protocol needs a second commitment:
+
+```text
+instance_digest =
+    H(
+        action_digest
+        ||
+        canonical_instance_envelope
+    )
+```
+
+This binds occurrence identity to exact content without polluting content
+identity with occurrence metadata.
+
+### 38.6 Action ID
+
+`action_id` SHOULD be included in the canonical instance envelope.
+
+Therefore:
+
+```text
+action_id
+  -> instance_digest
+  -> action_digest
+  -> exact semantic payload
+```
+
+A verifier can establish both:
+
+> Which occurrence is this?
+
+and:
+
+> What exact content does that occurrence carry?
+
+`action_id` remains useful as a human/system reference but is no longer
+the sole cryptographic binding between occurrence and content.
+
+### 38.7 Created time
+
+`created_at` has two possible meanings.
+
+#### Occurrence timestamp
+
+If it only means:
+
+> this Action instance was created at time T
+
+then it belongs in the instance envelope.
+
+#### Semantic timing constraint
+
+If the Action means:
+
+> execute at / before / after T
+
+then that timing value changes proposed semantics and belongs in the
+semantic payload.
+
+A single field MUST NOT ambiguously serve both meanings.
+
+Schemas SHOULD distinguish:
+
+```text
+instance_created_at
+```
+
+from semantic fields such as:
+
+```text
+execute_after
+execute_before
+effective_at
+```
+
+### 38.8 Expiration
+
+If expiration is merely a processing policy applied externally to the
+Action, it is not semantic payload.
+
+If the proposer explicitly constrains the Action:
+
+```text
+this transfer MUST NOT execute after T
+```
+
+then `execute_before = T` is part of the semantic proposal and MUST
+affect `action_digest`.
+
+### 38.9 Nonce
+
+A nonce has to be classified by purpose.
+
+#### Instance nonce
+
+Used only to distinguish occurrences or provide replay-control context:
+
+```text
+instance_nonce
+```
+
+belongs in the instance envelope.
+
+#### Semantic challenge/session binding
+
+If execution is meaningful only relative to challenge/session C:
+
+```text
+required_challenge = C
+```
+
+that constraint belongs in the semantic payload.
+
+The protocol MUST NOT add random nonces to semantic payload merely to
+force unique Action digests.
+
+### 38.10 Correlation and causation references
+
+A `correlation_id` used for tracing belongs in the instance envelope.
+
+A `caused_by_action_id` used only for observability belongs in the
+instance envelope.
+
+However, if the Action's semantics explicitly require execution as a
+consequence of a particular prior semantic Action, the required
+predecessor commitment MAY belong in semantic payload.
+
+Again, purpose determines layer.
+
+### 38.11 Actor / proposer identity
+
+Actor identity SHOULD NOT automatically be part of semantic Action
+content.
+
+The same proposed effect can be proposed by different actors while
+retaining the same `action_digest`.
+
+Authority for who may propose or authorize it belongs in Claims and
+Rule evaluation.
+
+If an Action schema explicitly makes actor identity part of the proposed
+effect—for example, "publish statement as legal entity X"—then the
+relevant represented identity is semantic and belongs in the payload.
+
+This avoids smuggling `Actor` back as a universal Action primitive.
+
+### 38.12 Claims and approvals
+
+Claims are not Action payload fields merely because they accompany an
+Action.
+
+Claims SHOULD bind either:
+
+```text
+action_digest
+```
+
+when they concern exact semantic content, or:
+
+```text
+instance_digest / action_id
+```
+
+when they concern a particular occurrence.
+
+An approval that is valid for one occurrence only SHOULD bind the
+instance commitment, not merely the content digest.
+
+### 38.13 Rule and selector references
+
+The Action SHOULD NOT generally embed the Rule or selector that will
+govern it.
+
+Doing so risks allowing the proposal to choose its own governance.
+
+Rule applicability and authority binding remain independently derived.
+
+If a protocol needs to carry candidate references for efficiency, those
+references MUST NOT be treated as authoritative merely because they are
+present in the Action envelope.
+
+### 38.14 Trust Context reference
+
+A candidate Trust Context reference MAY be carried as routing metadata,
+but MUST NOT become authoritative because the Action selected it.
+
+The independently accepted Trust Context remains external to the
+proposal.
+
+Therefore a Trust Context hint belongs, if anywhere, in the instance
+envelope and MUST be treated as non-authoritative input until accepted
+by the boundary.
+
+### 38.15 Execution profile reference
+
+An execution profile may affect how the Action is interpreted or what
+constitutes completion.
+
+If changing the execution profile can change the meaning of the proposed
+effect or completion contract, its normative identifier/digest belongs in
+the semantic payload.
+
+If it merely identifies a transport/Adapter implementation that can
+perform the same semantics, it belongs outside semantic content.
+
+This distinction must be explicit in profile specifications.
+
+### 38.16 Protocol version
+
+Protocol or envelope serialization version SHOULD be bound in the
+instance-envelope commitment or through digest-suite domain separation.
+
+A version that changes semantic payload interpretation MUST instead be
+bound through the schema digest.
+
+### 38.17 Receipts
+
+A strong Receipt SHOULD bind:
+
+```text
+action_id
+action_digest
+instance_digest
+```
+
+or an equivalent cryptographic structure establishing all three
+relationships.
+
+This lets the Receipt answer:
+
+```text
+Which instance?
+What exact content?
+Was this envelope-content pairing the one that resolved?
+```
+
+### 38.18 Execution evidence
+
+Execution evidence SHOULD bind at minimum `action_digest`.
+
+Where execution semantics are occurrence-sensitive, it SHOULD also bind
+`instance_digest` or an authoritative occurrence identifier bound to it.
+
+This prevents a valid commit fact for one instance from being
+silently transplanted onto another identical-content instance.
+
+### 38.19 What does not belong in either digest
+
+Purely local mutable implementation data MUST NOT affect canonical
+Action identity.
+
+Examples:
+
+```text
+database row ID
+UI display label
+cache key
+local processing status
+worker assignment
+retry backoff timer
+log formatting
+local storage path
+```
+
+Such values are implementation state, not protocol Action state.
+
+### 38.20 Two-layer identity model
+
+The resulting structure is:
+
+```text
+                 Action Instance
+                       |
+          +------------+------------+
+          |                         |
+          v                         v
+ Instance Envelope            Semantic Payload
+          |                         |
+          |                         +-- schema_digest
+          |                         +-- canonical fields
+          |                                  |
+          |                                  v
+          |                           action_digest
+          |                                  |
+          +---------------+------------------+
+                          |
+                          v
+                   instance_digest
+```
+
+This provides:
+
+- stable semantic content identity;
+- distinct execution-instance identity;
+- cryptographic binding between them;
+- freedom for identical semantic Actions to occur multiple times.
+
+### 38.21 Architectural conclusion
+
+The minimum robust model is:
+
+> **Hash semantic meaning once, then cryptographically bind occurrence
+> metadata to that semantic digest in a separate instance commitment.**
+
+This avoids both failure modes:
+
+```text
+one digest containing everything
+    -> destroys useful content equivalence
+```
+
+and:
+
+```text
+semantic digest + unbound envelope
+    -> permits instance/content substitution
+```
+
+------------------------------------------------------------------------
+
+## 39. New Validated Architectural Findings
+
+### KV-F53 — Action Requires Two-Layer Commitment
+
+Semantic content identity and cryptographically bound occurrence identity
+should be represented separately.
+
+**Status:** PASS.
+
+### KV-F54 — Semantic Payload Is Defined by Effect-Relevance
+
+Any field whose change can change the proposed execution, applicability,
+or completion semantics belongs in the canonical semantic payload.
+
+**Status:** PASS.
+
+### KV-F55 — Action ID Belongs in the Bound Instance Envelope
+
+`action_id` remains an instance identifier and should be
+cryptographically bound to `action_digest`.
+
+**Status:** PASS.
+
+### KV-F56 — Occurrence Metadata Must Not Pollute Content Identity
+
+Pure instance fields must not be inserted into semantic payload merely
+to force digest uniqueness.
+
+**Status:** PASS.
+
+### KV-F57 — Timing and Nonces Are Purpose-Dependent
+
+Timing values and nonces belong in semantic payload only when they change
+the proposal's semantics; otherwise they are instance-envelope fields.
+
+**Status:** PASS.
+
+### KV-F58 — Actor Is Not Automatically Semantic Action Content
+
+Proposer identity remains Claim/governance information unless the Action
+schema explicitly makes represented identity part of the proposed
+effect.
+
+**Status:** PASS.
+
+### KV-F59 — Governance References in the Envelope Are Non-Authoritative
+
+Rule, Trust Context, or authority hints carried with an Action cannot
+establish their own applicability.
+
+**Status:** PASS.
+
+### KV-F60 — Receipt Should Bind Instance and Content
+
+Portable execution resolution should cryptographically bind the Action
+instance to its exact semantic content.
+
+**Status:** PASS.
+
+------------------------------------------------------------------------
+
+## 40. Updated Validation Backlog
+
+### HYP-020 — Receipt Action identity requirements
+
+Should VE-004 v0.2 normatively require:
+
+```text
+action_id
+action_digest
+instance_digest
+```
+
+for every Receipt, or can `instance_digest` remain reconstructable from
+authoritative Action history?
+
+**Status:** NEXT CROSS-SPECIFICATION DECISION.
+
+### HYP-021 — Digest suite
+
+What minimum digest-suite representation provides algorithm agility
+without unnecessary cryptographic negotiation complexity?
+
+**Status:** OPEN.
+
+### HYP-022 — VE-001 revision
+
+Does the approved/current VE-001 Action specification already distinguish
+semantic Action payload from occurrence envelope strongly enough to
+support `action_digest` and `instance_digest`?
+
+**Status:** REQUIRES DIRECT SPECIFICATION COMPARISON BEFORE RFC.
 
 ------------------------------------------------------------------------
