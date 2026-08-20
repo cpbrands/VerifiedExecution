@@ -2,7 +2,7 @@
 
 **Project:** Verified Execution\
 **Document:** Kernel Validation Record\
-**Version:** 0.7\
+**Version:** 0.9\
 **Status:** Draft / Active Validation\
 **Date:** 2026-08-19
 
@@ -2538,6 +2538,791 @@ What is the minimum canonical schema-descriptor format needed to express
 field paths, structural types, requiredness, normalization profile, and
 comparison semantics without turning the descriptor into a second schema
 language ecosystem?
+
+**Status:** OPEN.
+
+------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------
+
+## 32. Pressure Test: Minimum Selector Operator Set
+
+### Question
+
+What is the smallest selector operator set that can express legitimate
+cross-domain authority scopes while making it structurally difficult for
+applicability to evolve into a second policy language?
+
+### Result
+
+**PASS — the selector can be reduced to three comparison forms with
+implicit conjunction:**
+
+```text
+eq
+in
+prefix
+```
+
+A selector is a finite set of field constraints. All constraints in one
+selector are implicitly ANDed.
+
+No separate `all` operator is required.
+
+Example:
+
+```text
+selector:
+    action.schema_ref.digest:
+        eq: D1
+    action.source_account:
+        prefix: "bank-b://"
+    action.currency:
+        in: ["CAD", "USD"]
+```
+
+means:
+
+```text
+schema_digest == D1
+AND
+source_account starts with "bank-b://"
+AND
+currency is one of {"CAD", "USD"}
+```
+
+### 32.1 Why `eq` is required
+
+Exact matching is the fundamental routing operation.
+
+Examples:
+
+```text
+action.schema_ref.digest == D1
+action.type == "communication.deliver"
+action.target == "person-X"
+action.repository.owner == "VerifiedExecution"
+```
+
+Without `eq`, even basic authority scoping is impossible.
+
+### 32.2 Why `in` is required
+
+`in` permits a finite enumerated set without introducing general OR.
+
+Examples:
+
+```text
+schema_digest in {D1, D2, D3}
+region in {"ca-central-1", "us-east-1"}
+currency in {"CAD", "USD"}
+```
+
+This supports explicit compatibility and multi-value routing while
+remaining finite and structural.
+
+`in` MUST mean exact membership under the field's canonical comparison
+semantics.
+
+### 32.3 Why `prefix` is required
+
+Hierarchical namespaces are common across execution domains:
+
+```text
+bank-b://accounts/*
+github://VerifiedExecution/*
+aws://account/123/*
+person://X/attention/*
+```
+
+`prefix` allows deterministic subtree / namespace routing without regex,
+glob, or arbitrary pattern languages.
+
+`prefix` MUST operate only on canonical field representations whose
+schema explicitly permits prefix comparison.
+
+### 32.4 Why conjunction should be implicit
+
+A selector normally needs to narrow by several independent structural
+dimensions:
+
+```text
+schema = D1
+AND
+account namespace = bank-b
+AND
+region = ca-central-1
+```
+
+Instead of adding an `all` operator, the selector container itself
+defines conjunction.
+
+This removes one operator while preserving necessary expressiveness.
+
+### 32.5 Why `any` / OR is rejected
+
+General OR increases expression complexity and encourages policy-like
+logic.
+
+Instead of:
+
+```text
+owner = A OR region = B
+```
+
+define two independent bindings:
+
+```text
+Binding 1 selector:
+    owner = A
+
+Binding 2 selector:
+    region = B
+```
+
+Each binding is independently auditable and independently authoritative.
+
+This makes alternatives explicit at the binding layer rather than hiding
+them inside selector logic.
+
+### 32.6 Why `not` is rejected
+
+Negation creates broad residual scopes:
+
+```text
+NOT jurisdiction = X
+NOT action.type = Y
+```
+
+Such selectors are difficult to reason about and behave like policy
+exclusions rather than routing.
+
+If an authority applies to a finite positive domain, that domain should
+be stated positively.
+
+Negative authorization conditions belong in Rules.
+
+### 32.7 Why `exists` is rejected
+
+Field existence does not require a dedicated operator.
+
+Referencing a field in a selector implicitly requires the field to be
+present and canonically interpretable.
+
+If the field is absent:
+
+```text
+selector does not match
+```
+
+This eliminates another operator.
+
+### 32.8 Why numeric comparisons are rejected
+
+The following operators are removed from applicability:
+
+```text
+lt
+lte
+gt
+gte
+```
+
+Examples such as:
+
+```text
+amount < 1000
+time < expiry
+risk_score >= 80
+```
+
+are policy conditions, not structural routing.
+
+They belong in Claims + Rule + Verify + Evaluate.
+
+Allowing thresholds in selectors would create a second authorization
+language.
+
+### 32.9 Why regex / glob / arbitrary matching is rejected
+
+Regex and general glob syntax are substantially more expressive than
+necessary and introduce:
+
+- engine-version differences;
+- Unicode and locale ambiguity;
+- catastrophic backtracking risk;
+- hidden pattern-language complexity;
+- difficult auditability.
+
+Hierarchical matching should use canonical `prefix`.
+
+Finite alternatives should use `in`.
+
+Exact values should use `eq`.
+
+### 32.10 Why functions and arithmetic are rejected
+
+Selectors MUST NOT support:
+
+```text
+add
+subtract
+multiply
+divide
+length
+contains
+substring
+date arithmetic
+custom functions
+user-defined functions
+```
+
+These operations are not necessary for authority routing and create
+policy/computation semantics.
+
+### 32.11 No nested boolean language
+
+The minimal selector is not an expression tree.
+
+It is a flat finite map of canonical field paths to one constraint each.
+
+Conceptually:
+
+```text
+Selector = {
+    field_1: Constraint,
+    field_2: Constraint,
+    ...
+}
+```
+
+with:
+
+```text
+Constraint = EQ(value)
+           | IN(finite_set)
+           | PREFIX(value)
+```
+
+All entries are conjunctive.
+
+No nested selectors.
+
+No recursion.
+
+No arbitrary boolean composition.
+
+### 32.12 Alternatives use multiple bindings
+
+If one authority applies to multiple structurally different domains, the
+protocol should represent multiple bindings.
+
+Example:
+
+```text
+Binding A:
+    authority = E
+    selector:
+        schema_digest eq D1
+        region eq "ca-central-1"
+
+Binding B:
+    authority = E
+    selector:
+        schema_digest eq D2
+        tenant prefix "org-x/"
+```
+
+This is more verbose than OR, but intentionally so.
+
+It improves:
+
+- auditability;
+- revocation precision;
+- independent versioning;
+- authority reasoning;
+- implementation simplicity.
+
+### 32.13 Selector complexity bounds
+
+A conforming protocol SHOULD impose finite limits on:
+
+- selector byte size;
+- number of field constraints;
+- maximum `in` set size;
+- maximum prefix length;
+- canonical field-path depth.
+
+These are denial-of-service and implementation-consistency protections,
+not semantic features.
+
+### 32.14 Field-path semantics
+
+Field paths referenced by selectors MUST be defined by the Action schema.
+
+Selectors MUST NOT dynamically discover fields or introspect arbitrary
+nested objects.
+
+A missing field causes non-match.
+
+An unknown field path or unsupported comparison mode MUST fail closed.
+
+### 32.15 Separation from Rule
+
+The boundary is now sharp:
+
+```text
+Selector:
+    Which binding is structurally applicable?
+
+Rule:
+    Given applicable Claims and conditions, is the Action authorized?
+```
+
+Selectors may answer:
+
+```text
+this is a bank.transfer.v1 Action
+from the bank-b namespace
+in region ca-central-1
+```
+
+Selectors may not answer:
+
+```text
+the amount is safe
+the delegation is valid
+the transfer is within daily limits
+the user approved it
+the current time is allowed
+```
+
+The first set is routing.
+
+The second set is governance.
+
+### 32.16 Minimal grammar
+
+Conceptually:
+
+```text
+selector := constraint*
+
+constraint :=
+    field_path eq canonical_value
+  | field_path in finite_set<canonical_value>
+  | field_path prefix canonical_prefix
+```
+
+with all constraints conjunctive.
+
+This grammar is deliberately not Turing-complete and is not intended to
+grow toward general expression evaluation.
+
+### 32.17 Architectural conclusion
+
+The smallest selector mechanism currently justified is:
+
+> **A flat conjunctive set of exact-match, finite-membership, and
+> canonical-prefix constraints over explicitly declared Action fields.**
+
+No:
+
+```text
+all
+any
+not
+exists
+lt
+lte
+gt
+gte
+regex
+glob
+functions
+arithmetic
+external state
+nested boolean expressions
+```
+
+is required.
+
+This makes selector semantics resemble routing tables rather than policy
+programs.
+
+------------------------------------------------------------------------
+
+## 33. New Validated Architectural Findings
+
+### KV-F39 — Three Constraint Forms Are Sufficient
+
+The tested cross-domain authority scopes can be represented with `eq`,
+`in`, and `prefix` plus implicit conjunction.
+
+**Status:** PASS.
+
+### KV-F40 — Conjunction Is Structural, Not an Operator
+
+The selector container itself defines AND semantics; no `all` operator is
+required.
+
+**Status:** PASS.
+
+### KV-F41 — Disjunction Belongs at the Binding Layer
+
+Alternative scopes should be represented as multiple bindings rather than
+an `any` / OR selector operator.
+
+**Status:** PASS.
+
+### KV-F42 — Negation Is Rejected
+
+Negative selector logic is unnecessary for routing and risks converting
+applicability into policy.
+
+**Status:** PASS.
+
+### KV-F43 — Numeric and Temporal Comparisons Are Rejected
+
+Threshold conditions belong in Rules and explicit Claims, not selector
+matching.
+
+**Status:** PASS.
+
+### KV-F44 — Field Presence Is Implicit
+
+Referencing a field requires that field to exist and be canonically
+interpretable; a separate `exists` operator is unnecessary.
+
+**Status:** PASS.
+
+### KV-F45 — Selector Is Flat and Non-Recursive
+
+Nested boolean expression trees are not justified and are rejected from
+the minimum mechanism.
+
+**Status:** PASS.
+
+------------------------------------------------------------------------
+
+## 34. Updated Validation Backlog
+
+### HYP-016 — Canonical Action digest
+
+Should every Action itself carry a canonical digest derived from its
+schema digest plus canonical Action bytes, so that Claims, Rules,
+Receipts, and execution evidence can bind the exact Action without
+depending only on an implementation-assigned `action_id`?
+
+**Status:** NEXT PRESSURE TEST CANDIDATE — HIGH PRIORITY.
+
+### HYP-017 — Schema descriptor format
+
+What is the minimum canonical schema-descriptor format needed to express
+field paths, structural types, requiredness, normalization profile, and
+comparison semantics without turning the descriptor into a second schema
+language ecosystem?
+
+**Status:** OPEN.
+
+### HYP-018 — Selector binding identity
+
+Should each applicability binding itself have a canonical digest so that
+Claims, Rules, and authority delegations can refer to the exact selector
+contract without copying selector bytes?
+
+**Status:** OPEN.
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+## 35. Pressure Test: Canonical Action Digest vs. Action ID
+
+### Question
+
+Should every Action have a canonical cryptographic digest derived from
+its schema digest plus canonical Action bytes, making the Action content
+addressable? If so, does `action_id` become merely metadata rather than
+identity?
+
+### Result
+
+**PASS FOR A REQUIRED CANONICAL ACTION DIGEST.**
+
+**REJECT the conclusion that `action_id` becomes merely metadata.**
+
+The correct model is **dual identity**:
+
+```text
+action_digest = identity of the exact Action content
+action_id     = identity of the Action execution instance
+```
+
+These solve different problems and MUST NOT be conflated.
+
+### 35.1 Canonical Action digest
+
+Every Action used in authorization, authority binding, Receipt binding,
+or execution evidence SHOULD have a canonical digest derived from:
+
+```text
+action_digest = H(schema_digest || canonical_action_bytes)
+```
+
+The exact framing and domain separation MUST be protocol-defined.
+
+The digest binds the exact schema contract and the exact canonical Action
+content.
+
+### 35.2 Why schema digest must participate
+
+Hashing canonical Action bytes without binding the schema is
+insufficient because identical bytes can have different meanings under
+different schemas.
+
+Therefore schema identity MUST participate in Action content identity.
+
+### 35.3 Why `action_id` still matters
+
+Two Action instances can have identical semantic content while remaining
+distinct execution occurrences.
+
+Example:
+
+```text
+A1: transfer 100 CAD from X to Y
+A2: transfer 100 CAD from X to Y
+```
+
+If their schema and semantic payload are identical:
+
+```text
+digest(A1) == digest(A2)
+```
+
+Yet A1 and A2 may have different authorization history, execution
+attempts, Lifecycle history, Receipts, cancellation state, external
+commit references, and audit positions.
+
+### 35.4 Content identity vs. occurrence identity
+
+The protocol therefore needs both:
+
+```text
+Action Content Identity  -> action_digest
+Action Instance Identity -> action_id
+```
+
+`action_digest` answers:
+
+> Exactly what was proposed?
+
+`action_id` answers:
+
+> Which execution instance are we talking about?
+
+### 35.5 `action_id` is not semantic content
+
+Changing only `action_id` while preserving the same schema and semantic
+payload SHOULD preserve the same `action_digest`.
+
+`action_id` SHOULD NOT determine the semantic meaning of the Action.
+
+### 35.6 Semantic payload boundary
+
+A candidate representation is:
+
+```text
+Action Envelope:
+    action_id
+    schema_ref
+    action_payload
+```
+
+with:
+
+```text
+action_digest =
+    H(schema_ref.digest || canonical(action_payload))
+```
+
+Every field whose value changes the proposed execution semantics or
+applicability semantics MUST be included in `action_payload`.
+
+Pure occurrence metadata SHOULD remain outside that payload.
+
+The exact boundary requires normative definition.
+
+### 35.7 Timestamps, nonces, and correlation identifiers
+
+A timestamp, nonce, retry counter, or correlation ID MUST NOT be added to
+semantic content merely to force digest uniqueness.
+
+If the value changes Action meaning or admissibility, it belongs in the
+semantic payload and therefore the digest.
+
+If it only distinguishes execution occurrences, it belongs in the
+instance envelope associated with `action_id`.
+
+### 35.8 Claims may bind content or instance
+
+Some Claims should bind exact content:
+
+```text
+Human H approves action_digest D
+```
+
+Other Claims may intentionally bind a specific execution occurrence:
+
+```text
+Human H approves action_id A1
+```
+
+The protocol must distinguish these semantics.
+
+An approval intended to authorize exact Action content SHOULD bind the
+digest, not merely an opaque identifier.
+
+### 35.9 Receipts should bind both
+
+A strong Receipt SHOULD identify:
+
+```text
+action_id
+action_digest
+```
+
+This provides both occurrence identity and exact content identity.
+
+### 35.10 Execution evidence should bind content
+
+Commit evidence SHOULD bind `action_digest`, directly or through an
+authoritative mapping from `action_id`.
+
+This reduces substitution risk between an execution instance and
+different Action content.
+
+### 35.11 Digest equality is not idempotency
+
+Implementations MAY use the digest for equivalence detection, caching, or
+deduplication assistance.
+
+They MUST NOT assume:
+
+```text
+same action_digest => same execution instance
+```
+
+or:
+
+```text
+same action_digest => execute only once
+```
+
+unless an execution profile explicitly defines that behavior.
+
+Replay prevention and exactly-once semantics remain separate concerns.
+
+### 35.12 Hash agility
+
+The digest representation SHOULD identify its hash suite or algorithm.
+
+A single hash algorithm SHOULD NOT be permanently implicit in the
+architecture.
+
+### 35.13 Architectural conclusion
+
+The Action should become **content-addressable**, but not
+**content-identified exclusively**.
+
+Candidate invariant:
+
+> **An Action MUST have a deterministic cryptographic content identity,
+> and an execution instance MUST remain separately identifiable.**
+
+------------------------------------------------------------------------
+
+## 36. New Validated Architectural Findings
+
+### KV-F46 — Canonical Action Digest Is Required
+
+The exact semantic Action content should have a deterministic digest
+derived from the schema digest and canonical Action payload.
+
+**Status:** PASS.
+
+### KV-F47 — Schema Identity Must Be Bound Into Action Digest
+
+Canonical Action bytes without schema identity are insufficient for
+stable semantic content identity.
+
+**Status:** PASS.
+
+### KV-F48 — Action ID Remains Distinct
+
+`action_id` identifies the execution instance and does not collapse into
+mere metadata.
+
+**Status:** PASS.
+
+### KV-F49 — Digest Is Content Identity, Not Occurrence Identity
+
+Identical Action content may legitimately produce multiple independent
+Action instances with the same digest.
+
+**Status:** PASS.
+
+### KV-F50 — Receipts Should Bind ID and Digest
+
+Portable resolution evidence should identify both the execution instance
+and the exact Action content.
+
+**Status:** PASS.
+
+### KV-F51 — Digest Equality Does Not Imply Idempotency
+
+Replay prevention, deduplication, and exactly-once semantics remain
+execution/profile concerns.
+
+**Status:** PASS.
+
+### KV-F52 — Semantic Payload Boundary Must Be Explicit
+
+The protocol must distinguish semantic Action fields included in the
+digest from instance-level envelope metadata.
+
+**Status:** PASS.
+
+------------------------------------------------------------------------
+
+## 37. Updated Validation Backlog
+
+### HYP-019 — Action envelope vs. semantic payload
+
+What exact fields belong in the Action envelope versus the canonical
+semantic payload?
+
+Should `action_id`, timestamps, correlation identifiers, provenance
+references, and schema metadata sit outside the hashed semantic payload,
+and which of them—if any—must nevertheless be cryptographically bound to
+the instance?
+
+**Status:** NEXT PRESSURE TEST CANDIDATE.
+
+### HYP-020 — Receipt Action digest requirement
+
+Should VE-004 v0.2 require `action_digest` in addition to `action_id`,
+rather than leaving stronger Action binding to a future Action
+specification?
+
+**Status:** OPEN; compare with RFC-003 before accepting VE-004 v0.2.
+
+### HYP-021 — Digest suite
+
+What minimum digest-suite representation provides algorithm agility
+without unnecessary cryptographic negotiation complexity?
 
 **Status:** OPEN.
 
