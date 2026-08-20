@@ -2,7 +2,7 @@
 
 **Project:** Verified Execution\
 **Document:** Kernel Validation Record\
-**Version:** 0.5\
+**Version:** 0.6\
 **Status:** Draft / Active Validation\
 **Date:** 2026-08-19
 
@@ -1788,3 +1788,322 @@ Trust Context authority, and execution authority.
 
 The approved `VE-004 Receipt` specification still requires direct
 comparison before any RFC affecting Receipt semantics is opened.
+
+
+------------------------------------------------------------------------
+
+## 25. Specification Comparison: VE-004 v0.1 vs. Canonical Commit Requirements
+
+### Result
+
+**GAP CONFIRMED — VE-004 v0.1 is insufficient for portable canonical-commit verification.**
+
+VE-004 v0.1 correctly establishes that Receipt is immutable, portable,
+derived from authoritative Event history, and never authoritative
+history itself.
+
+However, its required fields are limited to:
+
+```text
+receipt_id
+receipt_version
+action_id
+lifecycle_version
+final_state
+created_at
+```
+
+and its execution-related references are optional.
+
+A conforming v0.1 Receipt therefore need not bind:
+
+- authoritative execution outcome distinct from Lifecycle state;
+- predecessor state;
+- successor state;
+- authoritative commit reference;
+- independently established execution authority or proof mechanism;
+- uncertainty semantics sufficient to prevent uncertain execution from
+  advancing canonical state.
+
+### Decision
+
+The gap is semantically material.
+
+RFC-003 and ADR-003 are justified.
+
+VE-004 SHOULD be revised to v0.2 and accompanied by a changelog entry.
+
+### Governance note
+
+The inspected VE-004 artifact identifies itself as `Status: Draft`.
+If repository governance treats Draft specifications as non-approved,
+the formal RFC/ADR requirement may not be strictly mandatory.
+Nevertheless, because the change is semantic, security-relevant, and
+affects a Core Primitive Specification, the full change-control sequence
+is recommended and has been prepared.
+
+------------------------------------------------------------------------
+
+## 26. Pressure Test: Canonical Action Scoping Without `Scope` or Domain Ontology
+
+### Question
+
+Can canonical Action scoping be defined strongly enough that two
+independent implementations always agree about which Claims, Rules,
+Trust Context authorities, and execution authorities apply, without
+introducing `Scope` or a domain ontology as a semantic primitive?
+
+### Result
+
+**PASS, subject to explicit canonical-schema and predicate requirements.**
+
+Neither a universal `Scope` object nor a VE-owned domain ontology is
+required.
+
+Interoperability requires an Action to carry or resolve to an explicit
+schema contract and requires applicability predicates to operate
+deterministically over the canonical representation defined by that
+schema.
+
+### Required inputs
+
+For applicability decisions, two conforming implementations require the
+same:
+
+```text
+Action bytes / canonical Action value
+Action schema identifier + version or digest
+Applicability predicate identifier / bytes
+Predicate semantics version
+Relevant Trust Context
+```
+
+Given those inputs, applicability MUST be deterministic.
+
+### Action schema, not domain ontology
+
+VE does not need to know what a bank account, repository, patient,
+message, or cloud instance means globally.
+
+A domain or application may define an Action schema such as:
+
+```text
+schema_id: bank.transfer.v1
+fields:
+    source_account
+    destination_account
+    amount
+    currency
+```
+
+The schema defines:
+
+- field names and types;
+- canonical encoding;
+- normalization rules where required;
+- comparison semantics used by applicability predicates.
+
+VE requires the schema contract to be identifiable and deterministic.
+VE does not own the ontology represented by the schema.
+
+### Applicability predicate
+
+A Claim or governance binding may carry or reference a deterministic
+predicate:
+
+```text
+applies(Action) -> true | false
+```
+
+Example:
+
+```text
+action.schema == "bank.transfer.v1"
+AND
+action.source_account.namespace == "bank-b"
+```
+
+`Scope` is therefore a useful descriptive word, but no distinct semantic
+primitive is necessary.
+
+### No hidden equivalence
+
+Two textual identifiers MUST NOT be assumed equivalent merely because a
+human considers them equivalent.
+
+For example:
+
+```text
+bank://account/123
+BANK://ACCOUNT/123
+account-123
+```
+
+are equivalent only if the referenced Action schema defines a
+normalization or identity rule that makes them equivalent.
+
+If no such rule exists, implementations MUST NOT guess.
+
+### Unknown schema or unsupported predicate
+
+Fail-closed behavior is required.
+
+If an implementation cannot resolve the required schema, canonicalize
+the relevant Action fields, or execute the applicability predicate
+according to the specified semantics, it MUST NOT treat the binding as
+applicable merely by approximation.
+
+### External state prohibited from pure applicability matching
+
+The applicability predicate that selects a Claim, Rule, Trust Context
+authority, or execution authority SHOULD be a pure deterministic
+function of declared canonical inputs.
+
+Dynamic facts such as:
+
+- current time;
+- account balance;
+- revocation status;
+- historical counts;
+
+belong in Claims or other explicitly supplied verification/evaluation
+inputs rather than hidden environment lookups during scope matching.
+
+This prevents two implementations from selecting different governance
+because their ambient state differs.
+
+### Schema evolution
+
+Action schema changes require explicit schema identity/version changes
+or a canonical compatibility mechanism.
+
+An applicability binding MUST be evaluated against the schema semantics
+it identifies, not whichever schema version an implementation happens
+to prefer.
+
+### Multi-domain Actions
+
+An Action may contain fields governed by multiple domain schemas or
+substructures.
+
+Applicability predicates may address those canonical substructures
+without forcing VE to collapse them into a single `Resource`.
+
+### Interoperability condition
+
+For the applicability layer:
+
+```text
+Same canonical Action
++ same schema semantics
++ same applicability predicate
++ same predicate semantics
+= same applicability result
+```
+
+This is sufficient for independent implementations to agree on which
+candidate bindings apply.
+
+Agreement about whether the resulting Claims verify or whether the
+Action is authorized remains the responsibility of `Verify` and
+`Evaluate`.
+
+### Candidate normative invariant
+
+> **Canonical Applicability Invariant:** Any binding whose applicability
+> affects Rule selection, Claim selection, Trust Context authority, or
+> execution authority MUST be evaluated as a deterministic predicate over
+> explicitly identified canonical inputs. A conforming implementation
+> MUST NOT infer undeclared domain equivalence or rely on hidden ambient
+> state when determining applicability.
+
+### Candidate protocol requirement
+
+> **Action Schema Requirement:** Action data used in applicability
+> decisions MUST be interpreted under an explicitly identified schema or
+> canonicalization contract sufficient for independent implementations
+> to produce the same field values and comparison results.
+
+### Primitive decision
+
+`Scope`: **not justified as a primitive.**
+
+Domain ontology: **not required by VE.**
+
+Action schema / canonicalization contract: **required protocol
+mechanism, not semantic primitive.**
+
+------------------------------------------------------------------------
+
+## 27. New Validated Architectural Findings
+
+### KV-F26 — VE-004 v0.1 Has a Canonical-Commit Gap
+
+The existing Receipt specification does not normatively carry all
+information required for portable canonical-commit verification.
+
+**Status:** PASS.
+
+### KV-F27 — Canonical Scoping Does Not Require `Scope`
+
+Applicability can be represented as deterministic predicates over
+canonical Action data.
+
+**Status:** PASS.
+
+### KV-F28 — VE Does Not Require a Domain Ontology
+
+Domain semantics can remain external schema contracts identified by
+version or digest.
+
+**Status:** PASS.
+
+### KV-F29 — Action Schema Identity Is Required for Applicability
+
+Action fields used in governance or authority selection require an
+explicit deterministic schema/canonicalization contract.
+
+**Status:** PASS.
+
+### KV-F30 — Applicability Must Fail Closed
+
+Unknown schema, unsupported predicate semantics, or ambiguous
+canonicalization MUST NOT be approximated as applicable.
+
+**Status:** PASS.
+
+### KV-F31 — Applicability Must Not Depend on Hidden Ambient State
+
+Dynamic facts affecting authorization belong in explicit Claims or
+evaluation inputs rather than implicit scope matching.
+
+**Status:** PASS.
+
+------------------------------------------------------------------------
+
+## 28. Updated Validation Backlog
+
+### HYP-013 — Action schema protocol object
+
+What is the minimum interoperable protocol representation for an Action
+schema identifier, version/digest, canonical encoding rules, and
+applicability predicate semantics?
+
+Can this be added as protocol machinery without altering the semantic
+definition of Action?
+
+**Status:** NEXT PRESSURE TEST CANDIDATE.
+
+### HYP-014 — General non-self-authorization invariant
+
+Can the repeated Rule, Trust Context, and Receipt independence findings
+be collapsed into one normative invariant:
+
+> No object or assertion may establish the authority required to
+> establish itself.
+
+Does that statement remain correct under delegation, threshold
+authority, bootstrap roots, and recursive proof systems?
+
+**Status:** OPEN.
+
