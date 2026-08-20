@@ -2,7 +2,7 @@
 
 **Project:** Verified Execution\
 **Document:** Kernel Validation Record\
-**Version:** 0.10\
+**Version:** 0.11\
 **Status:** Draft / Active Validation\
 **Date:** 2026-08-19
 
@@ -3875,5 +3875,113 @@ semantic Action payload from occurrence envelope strongly enough to
 support `action_digest` and `instance_digest`?
 
 **Status:** REQUIRES DIRECT SPECIFICATION COMPARISON BEFORE RFC.
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+## 41. Direct Specification Comparison: VE-001 v0.1
+
+### Result
+
+**SUBSTANTIVE GAP CONFIRMED.**
+
+VE-001 v0.1 correctly establishes Action immutability, historical Action identity, same-content/different-Action semantics, separation from idempotency identity, retry-vs-Action distinction, and the future need for canonical hashing.
+
+However, it conflicts with the reduced architecture by treating the following as universal required semantic fields:
+
+```text
+action_id
+created_at
+initiator
+authority_context
+target
+operation
+arguments
+scope
+```
+
+### Required corrections
+
+1. Add required `action_digest`.
+2. Add required `instance_digest`.
+3. Retain `action_id` as historical occurrence identity.
+4. Bind `schema_ref.digest` into `action_digest`.
+5. Move occurrence-only `created_at` into the Instance Envelope.
+6. Remove initiator as universally required semantic payload.
+7. Remove authority context as universally required semantic payload.
+8. Remove universal `scope`.
+9. Make effect fields schema-defined rather than a universal ontology.
+10. Make Action hashing normative rather than optional.
+
+### Governance consequence
+
+RFC-004 and ADR-004 are justified.
+
+VE-001 SHOULD advance to v0.2 before VE-004 v0.2 is finalized because Receipt identity requirements depend on the finalized Action identity model.
+
+------------------------------------------------------------------------
+
+## 42. New Validated Architectural Findings
+
+### KV-F61 — VE-001 v0.1 Has an Identity-Layer Gap
+
+The current specification lacks required canonical content identity and instance/content cryptographic binding.
+
+**Status:** PASS.
+
+### KV-F62 — Existing Action ID Semantics Remain Valuable
+
+VE-001 v0.1 historical identity maps cleanly to `action_id` as occurrence identity.
+
+**Status:** PASS.
+
+### KV-F63 — Initiator Is Over-Specified in VE-001 v0.1
+
+Initiator identity should not be universally required semantic Action content.
+
+**Status:** PASS.
+
+### KV-F64 — Authority Context Is Over-Specified in VE-001 v0.1
+
+Authority must be established independently rather than embedded as universal Action semantics.
+
+**Status:** PASS.
+
+### KV-F65 — Universal Action Scope Must Be Removed
+
+Applicability selectors over schema-defined canonical Action fields replace universal semantic `scope`.
+
+**Status:** PASS.
+
+### KV-F66 — Action Hashing Must Become Normative
+
+Optional hashing is insufficient for interoperable binding across Claims, Rules, Receipts, and execution evidence.
+
+**Status:** PASS.
+
+------------------------------------------------------------------------
+
+## 43. Updated Validation Backlog
+
+### HYP-023 — VE-004 Action binding after VE-001 v0.2
+
+Once RFC-004 / ADR-004 are accepted, should VE-004 v0.2 require all of:
+
+```text
+action_id
+action_digest
+instance_digest
+```
+
+or may a Receipt omit `instance_digest` when it is independently reconstructable from canonical Action history?
+
+**Status:** NEXT CROSS-SPECIFICATION DECISION AFTER VE-001.
+
+### HYP-024 — Canonical encoding profile
+
+Which canonical encoding profile should be used for schema descriptors, semantic payloads, and instance envelopes?
+
+**Status:** OPEN — BLOCKS FINAL DIGEST NORMATIVITY.
 
 ------------------------------------------------------------------------
