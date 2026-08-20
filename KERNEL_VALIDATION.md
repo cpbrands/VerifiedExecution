@@ -1,529 +1,661 @@
----
-id: KERNEL-VALIDATION
-title: Verified Execution Kernel Validation
-version: 0.1
-status: Draft
-
-kind: Validation
-domain: Core Kernel
-topic: Kernel Validation Program
-
-created: 2026-08-11
-updated: 2026-08-11
-
-depends_on:
-  - VE-000
-  - VE-001
-  - VE-002
-  - VE-003
-  - VE-004
-  - VE-005
-  - VE-006
-
-related_documents:
-  - SPECIFICATION_GOVERNANCE.md
-  - RFC-001
-  - RFC-002
-
-author: Verified Execution Editorial Board
----
-
 # KERNEL_VALIDATION.md
 
----
+**Project:** Verified Execution\
+**Document:** Kernel Validation Record\
+**Version:** 0.2\
+**Status:** Draft / Active Validation\
+**Date:** 2026-08-19
 
-# Purpose
+------------------------------------------------------------------------
 
-This document records the systematic validation of the Verified Execution Kernel.
+## 1. Purpose
 
-Its purpose is **not** to describe the architecture.
+This document records pressure tests, findings, rejected additions, open
+hypotheses, and architectural consequences discovered while validating
+the Verified Execution kernel.
 
-Its purpose is to record objective evidence that the architecture survives increasingly difficult attempts to invalidate it.
+It is not an authoritative specification. A finding recorded here does
+not modify an approved specification by itself.
 
-The kernel is considered trustworthy only after repeatedly surviving independent validation scenarios.
+Any normative change to an approved specification MUST follow the
+project change-control process:
 
----
+1.  RFC describing the proposed change.
+2.  Architecture Decision Record documenting the decision and reasoning.
+3.  Specification revision with a version increment.
+4.  Changelog entry describing the semantic impact.
 
-# Scope
+The development cadence remains:
 
-Kernel validation evaluates only the six core primitives.
+> Kernel Specification → Reference Scenario → Gap Analysis → RFC if
+> needed → Next Specification
 
-- Action
-- Event
-- Lifecycle
-- Receipt
-- Adapter
-- Execution Boundary
+The objective is to discover the smallest architecture that can express
+legitimate execution across domains without importing domain-specific
+concepts into the kernel.
 
-Future specifications (Policy, Identity, Verification, Security, etc.) are validated only after the kernel itself demonstrates sufficient stability.
+------------------------------------------------------------------------
 
----
+## 2. Architectural Decision Test
 
-# Validation Philosophy
+Every proposed kernel concept is tested against the following questions:
 
-Verified Execution follows an adversarial validation methodology.
+1.  Is it consistent with the Founding Principles?
+2.  Does it introduce a new architectural primitive? If so, the burden
+    of proof is very high.
+3.  Can it be removed while preserving the architecture's expressive
+    power?
+4.  Will the concept still make sense in twenty years?
+5.  Can two independent engineering teams implement it from the written
+    specification and interoperate?
+6.  Does it reduce total conceptual complexity?
 
-The objective is **not** to prove the architecture correct.
+A concept that does not survive these tests SHOULD NOT enter the kernel.
 
-The objective is to discover where it is wrong.
+------------------------------------------------------------------------
 
-Every successful scenario increases confidence.
+## 3. Current Validation Status
 
-Every failure improves the standard.
+**Assessment:** FUNCTIONALLY COHERENT, UNDER ACTIVE REDUCTION\
+**Confidence:** MODERATE\
+**Normative status:** No findings in this document modify approved
+specifications until change control is completed.
 
-Both outcomes are valuable.
+Earlier reference-scenario validation established:
 
----
+-   RS-001 through RS-004 can be represented without adding
+    scenario-specific primitives.
+-   A single semantic Action may involve multiple Adapter-level
+    execution steps.
+-   Operational uncertainty or partial progress does not by itself
+    justify an `INDETERMINATE` semantic lifecycle state.
+-   Authorized target-local recovery may remain within the original
+    Action when already contained by that Action's semantics.
+-   A later independently chosen compensating correction is a new
+    Action.
+-   Historical truth and receipts remain coherent under these
+    distinctions.
 
-# Validation Process
+### Previous open hypothesis
 
-Every validation follows the same sequence.
+**HYP-001 --- Explicit Action completion predicate**
 
-```text
-Kernel Specification
-        │
-        ▼
-Reference Scenario
-        │
-        ▼
-Specification-Based Simulation
-        │
-        ▼
-Gap Analysis
-        │
-        ▼
-Observation
-        │
-        ▼
-Hypothesis
-        │
-        ▼
-RFC (if required)
-        │
-        ▼
-Specification Revision
+An Action may require an explicit completion predicate so that execution
+infrastructure can determine when the semantic Action has completed
+despite multi-step operational mechanics.
+
+**Status:** OPEN. RFC not yet required.
+
+------------------------------------------------------------------------
+
+## 4. Kernel Reduction Under Test
+
+The current reduced semantic model under pressure test is:
+
+-   `Action`
+-   `Claim`
+-   `Rule`
+-   `Verify`
+-   `Evaluate`
+
+The following concepts are currently **not justified as kernel
+primitives**:
+
+-   Actor
+-   Resource
+-   Permission
+-   Policy
+-   Evidence
+-   State
+-   Identity
+-   Authority
+-   Delegation
+-   Human
+-   AI
+-   Trust Context
+
+This does not mean these concepts are unimportant. They may exist as
+Action data, Claim semantics, Rule content, protocol objects,
+implementation mechanisms, domain models, or environmental context
+without becoming kernel primitives.
+
+`Rule` remains a candidate primitive and has not yet survived final
+elimination testing.
+
+------------------------------------------------------------------------
+
+## 5. Semantic Separation: Verify vs. Evaluate
+
+A critical separation has emerged.
+
+### Verify
+
+`Verify` establishes whether a Claim is valid under a specified
+verification method and the applicable trust basis.
+
+Conceptually:
+
+``` text
+Verify(Claim, TrustContext)
+    → established / not established
 ```
 
-Architectural changes MUST NOT occur before completing this process.
+Verification may include, as required by the verification mechanism:
 
----
+-   integrity verification;
+-   issuer authentication;
+-   credential validity;
+-   proof or signature validation;
+-   chain validation;
+-   scope anchoring.
 
-# Validation Criteria
+`Verify` MUST NOT be interpreted merely as "the signature is
+mathematically correct."
 
-Every reference scenario is evaluated against the following questions.
+### Evaluate
 
-## Representability
+`Evaluate` determines whether a proposed Action satisfies an applicable
+Rule given established Claims.
 
-Can every consequential effect be represented by the existing primitives?
+Conceptually:
 
----
-
-## Ownership
-
-Does every responsibility belong to exactly one primitive?
-
----
-
-## Determinism
-
-Would two independent implementations derive equivalent semantic meaning?
-
----
-
-## Truthfulness
-
-Does the architecture ever require asserting something that is not actually known?
-
----
-
-## Minimality
-
-Did the scenario require a new primitive?
-
----
-
-## Consistency
-
-Do all specifications remain mutually consistent?
-
----
-
-## Reconstructability
-
-Can authoritative history reconstruct the final semantic state?
-
----
-
-## Boundary Integrity
-
-Can the protected capability be exercised without crossing the Execution Boundary?
-
----
-
-## Receipt Integrity
-
-Can a Receipt truthfully summarize terminal resolution?
-
----
-
-# Validation Maturity
-
-Kernel validation progresses through four maturity levels.
-
-```text
-Scenario Executed
-        │
-        ▼
-Observation Recorded
-        │
-        ▼
-Architectural Hypothesis
-        │
-        ▼
-Architectural Invariant
+``` text
+Evaluate(Action, EstablishedClaims, Rule)
+    → decision
 ```
 
-The kernel itself is considered stable only after multiple independent scenarios support the same invariants.
+`Verify` concerns whether assertions can be established.
 
----
+`Evaluate` concerns whether established assertions are sufficient under
+governance.
 
-# Executed Reference Scenarios
+This separation is currently considered foundational to avoiding
+circular authority reasoning.
 
----
+------------------------------------------------------------------------
 
-## RS-001 — Send Email
+## 6. Pressure Test: Communication vs. Financial Execution
 
-**Domain**
+### Question
 
-Communication
+Can:
+
+``` text
+send Cristi a message
+```
+
+and:
+
+``` text
+transfer $100 from Cristi's account
+```
+
+be represented using the same kernel semantics without special-casing
+communication?
 
 ### Result
 
-PASS
+**PASS --- no communication-specific primitive required.**
 
-### Primary Findings
+A communication request can be represented as an Action. Sender
+identity, human status, provenance, delegation, relationship, urgency,
+temporal validity, and prior activity can be represented through Claims.
+Rules can determine which conditions are required. `Verify` establishes
+relevant Claims; `Evaluate` determines whether the Action satisfies the
+governing Rule.
 
-- Kernel successfully models successful communication.
-- No ownership conflicts.
-- No additional primitive required.
+Communication exposed no irreducible semantic requirement absent from
+financial, cloud, or other execution domains.
 
-### Observations
+### General problems surfaced
 
-Completion semantics appear to require explicit definition.
+The pressure test exposed two cross-domain concerns:
 
----
+1.  **History-dependent authorization** --- e.g. daily spending limits
+    or interruption-rate limits.
+2.  **Concurrent Actions competing for constrained state** ---
+    e.g. simultaneous transfers or simultaneous requests for attention.
 
-## RS-002 — Bank Transfer (Successful Settlement)
+These are general execution-model concerns and MUST NOT be solved
+through communication-specific primitives.
 
-**Domain**
+------------------------------------------------------------------------
 
-Financial Infrastructure
+## 7. Pressure Test: Resource as a Primitive
 
-### Result
+### Question
 
-PASS
-
-### Primary Findings
-
-- Human approval path validated.
-- Settlement semantics modeled successfully.
-- Receipt remains coherent.
-
-### Observations
-
-Independent confirmation that Action completion semantics require explicit definition.
-
----
-
-## RS-003 — Bank Transfer (Uncertain Outcome)
-
-**Domain**
-
-Distributed Systems
+Does the Execution Boundary need to understand a `Resource` as a
+semantic primitive?
 
 ### Result
 
-PASS
-
-### Primary Findings
-
-- Unknown external outcome represented truthfully.
-- Existing EXECUTING semantics remain sufficient.
-- No INDETERMINATE state required.
-
-### Observations
-
-Operational progress and semantic Lifecycle State are distinct concepts.
-
----
-
-## RS-004 — Software Deployment
-
-**Domain**
-
-Infrastructure Automation
-
-### Result
-
-PASS
-
-### Primary Findings
-
-- Multi-step execution represented as one semantic Action.
-- Automatic rollback distinguished from compensating Action.
-- Immutable history preserved.
-
-### Observations
-
-Automatic target-local recovery differs fundamentally from later corrective intent.
-
----
-
-# Architectural Observations
-
----
-
-## OBS-001
-
-Completion semantics depend upon Action semantics.
-
-Evidence:
-
-- RS-001
-- RS-002
-- RS-003
-- RS-004
-
-Status:
-
-Architectural Hypothesis
-
----
-
-## OBS-002
-
-Operational progress and semantic Lifecycle State are distinct concepts.
-
-Evidence:
-
-- RS-003
-- RS-004
-
-Status:
-
-Observation
-
----
-
-## OBS-003
-
-Automatic recovery contained within authorized execution semantics remains part of the original Action.
-
-Later corrective intent becomes a new Action.
-
-Evidence:
-
-- RS-004
-
-Status:
-
-Observation
-
----
-
-# Architectural Hypotheses
-
----
-
-## HYP-001
-
-Every canonical Action requires an explicit completion predicate.
-
-Definition:
-
-The completion predicate defines the externally observable condition under which the Execution Boundary may legitimately append `EXECUTION_COMPLETED`.
-
-Evidence:
-
-- RS-001
-- RS-002
-- RS-003
-- RS-004
-
-Status:
-
-Architectural Hypothesis
-
-RFC Required:
-
-Not yet.
-
-One additional independent domain is recommended before proposing a normative specification change.
-
----
-
-# Falsified Hypotheses
-
----
-
-## FAL-001
-
-Hypothesis:
-
-The Lifecycle requires an `INDETERMINATE` state.
-
-Evidence:
-
-RS-003
-
-Result:
-
-Rejected.
-
-Reason:
-
-Existing `EXECUTING` semantics truthfully represent execution whose terminal outcome has not yet become authoritative.
-
-Status:
-
-Closed
-
----
-
-# Kernel Confidence Matrix
-
-| Domain | Status |
-|---------|--------|
-| Communication | PASS |
-| Finance | PASS |
-| Distributed Failure | PASS |
-| Software Deployment | PASS |
-| Physical Systems | Pending |
-| Robotics | Pending |
-| Medical Systems | Pending |
-| Legal Systems | Pending |
-
----
-
-# Kernel Metrics
-
-Current metrics:
-
-| Metric | Value |
-|----------|------:|
-| Core primitives | 6 |
-| Executed scenarios | 4 |
-| Successful scenarios | 4 |
-| New primitives introduced | 0 |
-| Ownership conflicts | 0 |
-| Lifecycle states added | 0 |
-| Architectural hypotheses | 1 |
-| Architectural observations | 3 |
-| Falsified hypotheses | 1 |
-| RFCs required from validation | 0 |
-
----
-
-# Exit Criteria for Kernel Stability
-
-The kernel may be considered **v1.0 Stable** only if all of the following conditions are satisfied.
-
-## Validation Coverage
-
-At least:
-
-- 10 executed reference scenarios
-
-covering materially different domains.
-
----
-
-## Domain Diversity
-
-The scenarios SHALL include:
-
-- communication
-- finance
-- software
-- robotics
-- healthcare
-- legal
-- physical infrastructure
-- identity / authentication
-- autonomous AI
-- distributed systems
-
----
-
-## Architectural Integrity
-
-Validation SHALL demonstrate:
-
-- zero ownership conflicts,
-- zero primitive additions,
-- no unresolved semantic contradictions.
-
----
-
-## Independent Reproducibility
-
-At least two independent implementations SHALL successfully replay the canonical scenarios and derive equivalent semantic results.
-
----
-
-## Editorial Review
-
-All discovered hypotheses SHALL be either:
-
-- promoted to invariant,
-- rejected,
-- or explicitly retained as open questions.
-
----
-
-# Current Assessment
-
-Kernel Status:
-
-```text
-FUNCTIONALLY COHERENT
+**PASS FOR ELIMINATION --- `Resource` is not currently justified as a
+kernel primitive.**
+
+A proposed Action can contain the identifiers, targets, parameters,
+namespaces, capabilities, or affected objects necessary for Claims and
+Rules to refer to the proposed execution.
+
+Examples:
+
+``` text
+Action:
+    type: bank.transfer
+    source_account: account-X
+    destination_account: account-Y
+    amount: 100 CAD
 ```
 
-Confidence Level:
-
-```text
-MODERATE
+``` text
+Action:
+    type: communication.request_interrupt
+    target: person-X
+    payload_hash: ...
 ```
 
-Justification:
+The kernel need not possess a universal ontology for "resource."
 
-The kernel has successfully survived validation across four materially different domains without requiring architectural expansion.
+### Rationale
 
-However, broader domain coverage and independent implementation evidence are still required before declaring architectural stability.
+`Resource` had been carrying several separable meanings:
 
----
+-   thing affected;
+-   locus of authority;
+-   state-bearing object;
+-   Rule attachment point;
+-   protected capability.
 
-# Next Validation Scenario
+No expressive power has yet been identified that requires these meanings
+to be collapsed into one kernel primitive.
 
-RS-005 — Robotic Arm Command
+Multi-target Actions further weaken a single-Resource abstraction.
 
-Purpose:
+### Architectural consequence
 
-Determine whether the kernel remains coherent when consequences become physical and partially irreversible.
+Previous language such as:
 
-Key questions:
+> The Resource defines which authorities it recognizes.
 
-- Does one Action remain sufficient?
-- Can cancellation semantics remain truthful after motion begins?
-- Does physical execution require new primitives?
-- Does the completion predicate hypothesis survive?
+is insufficiently precise for the reduced model.
 
----
+The unresolved problem becomes:
 
-# Foundational Rule
+> How is the Rule governing a proposed Action authoritatively
+> established?
 
-> **Architecture earns trust by surviving attempts to invalidate it.**
+------------------------------------------------------------------------
 
-Kernel validation exists to measure that survival objectively.
+## 8. Pressure Test: Rule Applicability as a Claim
 
-Confidence in the Verified Execution Standard increases through evidence, not optimism.
+### Question
+
+Can Rule applicability itself be represented as a Claim without causing
+infinite regress?
+
+Example:
+
+``` text
+Claim:
+    Rule R governs Action A
+```
+
+### Result
+
+**PASS, subject to a bootstrap constraint.**
+
+Rule applicability MAY be represented by a Claim, but the authority of
+that Claim cannot be established by an unbounded sequence of ordinary
+Rules and Claims.
+
+The verification chain MUST terminate in a non-derived trust commitment
+recognized by the Execution Boundary's verification environment.
+
+### Finding
+
+A Rule cannot be considered applicable merely because the Rule, the
+actor, or an untrusted Claim says that it is applicable.
+
+Otherwise an attacker could supply an `ALLOW` Rule and use that Rule to
+establish its own authority.
+
+### Security finding: non-self-authorization
+
+Candidate normative invariant:
+
+> **No Rule may establish, directly or indirectly, its own authority to
+> govern an Action. Rule applicability MUST derive from Claims verified
+> against a Trust Context selected independently of that Rule.**
+
+Related bootstrap invariant:
+
+> **Every verification chain used to establish governance MUST terminate
+> in a trust root recognized by the applicable Trust Context.**
+
+**Status:** VALIDATED FINDING; NOT YET NORMATIVE.
+
+These statements SHOULD remain in kernel validation until the Trust
+Context and trust-evolution pressure tests are complete. Promotion into
+an approved specification requires the project change-control process.
+
+------------------------------------------------------------------------
+
+## 9. Bootstrap Authority vs. Derived Authority
+
+The Rule-applicability test exposed two distinct authority layers.
+
+### Bootstrap authority
+
+Defines the non-derived roots recognized by an Execution Boundary for a
+relevant scope.
+
+It answers:
+
+> Which roots does this boundary begin by recognizing?
+
+### Derived authority
+
+Represents authority relationships established from those roots,
+including:
+
+-   control;
+-   delegation;
+-   approval;
+-   organizational authority;
+-   provenance;
+-   permissions;
+-   constraints;
+-   subordinate authority.
+
+Derived authority can be expressed through Claims and verified chains.
+
+Bootstrap authority cannot be recursively derived forever from ordinary
+Claims without hiding the base case.
+
+### Finding
+
+Verified Execution MUST consume bootstrap authority rather than
+manufacture it.
+
+------------------------------------------------------------------------
+
+## 10. Pressure Test: Trusted Setup / Trust Context
+
+### Question
+
+Can trusted setup remain outside the kernel, or is bootstrap trust
+sufficiently fundamental to interoperability that it must become a
+kernel primitive?
+
+### Result
+
+**PASS FOR EXCLUSION FROM THE SEMANTIC KERNEL, WITH AN EXPLICIT-PROTOCOL
+REQUIREMENT.**
+
+The actual roots trusted by different Execution Boundaries MUST be
+allowed to differ. Global agreement on trusted authorities would
+improperly turn Verified Execution into an authority.
+
+However, leaving the trust basis implicit or entirely
+implementation-private would damage:
+
+-   reproducibility;
+-   interoperability;
+-   auditability;
+-   governance;
+-   debugging;
+-   portability.
+
+### Terminology
+
+`Trust Context` is preferred over `Trusted Setup`.
+
+A Trust Context represents the bounded trust assumptions against which
+verification occurs, including as applicable:
+
+-   recognized trust roots;
+-   authority scopes;
+-   verification parameters;
+-   credential-chain requirements;
+-   relevant trust-context version or identifier.
+
+### Current classification
+
+`Trust Context` is **not justified as a semantic kernel primitive**.
+
+It is currently classified as **required protocol context** supplied to
+`Verify`.
+
+Conceptually:
+
+``` text
+Trust Context T
+       |
+       v
+Verify(Claim, T)
+       |
+       v
+Established Claim
+       |
+       v
+Evaluate(Action, Claims, Rule)
+```
+
+### Interoperability requirement
+
+Two conforming implementations are not required to trust the same roots.
+
+They SHOULD, however, reach the same result when given:
+
+-   the same Action;
+-   the same Claims and proofs;
+-   the same Rule;
+-   the same Trust Context;
+-   the same relevant deterministic inputs.
+
+### Trust Context independence
+
+A candidate Rule MUST NOT be permitted to select the Trust Context used
+to prove that Rule's own applicability.
+
+Likewise, an Action or actor MUST NOT be able to replace the boundary's
+accepted Trust Context merely by supplying a different one.
+
+The trust basis used for governance verification must be selected or
+accepted independently of the candidate Rule whose authority depends on
+it.
+
+### Auditability hypothesis
+
+Authorization records may need to bind the decision to an identifier or
+digest of the Trust Context used during verification.
+
+Candidate form:
+
+``` text
+Action hash
+Claim hashes
+Rule hash
+Trust Context identifier/digest
+Verify results
+Evaluate result
+relevant time/context
+```
+
+**Status:** OPEN as to whether this binding is a `MUST` or `SHOULD`.
+
+------------------------------------------------------------------------
+
+## 11. Current Kernel Boundary
+
+The current working architectural boundary is:
+
+### Inside the semantic kernel
+
+``` text
+Action
+Claim
+Rule
+Verify
+Evaluate
+```
+
+### Immediately outside the semantic kernel
+
+``` text
+Trust Context
+Executor
+external state
+cryptographic mechanisms
+serialization / wire format
+domain-specific target and resource models
+```
+
+Items outside the semantic kernel may still require protocol
+specifications. "Outside the kernel" does not mean "unspecified."
+
+------------------------------------------------------------------------
+
+## 12. Validated Architectural Findings
+
+### KV-F01 --- Communication Generalizes to Execution
+
+Communication access can be represented as an Action governed through
+the same Claim/Rule/Verify/Evaluate semantics used for financial and
+infrastructure actions.
+
+**Status:** PASS.
+
+### KV-F02 --- Resource Is Not Currently Irreducible
+
+No tested scenario requires `Resource` as a kernel primitive when target
+and scope information can be represented within Action data and
+referenced by Claims and Rules.
+
+**Status:** CANDIDATE ELIMINATED.
+
+### KV-F03 --- Rule Applicability Requires Independent Authority
+
+A Rule cannot establish its own applicability. Applicability must derive
+from independently established authority.
+
+**Status:** PASS; candidate security invariant.
+
+### KV-F04 --- Verification Chains Require a Base Case
+
+Governance verification cannot recurse indefinitely through Claims and
+Rules. It must terminate in a non-derived trust commitment.
+
+**Status:** PASS.
+
+### KV-F05 --- Trust Choice and Protocol Semantics Are Distinct
+
+Different Execution Boundaries may recognize different trust roots
+without violating protocol interoperability.
+
+**Status:** PASS.
+
+### KV-F06 --- Trust Context Must Be Explicit
+
+The trust basis used by `Verify` cannot remain an invisible
+implementation detail if decisions are to be reproducible and auditable.
+
+**Status:** PASS.
+
+### KV-F07 --- Trust Context Is Not Yet a Kernel Primitive
+
+Explicit Trust Context is required for verification but can remain
+protocol context rather than a semantic primitive.
+
+**Status:** PASS FOR EXCLUSION.
+
+------------------------------------------------------------------------
+
+## 13. Open Questions / Validation Backlog
+
+### HYP-001 --- Explicit Action completion predicate
+
+Does every Action require a normative completion predicate?
+
+**Status:** OPEN.
+
+### HYP-002 --- History-dependent authorization
+
+Can historical limits and cumulative constraints be represented through
+Claims and external state without introducing kernel state semantics?
+
+**Status:** OPEN.
+
+### HYP-003 --- Concurrent Actions
+
+Can multiple individually authorized Actions competing for constrained
+external state be handled entirely at execution/commit semantics without
+expanding the authorization kernel?
+
+**Status:** OPEN.
+
+### HYP-004 --- Rule as primitive
+
+Can `Rule` itself be eliminated by treating `Evaluate` as execution of
+an externally supplied deterministic function identified by hash, or
+does naming Rule materially improve interoperability, auditability,
+governance, and reproducibility?
+
+**Status:** OPEN.
+
+### HYP-005 --- Trust Context binding
+
+Must every authorization decision cryptographically bind the exact Trust
+Context identifier/digest used during verification?
+
+**Status:** OPEN.
+
+### HYP-006 --- Trust evolution
+
+If Trust Context determines recognized roots, who is authorized to
+update that Trust Context for:
+
+-   revocation;
+-   key rotation;
+-   compromise;
+-   ownership transfer;
+-   organizational change;
+-   emergency recovery?
+
+Can trust evolution remain outside the semantic kernel without
+introducing a higher-level governance primitive or circular authority?
+
+**Status:** NEXT PRESSURE TEST.
+
+------------------------------------------------------------------------
+
+## 14. Current Assessment
+
+The reduced kernel continues to survive cross-domain pressure testing
+without requiring domain-specific primitives.
+
+The strongest current candidate semantic kernel is:
+
+``` text
+Action + Claim + Rule + Verify + Evaluate
+```
+
+The current evidence suggests:
+
+-   `Resource` does not need kernel status.
+-   communication does not need special semantics;
+-   identity, authority, delegation, human status, AI status,
+    provenance, and permissions can be represented through Claims and
+    Rules;
+-   Rule applicability can be Claim-driven;
+-   governance verification must terminate in independently selected
+    trust roots;
+-   Trust Context is necessary and must be explicit, but is not
+    currently justified as a semantic primitive.
+
+No RFC is opened by this document alone.
+
+The next pressure test is trust evolution: whether revocation, key
+rotation, compromise, ownership transfer, and emergency recovery can
+update Trust Context without creating circular authority or requiring
+another semantic primitive.
