@@ -2,7 +2,7 @@
 
 **Project:** Verified Execution\
 **Document:** Kernel Validation Record\
-**Version:** 0.16\
+**Version:** 0.17\
 **Status:** Draft / Active Validation\
 **Date:** 2026-08-19
 
@@ -6070,5 +6070,661 @@ using the same bounded-memory machinery while supporting all required
 field and selector semantics?
 
 **Status:** OPEN.
+
+------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------
+
+## 58. Pressure Test: Cryptographic Domain Separation and Framing
+
+### Question
+
+What exact domain-separation and framing construction should VE use so
+Action, Claim, Rule descriptor, Receipt, Schema, and Trust-transition
+objects can be streamed into cryptographic identity and signatures
+without:
+
+- concatenation ambiguity;
+- cross-object substitution;
+- digest/signature role confusion;
+- dependence on one hash function forever;
+- requiring a second pass over large canonical objects?
+
+### Result
+
+**PASS — use one fixed-width typed streaming hash frame for object
+identity, then sign an algorithm-tagged Digest Reference rather than
+rehashing/reframing the full object.**
+
+The construction has two layers:
+
+```text
+Layer A — Object Digest Frame
+canonical object bytes
+        |
+        v
+VE Hash Frame v1
+        |
+        v
+algorithm-tagged Digest Reference
+
+Layer B — Signature Binding Frame
+Digest Reference
+        |
+        v
+VE Signature Frame v1
+        |
+        v
+signature algorithm
+```
+
+This separates:
+
+```text
+object canonicalization
+object cryptographic identity
+signature authentication
+```
+
+and preserves streaming verification.
+
+### 58.1 Raw concatenation is prohibited
+
+VE MUST NOT define cryptographic identity using ambiguous constructions
+such as:
+
+```text
+H(type || version || payload)
+```
+
+when any field has variable length and no injective framing rule.
+
+Domain-separation context MUST have one unambiguous encoding.
+
+RFC 9380's general domain-separation analysis demonstrates why distinct
+logical tuples must map injectively to distinct hash inputs and why raw
+concatenation of variable-length components is unsafe.
+
+### 58.2 Object Digest Frame v1
+
+Candidate exact byte framing:
+
+```text
+VE_HASH_FRAME_V1 :=
+    magic[4]
+ || frame_version[1]
+ || purpose[1]
+ || object_type[2]
+ || representation_profile[2]
+ || hash_suite[2]
+ || canonical_object_body
+```
+
+All integer header fields are unsigned big-endian fixed-width integers.
+
+Profile-1 values:
+
+```text
+magic                  = ASCII "VEH1"
+frame_version          = 0x01
+purpose                = 0x01   ; OBJECT_DIGEST
+representation_profile = assigned Profile-1 identifier
+hash_suite             = assigned digest-suite identifier
+object_type            = stable VE cryptographic object-type identifier
+```
+
+The header is exactly 12 bytes.
+
+`canonical_object_body` is exactly one complete object encoded under the
+declared VE Canonical Representation Profile.
+
+Trailing bytes are prohibited.
+
+Because:
+
+- the header has fixed field boundaries; and
+- canonical CBOR is self-delimiting;
+
+the full framed hash input is injectively parseable without carrying the
+body length in the prefix.
+
+This preserves single-pass hashing.
+
+### 58.3 Object type identifiers
+
+Cryptographic object types require stable numeric identifiers.
+
+Candidate initial object classes include:
+
+```text
+SCHEMA_DESCRIPTOR
+ACTION_CONTENT
+CLAIM
+RULE_DESCRIPTOR
+RECEIPT
+TRUST_TRANSITION
+```
+
+Additional types require governance.
+
+This registry is a cryptographic framing registry, not a semantic domain
+ontology.
+
+An object type identifier MUST NOT be inferred from the contents of the
+body.
+
+### 58.4 Object-specific canonical body
+
+The common hash frame does not decide which fields define an object's
+identity.
+
+Each object specification defines the canonical body supplied to the
+frame.
+
+Example Action content identity:
+
+```text
+ActionDigestBody := [
+    schema_digest_reference,
+    semantic_payload
+]
+```
+
+encoded as one canonical Profile-1 value.
+
+Then:
+
+```text
+action_digest =
+    H_suite(
+        VE_HASH_FRAME_V1(
+            object_type = ACTION_CONTENT,
+            body = canonical(ActionDigestBody)
+        )
+    )
+```
+
+This replaces ambiguous conceptual formulas such as:
+
+```text
+H(schema_digest || canonical_payload)
+```
+
+with one structurally framed canonical body.
+
+### 58.5 Schema digest bootstrap
+
+A Schema descriptor body is canonically encoded and framed as:
+
+```text
+object_type = SCHEMA_DESCRIPTOR
+body        = canonical(schema_descriptor_body)
+```
+
+The descriptor body does not contain its own digest.
+
+The resulting Digest Reference identifies the schema.
+
+This terminates schema identity without self-reference.
+
+### 58.6 Digest Reference
+
+A digest MUST carry algorithm identity.
+
+Candidate abstract representation:
+
+```text
+DigestReference := {
+    suite_id,
+    digest_bytes
+}
+```
+
+The canonical wire representation is defined by the applicable object
+schema / Canonical Representation Profile.
+
+The digest suite determines:
+
+- hash/XOF algorithm;
+- output length;
+- security parameters;
+- any suite-specific initialization rules.
+
+A bare digest byte string is not a complete VE cryptographic identity.
+
+### 58.7 Hash agility
+
+The `hash_suite` field is included both:
+
+1. in the Hash Frame input; and
+2. in the resulting Digest Reference.
+
+Therefore a digest computed under Suite A cannot be silently relabeled
+as Suite B.
+
+Hash upgrades create a new Digest Reference for the same semantic
+canonical object.
+
+They do not change the semantic object itself.
+
+The protocol MUST NOT define one hash function as eternally implicit.
+
+### 58.8 Why no body-length prefix is required
+
+A length prefix for `canonical_object_body` would force a streaming
+implementation either to:
+
+```text
+know total canonical body byte length before hashing
+```
+
+or:
+
+```text
+perform a preliminary counting pass
+```
+
+Neither is necessary.
+
+The header has fixed length, and RFC 8949 CBOR data items are
+self-delimiting.
+
+Profile 1 additionally requires exactly one top-level canonical item and
+forbids trailing bytes.
+
+Therefore:
+
+```text
+fixed header || one canonical CBOR item
+```
+
+has an unambiguous parse boundary while allowing the item to be hashed as
+it arrives.
+
+### 58.9 Signature construction
+
+VE SHOULD NOT require signature algorithms to process the entire
+canonical object again.
+
+Instead, a signature authenticates a Digest Reference through a
+separate typed Signature Binding Frame.
+
+Candidate exact byte framing:
+
+```text
+VE_SIGNATURE_FRAME_V1 :=
+    magic[4]
+ || frame_version[1]
+ || purpose[1]
+ || object_type[2]
+ || representation_profile[2]
+ || signature_suite[2]
+ || digest_suite[2]
+ || digest_bytes
+```
+
+Profile-1 values:
+
+```text
+magic         = ASCII "VES1"
+frame_version = 0x01
+purpose       = 0x01   ; OBJECT_DIGEST_SIGNATURE
+```
+
+The signature suite determines the expected digest-reference length or
+the referenced digest suite determines digest length.
+
+A signature algorithm signs these exact frame bytes.
+
+The signed frame is small and independent of original object size.
+
+### 58.10 Why the signature frame includes object type
+
+Although the object Digest Reference already derives from a typed Hash
+Frame, including object type again in the signature frame gives explicit
+defense in depth and makes the signature's intended cryptographic role
+locally inspectable.
+
+An ACTION_CONTENT signature cannot be interpreted as a RECEIPT signature
+without changing signed bytes.
+
+### 58.11 Signature suite agility
+
+`signature_suite` is explicit and participates in the signature input
+frame.
+
+A Signature Reference / envelope MUST also identify the signature suite.
+
+Therefore signature-algorithm upgrades do not alter object identity.
+
+Object digest suite and signature suite are independent.
+
+For example:
+
+```text
+same Action Digest Reference
+    may be signed using Signature Suite S1
+    and Signature Suite S2
+```
+
+during migration.
+
+### 58.12 Approval semantics
+
+A bare signature over `ACTION_CONTENT` MUST NOT automatically mean:
+
+```text
+human approval
+```
+
+unless the signed object's semantics say so.
+
+Approval should normally be represented as a Claim whose semantic body
+states the approval and binds the relevant:
+
+```text
+action_digest
+```
+
+or:
+
+```text
+(action_id, action_digest)
+```
+
+Then the signer signs the CLAIM object, not the Action and an implicit
+out-of-band role.
+
+This keeps semantic role in Claim semantics rather than cryptographic
+framing.
+
+### 58.13 Occurrence-specific artifacts
+
+An artifact concerning one particular Action occurrence includes
+`action_id` and `action_digest` in its canonical semantic body as required
+by the Occurrence/Content Binding Invariant.
+
+The artifact then receives its own typed object digest.
+
+Therefore the generic cryptographic layer does not need an
+`instance_digest` or special Action-instance framing primitive.
+
+### 58.14 Representation-profile binding
+
+The Hash Frame includes the canonical representation profile identifier.
+
+This prevents the same logical object encoded under two different
+canonicalization profiles from being mistaken for the same framed byte
+identity.
+
+Historical Digest References remain reproducible because the profile
+identifier is immutable within the digest frame.
+
+### 58.15 Profile upgrades
+
+A representation profile upgrade changes:
+
+```text
+representation_profile
+```
+
+and therefore object Digest References even if semantic object values are
+unchanged.
+
+This is intentional.
+
+Semantic equality across profiles may be established at a higher layer,
+but cryptographic byte identity is profile-specific.
+
+### 58.16 Digest-suite registry
+
+VE requires a stable digest-suite identifier space.
+
+The suite identifier MAY be a compact fixed-width numeric code.
+
+The registry must define at least:
+
+```text
+suite ID
+algorithm
+output length
+security status
+parameters
+```
+
+The registry is protocol machinery and does not introduce a semantic
+primitive.
+
+Retired suites remain identifiable for historical verification.
+
+### 58.17 Object-type registry
+
+VE requires a stable cryptographic object-type identifier space.
+
+The registry should be intentionally small.
+
+New semantic domains such as:
+
+```text
+bank transfer
+GitHub write
+medical record
+message
+```
+
+do NOT receive cryptographic object-type identifiers merely because they
+exist.
+
+Those are Action-schema domains.
+
+The object-type registry represents VE protocol artifact classes only.
+
+### 58.18 Concatenation ambiguity proof sketch
+
+For Object Digest Frame v1:
+
+```text
+header = fixed 12 bytes
+body   = exactly one self-delimiting canonical CBOR item
+```
+
+No two distinct tuples:
+
+```text
+(frame_version,
+ purpose,
+ object_type,
+ representation_profile,
+ hash_suite,
+ canonical_object_body)
+```
+
+produce the same pre-hash byte string unless their corresponding fields
+and canonical body bytes are identical.
+
+Therefore framing is injective before relying on hash collision
+resistance.
+
+### 58.19 Cross-type substitution
+
+Because `object_type` participates in the preimage:
+
+```text
+Digest(ACTION_CONTENT, B)
+!=
+Digest(RECEIPT, B)
+```
+
+except with cryptographic hash collision probability.
+
+Likewise, `purpose` prevents the same framing namespace from later being
+silently reused for a different cryptographic operation.
+
+### 58.20 Streaming property
+
+A verifier can:
+
+```text
+initialize H_suite
+hash fixed 12-byte frame header
+stream-validate and hash canonical body bytes
+finalize digest
+```
+
+in one pass.
+
+No body buffering or preliminary length computation is required.
+
+Signature creation/verification then operates only on the small Signature
+Binding Frame containing the Digest Reference.
+
+### 58.21 Relationship to COSE
+
+COSE demonstrates the value of explicit signature context strings and
+structured signing inputs.
+
+VE may later use COSE as a signature envelope/transport mechanism.
+
+However, VE object identity should remain defined independently through
+the VE Hash Frame so:
+
+- Action/Claim/Receipt identity is not coupled to one signature format;
+- unsigned objects still have cryptographic identity;
+- large canonical objects are streamed once;
+- multiple signature suites or envelopes can authenticate the same Digest
+  Reference.
+
+### 58.22 Architectural conclusion
+
+The minimum robust construction is:
+
+```text
+Canonical VE Object
+        |
+        v
+fixed-width typed VE Hash Frame
+        |
+        v
+algorithm-tagged Digest Reference
+        |
+        v
+optional typed VE Signature Binding Frame
+        |
+        v
+signature
+```
+
+This provides:
+
+- injective framing;
+- explicit domain separation;
+- cross-object substitution resistance;
+- representation-profile binding;
+- hash agility;
+- signature-suite agility;
+- one-pass object hashing;
+- independence between object identity and authentication format.
+
+------------------------------------------------------------------------
+
+## 59. New Validated Architectural Findings
+
+### KV-F107 — Cryptographic Framing Must Be Injective Before Hashing
+
+VE must not rely on ambiguous raw concatenation for domain separation or
+object digest construction.
+
+**Status:** PASS.
+
+### KV-F108 — Fixed-Width Typed Hash Frame Preserves Streaming
+
+A fixed-size framing header followed by exactly one self-delimiting
+canonical object provides unambiguous one-pass digest input.
+
+**Status:** PASS.
+
+### KV-F109 — Object Type Is Cryptographically Bound
+
+VE protocol artifact class participates in the digest preimage, preventing
+cross-type substitution.
+
+**Status:** PASS.
+
+### KV-F110 — Representation Profile Is Cryptographically Bound
+
+Canonicalization-profile identity participates in the digest preimage.
+
+**Status:** PASS.
+
+### KV-F111 — Hash Suite Is Explicit and Bound
+
+Digest algorithm/output suite identity participates in both the digest
+frame and resulting Digest Reference.
+
+**Status:** PASS.
+
+### KV-F112 — Signature Authentication Is Separated From Object Identity
+
+Object identity is computed once; signatures authenticate a typed Digest
+Reference rather than redefining object identity.
+
+**Status:** PASS.
+
+### KV-F113 — Signature Suite Is Independently Agile
+
+Signature-algorithm migration does not require changing semantic object
+identity or its Digest Reference.
+
+**Status:** PASS.
+
+### KV-F114 — Semantic Roles Must Not Be Inferred From Bare Signatures
+
+Approval, delegation, authority, and similar meaning belongs in signed
+Claim/object semantics, not implicit signature context.
+
+**Status:** PASS.
+
+### KV-F115 — No Body-Length Prefix Is Required
+
+Fixed framing plus one self-delimiting Profile-1 CBOR body preserves
+injectivity without a precomputed object byte length.
+
+**Status:** PASS.
+
+------------------------------------------------------------------------
+
+## 60. Updated Validation Backlog
+
+### HYP-044 — Frame identifier widths
+
+Are fixed 16-bit identifier spaces for object type, representation
+profile, digest suite, and signature suite sufficient and preferable to
+canonical varints or content-addressed identifiers?
+
+**Status:** OPEN — LOW ARCHITECTURAL RISK.
+
+### HYP-045 — Initial digest suite
+
+Which initial digest suite should Profile 1 require, and what minimum
+security properties should future suites satisfy?
+
+**Status:** OPEN — CRYPTOGRAPHIC STANDARDS DECISION.
+
+### HYP-046 — Signature envelope
+
+Should VE standardize a native minimal signature envelope, adopt COSE
+structures, or define only the signed-frame bytes and allow multiple
+transport envelopes?
+
+**Status:** OPEN.
+
+### HYP-047 — RFC-005 readiness
+
+Do KV-F67 through KV-F115 now justify opening RFC-005 for VE Canonical
+Representation Profile 1 and Cryptographic Framing, with exact resource
+limits and initial suite selections as explicit approval gates?
+
+**Status:** READY FOR GOVERNANCE REVIEW.
 
 ------------------------------------------------------------------------
