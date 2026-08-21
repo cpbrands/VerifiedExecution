@@ -2,7 +2,7 @@
 
 **Project:** Verified Execution\
 **Document:** Kernel Validation Record\
-**Version:** 0.17\
+**Version:** 0.18\
 **Status:** Draft / Active Validation\
 **Date:** 2026-08-19
 
@@ -6726,5 +6726,442 @@ Representation Profile 1 and Cryptographic Framing, with exact resource
 limits and initial suite selections as explicit approval gates?
 
 **Status:** READY FOR GOVERNANCE REVIEW.
+
+------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------
+
+## 61. Pressure Test: Signature Semantics vs. Signature Transport Envelope
+
+### Question
+
+Should VE standardize only the signed bytes and Digest Reference
+semantics while allowing COSE, JWS, CMS, or other envelopes for
+transport, or does interoperability require VE to standardize one
+signature envelope as well?
+
+### Result
+
+**PASS — VE should standardize a minimal canonical Signature Record, but
+MUST NOT require one external transport/security envelope such as COSE
+as the sole representation of a VE signature.**
+
+The architecture has three distinct layers:
+
+```text
+1. Signature Input
+   exact bytes authenticated by the signature algorithm
+
+2. VE Signature Record
+   canonical interoperable record of:
+       what was signed
+       which signature suite was used
+       which signer/key reference applies
+       what signature bytes resulted
+
+3. Transport / Security Envelope
+   optional COSE / JWS / CMS / protocol-specific packaging
+```
+
+Layer 2 is required for VE-native interoperability.
+
+Layer 3 is not.
+
+### 61.1 Why signed bytes alone are insufficient
+
+Suppose VE standardizes only:
+
+```text
+VE_SIGNATURE_FRAME_V1
+```
+
+and says:
+
+> transport the resulting signature however you want.
+
+A recipient still needs to determine, interoperably:
+
+```text
+signature_suite
+signature_bytes
+signing_key / signer reference
+Digest Reference being authenticated
+signature-record version
+```
+
+If every transport chooses different locations and conventions for those
+facts, two independent VE implementations require transport-specific
+adapters before they can even invoke the same verification semantics.
+
+Therefore VE needs one canonical protocol artifact representing the
+signature result.
+
+### 61.2 Why a mandatory COSE envelope is also too strong
+
+COSE is a mature IETF security-envelope standard, but its signature
+semantics are defined through its own `Sig_structure`, protected header
+buckets, external AAD, payload/detached-payload rules, and algorithm
+headers.
+
+If VE made COSE_Sign1 the definition of a VE signature:
+
+- VE signature identity would become coupled to COSE framing;
+- alternative signature transports would need to reproduce COSE
+  semantics even when COSE itself is not otherwise needed;
+- VE object authentication would inherit protected-header and external
+  AAD semantics that are not necessary to the VE kernel;
+- cryptographic migration away from COSE packaging would become a VE
+  specification change.
+
+That violates the removability and complexity tests.
+
+### 61.3 VE Signature Input
+
+The exact bytes authenticated by a VE signature remain the typed
+Signature Binding Frame:
+
+```text
+VE_SIGNATURE_FRAME_V1 :=
+    magic[4]
+ || frame_version[1]
+ || purpose[1]
+ || object_type[2]
+ || representation_profile[2]
+ || signature_suite[2]
+ || digest_suite[2]
+ || digest_bytes
+```
+
+The signature algorithm consumes these exact bytes.
+
+The signature semantics therefore do not depend on any external
+envelope.
+
+### 61.4 VE Signature Record
+
+VE SHOULD define one canonical Signature Record as a normal Profile-1
+object.
+
+Candidate semantic structure:
+
+```text
+SignatureRecord := {
+    record_version,
+    object_type,
+    representation_profile,
+    digest_reference,
+    signature_suite,
+    signer_reference,
+    signature_bytes
+}
+```
+
+Optional fields MAY later include key or credential references only when
+their semantics are explicitly defined.
+
+The Signature Record MUST NOT duplicate arbitrary transport headers.
+
+### 61.5 What the Signature Record means
+
+A valid Signature Record establishes only that the holder of the signing
+key corresponding to `signer_reference` produced `signature_bytes` under
+`signature_suite` over the exact VE Signature Binding Frame derived from
+the included Digest Reference and object context.
+
+It does **not** by itself establish:
+
+```text
+approval
+authority
+delegation
+identity legitimacy
+permission
+execution
+commit
+```
+
+Those meanings belong to signed Claims and verification context.
+
+### 61.6 Signer reference
+
+Portable verification requires the Signature Record to identify or
+reference the signing key / signer sufficiently for the applicable Trust
+Context to resolve verification authority.
+
+The Signature Record MUST NOT establish the authority of its own signer.
+
+Signer authority remains independently verified.
+
+### 61.7 Raw signature bytes
+
+The Signature Record carries the algorithm-defined raw signature result.
+
+The signature suite specification defines the exact encoding of
+`signature_bytes`.
+
+Signature-suite identity therefore includes signature-value encoding
+semantics.
+
+### 61.8 Transport envelopes
+
+A VE Signature Record MAY be transported:
+
+```text
+bare Profile-1 CBOR
+inside COSE
+inside an HTTP body
+inside a database row
+inside another VE object
+inside a messaging protocol
+```
+
+Transport wrapping MUST NOT change the inner VE Signature Record or the
+VE Signature Binding Frame it authenticates.
+
+### 61.9 COSE transport distinction
+
+Two uses must be distinguished.
+
+#### A. COSE as outer wrapper
+
+The canonical VE Signature Record is payload data inside a COSE object.
+
+COSE may independently provide confidentiality, integrity, or additional
+transport authentication.
+
+The inner VE signature remains verified according to VE semantics.
+
+#### B. COSE as the VE signature mechanism itself
+
+Rejected for Profile 1 unless a future explicit VE signature suite
+defines COSE-based signing semantics.
+
+Generic COSE protected headers or `external_aad` MUST NOT silently alter
+the signed bytes defined by VE.
+
+### 61.10 External AAD attack
+
+If one transport uses:
+
+```text
+external_aad = X
+```
+
+and another uses:
+
+```text
+external_aad = Y
+```
+
+then COSE signatures authenticate different contexts even when payload is
+identical.
+
+That is useful for COSE applications but would violate VE's goal that
+the same Signature Record have portable verification semantics
+independent of transport.
+
+Transport-specific AAD therefore remains outside the inner VE signature
+semantics unless a VE suite explicitly incorporates it.
+
+### 61.11 Algorithm header duplication
+
+If COSE wraps a VE Signature Record and declares a COSE algorithm, that
+algorithm belongs to the outer COSE security operation.
+
+It MUST NOT be assumed identical to the inner VE `signature_suite`.
+
+Any required equality must be explicit.
+
+### 61.12 Multiple signatures
+
+Multiple signers do not require a multi-signature transport primitive.
+
+An object may have:
+
+```text
+SignatureRecord S1
+SignatureRecord S2
+SignatureRecord S3
+```
+
+Threshold semantics such as:
+
+```text
+2-of-3 approvals
+```
+
+belong in Claims / Rules / Evaluate, not in the signature envelope.
+
+### 61.13 Countersignatures
+
+Countersignature semantics are not required for the initial VE Signature
+Record.
+
+If one actor must attest another signature, the preferred semantic model
+is a Claim referencing the relevant Signature Record digest.
+
+### 61.14 Signature Record identity
+
+A Signature Record is itself a VE protocol object and MAY receive its
+own typed object digest if another object needs to reference it
+cryptographically.
+
+If so, `SIGNATURE_RECORD` should be assigned in the VE cryptographic
+object-type registry.
+
+### 61.15 Envelope removability test
+
+Remove COSE:
+
+```text
+VE Digest Reference
+VE Signature Binding Frame
+VE Signature Record
+raw signature verification
+```
+
+still interoperate.
+
+Therefore COSE is not architecturally required.
+
+Remove the VE Signature Record and retain only arbitrary transport
+envelopes:
+
+```text
+portable verification metadata
+```
+
+no longer has one canonical VE representation.
+
+Therefore a minimal VE Signature Record is justified.
+
+### 61.16 Architectural conclusion
+
+The minimum architecture is:
+
+```text
+VE Object
+    |
+    v
+Digest Reference
+    |
+    v
+VE Signature Binding Frame
+    |
+    v
+signature algorithm
+    |
+    v
+VE Signature Record
+    |
+    +--> bare transport
+    +--> COSE wrapper
+    +--> HTTP / DB / message transport
+```
+
+VE standardizes the inner cryptographic semantics and portable result.
+
+External envelopes remain removable adapters.
+
+------------------------------------------------------------------------
+
+## 62. New Validated Architectural Findings
+
+### KV-F116 — Signed Bytes Alone Are Not Sufficient for Portable Signature Interoperability
+
+VE requires a canonical result record carrying verification metadata in
+addition to the exact signed bytes.
+
+**Status:** PASS.
+
+### KV-F117 — A Minimal VE Signature Record Is Justified
+
+A canonical Signature Record should represent Digest Reference,
+signature suite, signer/key reference, and raw signature bytes.
+
+**Status:** PASS.
+
+### KV-F118 — One Mandatory External Signature Envelope Is Not Required
+
+COSE/JWS/CMS packaging is removable without loss of VE-native signature
+semantics.
+
+**Status:** PASS FOR EXCLUSION.
+
+### KV-F119 — COSE Is Not Merely Transport Semantics
+
+COSE signatures authenticate structured context including protected
+headers, external AAD, and payload, so adopting COSE as VE signature
+identity would import additional semantics.
+
+**Status:** PASS.
+
+### KV-F120 — Transport AAD Must Not Silently Alter VE Signature Meaning
+
+External transport authentication context remains separate from the
+inner VE Signature Binding Frame unless explicitly standardized by a VE
+signature suite.
+
+**Status:** PASS.
+
+### KV-F121 — Signature Record Does Not Establish Signer Authority
+
+Signer/key authority must derive independently from Claims and Trust
+Context.
+
+**Status:** PASS.
+
+### KV-F122 — Multi-Party Approval Does Not Belong in Signature Envelope Semantics
+
+Multiple Signature Records may exist; threshold/approval meaning remains
+Claim/Rule/Evaluate semantics.
+
+**Status:** PASS.
+
+### KV-F123 — Signature Value Encoding Belongs to the Signature Suite
+
+A signature-suite identifier fixes algorithm parameters and canonical
+signature-byte representation.
+
+**Status:** PASS.
+
+------------------------------------------------------------------------
+
+## 63. Updated Validation Backlog
+
+### HYP-048 — Signature Record minimum schema
+
+What is the exact minimum canonical Signature Record field set, and
+should `signer_reference` identify a key, a Claim subject, or a generic
+verifier-resolvable identifier?
+
+**Status:** NEXT PRESSURE TEST CANDIDATE.
+
+### HYP-049 — Signature Record object identity
+
+Should `SIGNATURE_RECORD` be an initial cryptographic object type in
+RFC-005, or should signature records remain non-hashable leaf artifacts
+until a reference scenario requires countersigning / signature
+attestation?
+
+**Status:** OPEN.
+
+### HYP-050 — COSE adapter profile
+
+Should VE later publish an optional interoperability profile describing
+how canonical VE Signature Records are transported inside COSE without
+changing inner VE signature semantics?
+
+**Status:** OPEN — LOW PRIORITY.
+
+### HYP-051 — RFC-005 scope
+
+Should RFC-005 include Canonical Representation, Digest References,
+Hash/Signature Framing, and the minimal Signature Record in one
+cryptographic representation RFC, or split Signature Record into a
+follow-on RFC?
+
+**Status:** NEXT GOVERNANCE-SCOPE DECISION.
 
 ------------------------------------------------------------------------
