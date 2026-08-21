@@ -1,1305 +1,755 @@
-# VE-001 — Action Specification
+# VE-001 --- Action Specification
 
-**Version:** 0.1  
-**Status:** Draft  
-**Category:** Core Primitive Specification  
-**Identifier:** VE-001  
-**Depends on:** VE-000  
-**Project:** Verified Execution
+**Version:** 0.2\
+**Status:** Approved\
+**Category:** Core Primitive Specification\
+**Identifier:** VE-001\
+**Project:** Verified Execution\
+**Supersedes:** VE-001 v0.1\
+**Change authority:** RFC-004 v0.2; ADR-004\
+**Normative dependency:** VE Canonical Encoding Profile
+(identifier/version to be assigned before cryptographic interoperability
+conformance is claimed)
 
----
+------------------------------------------------------------------------
 
 ## Abstract
 
-This specification defines the **Action**, the canonical representation of a request to produce a governed consequential external side effect.
+This specification defines the **Action**, the canonical, immutable
+representation of one bounded request to produce a governed
+consequential external effect.
 
-An Action is the fundamental unit of intent in Verified Execution.
+An Action preserves two distinct identities:
 
-It expresses **what is being requested**, **by whom or what**, **under which authority context**, and **against which target**, but it does not itself imply authorization, successful execution, legitimacy, or outcome.
+``` text
+action_id     — identity of the historical Action occurrence
+action_digest — deterministic cryptographic identity of exact semantic Action content
+```
 
-All governed execution requests MUST be converted into a canonical Action before external execution is attempted.
+These identities MUST NOT be conflated.
 
-This specification defines:
+An Action does not imply authorization, execution, legitimacy, success,
+or canonical commit.
 
-- Action semantics,
-- Action identity,
-- Action boundaries,
-- required semantic fields,
-- canonicalization rules,
-- immutability requirements,
-- relationships,
-- duplicate handling,
-- retry implications,
-- validation requirements,
-- privacy considerations,
-- conformance criteria,
-- and open questions.
+Any authoritative artifact whose meaning depends on a particular Action
+occurrence carrying particular semantic content MUST cryptographically
+bind `action_id` to `action_digest`, together with any additional
+authoritative occurrence fields on which that artifact relies.
 
----
+VE-001 does not define a third universal Action identity.
+
+------------------------------------------------------------------------
 
 # 1. Purpose
 
-The purpose of the Action primitive is to provide one stable representation for consequential execution intent regardless of:
+The Action primitive provides a stable, provider-independent
+representation of consequential execution intent.
 
-- AI model,
-- model provider,
-- agent framework,
-- transport protocol,
-- programming language,
-- external system,
-- or application domain.
+It separates:
 
-Without a canonical Action, downstream policy, authorization, evidence, audit, and verification mechanisms would depend upon vendor-specific representations.
+``` text
+what is being requested
+```
 
-Verified Execution therefore establishes the Action as the authoritative representation of governed intent.
+from:
 
----
+``` text
+who proposed it
+who may authorize it
+whether it is authorized
+whether it executed
+whether reality changed
+```
 
-# 2. Scope
+All governed consequential execution requests MUST become canonical
+Actions before external execution is attempted.
 
-VE-001 defines the semantics of an Action.
+------------------------------------------------------------------------
 
-It does not define:
-
-- Event serialization,
-- lifecycle transition rules,
-- policy languages,
-- authorization protocols,
-- Adapter interfaces,
-- Receipt formats,
-- cryptographic signatures,
-- execution transport protocols.
-
-Those concerns are defined elsewhere.
-
-VE-001 defines the object those systems operate upon.
-
----
-
-# 3. Normative Language
-
-The terms **MUST**, **MUST NOT**, **SHOULD**, **SHOULD NOT**, and **MAY** are normative when capitalized.
-
-Their interpretation follows VE-000.
-
----
-
-# 4. Definition
+# 2. Definition
 
 An **Action** is:
 
-> **The canonical, immutable representation of a request to produce one governed consequential change in an external system or environment.**
+> **The canonical, immutable representation of one bounded request to
+> produce a governed consequential external effect.**
 
-Three properties are essential.
+An Action represents semantic intent.
 
-An Action represents:
+It does not itself represent:
 
-1. **Intent**
-2. **A defined execution target**
-3. **A bounded requested effect**
+-   permission;
+-   authority;
+-   Rule applicability;
+-   Rule satisfaction;
+-   execution;
+-   success;
+-   legitimacy;
+-   canonical commit.
 
-An Action does not represent:
+------------------------------------------------------------------------
 
-- permission,
-- policy satisfaction,
-- execution,
-- success,
-- correctness,
-- legitimacy.
+# 3. Intent Is Not Execution
 
-Those properties are determined elsewhere in the lifecycle.
-
----
-
-# 5. Intent Is Not Execution
-
-The existence of an Action MUST NOT imply that execution occurred.
-
-The following are distinct:
-
-```text
+``` text
 ACTION EXISTS
       ≠
 ACTION AUTHORIZED
       ≠
 ACTION EXECUTED
       ≠
-ACTION SUCCEEDED
+ACTION COMMITTED
 ```
 
-An Action MAY exist permanently without ever being executed.
+An Action remains historically meaningful even if it never executes.
 
-For example:
+------------------------------------------------------------------------
 
-```text
-Action:
-Transfer $100,000
+# 4. Action Boundary
 
-Outcome:
-REJECTED
+An Action SHOULD represent the smallest semantically meaningful governed
+effect for which independent authorization, lifecycle tracking, or
+execution evidence is useful.
+
+If requested effects can be independently authorized, fail
+independently, produce independently meaningful consequences, or require
+distinct evidence, they SHOULD be separate Actions.
+
+Action is a semantic unit. It is not necessarily an HTTP request,
+function call, model tool call, database statement, or workflow step.
+
+------------------------------------------------------------------------
+
+# 5. Logical Action Structure
+
+Every authoritative Action consists logically of:
+
+``` text
+Action
+├── Instance Envelope
+│   └── action_id
+└── Semantic Payload
+    ├── schema_digest
+    └── schema-defined semantic fields
 ```
 
-The Action remains historically meaningful even though no transfer occurred.
+The Semantic Payload answers:
 
----
+> **What exactly is being proposed?**
 
-# 6. What Constitutes an Action
+The Instance Envelope answers:
 
-An Action SHOULD represent the smallest **semantically meaningful governed side effect** for which independent authorization, lifecycle tracking, and evidence are useful.
+> **Which occurrence of that proposal is this?**
 
-This definition deliberately avoids equating an Action with:
+Occurrence metadata MUST NOT be inserted into Semantic Payload merely to
+force unique content identity.
 
-- one HTTP request,
-- one function call,
-- one model tool call,
-- one database statement,
-- one workflow step.
+------------------------------------------------------------------------
 
-Those are implementation mechanics.
+# 6. Action Schema
 
-An Action is a semantic unit.
+Every Action MUST identify the exact schema contract under which its
+Semantic Payload is interpreted.
 
----
+The normative schema identity is:
 
-# 7. Action Boundary
-
-Determining where one Action ends and another begins is fundamental.
-
-The default rule is:
-
-> **If two requested effects can be independently authorized, independently fail, independently produce consequences, or require distinct evidence, they SHOULD be separate Actions.**
-
-Examples:
-
-```text
-Send one email
-→ one Action
-
-Transfer money to one beneficiary
-→ one Action
-
-Delete one customer account
-→ one Action
+``` text
+schema_digest
 ```
 
-By contrast:
+Human-readable fields MAY accompany it:
 
-```text
-Generate email body
-→ not necessarily an Action
-
-Calculate tax amount
-→ not necessarily an Action
-
-Rank candidate responses
-→ not necessarily an Action
+``` text
+schema_id
+schema_version
 ```
 
-unless those operations themselves cause governed external consequences.
+They are operational labels, not normative schema identity.
 
----
+`schema_digest` MUST participate in `action_digest`.
 
-# 8. Consequentiality
+A semantic change to a schema MUST change `schema_digest`.
 
-Verified Execution does not define one universal list of consequential Actions.
+VE-001 does not require a global schema registry and does not introduce
+Action Schema as a semantic kernel primitive.
 
-A deployment MUST define its governed execution scope.
+------------------------------------------------------------------------
 
-A requested operation SHOULD be treated as consequential when it can materially alter:
+# 7. Semantic Payload Classification Rule
 
-- persistent external state,
-- financial state,
-- legal state,
-- security state,
-- organizational state,
-- human communication,
-- physical systems,
-- permissions,
-- or externally observable behavior.
+A field MUST belong to canonical Semantic Payload when changing it can
+change:
 
-Examples MAY include:
+-   the requested external effect;
+-   target or destination;
+-   requested operation or capability;
+-   material arguments;
+-   quantity or amount;
+-   deterministic applicability of Claims, Rules, Trust Context
+    authority, or execution authority;
+-   an explicit execution constraint;
+-   completion semantics.
 
-- sending communication,
-- modifying a database,
-- moving funds,
-- approving access,
-- issuing a purchase order,
-- deploying code,
-- deleting infrastructure,
-- operating machinery.
+The governing test is:
 
-A deployment MAY govern additional classes of Actions.
+> **If two Actions differ only in field X, could a legitimate authority
+> distinguish them because the proposed execution, deterministic
+> applicability, or completion semantics differ?**
 
----
+If yes, X is semantic Action content.
 
-# 9. Reads and Observations
+This rule does not permit an Action to choose its own governance.
 
-Pure reads are not automatically Actions under VE-001.
+------------------------------------------------------------------------
 
-For example:
+# 8. Schema-Defined Semantic Fields
 
-```text
-Read weather data
-Read customer record
-Query inventory
-Retrieve documentation
+A schema MAY define semantic fields such as:
+
+``` text
+operation
+target
+destination
+amount
+currency
+requested capability
+arguments
+payload commitment
+execute_before
+execute_after
+effective_at
+completion semantics
 ```
 
-These are ordinarily outside the Action primitive unless the deployment explicitly governs them.
+This list is illustrative.
 
-However, a read MAY become consequential where access itself creates a meaningful external effect.
+VE does not define a universal domain ontology or universal `target`
+structure.
 
-Examples include:
+Unknown or ambiguous semantics MUST fail closed.
 
-- accessing regulated health records,
-- retrieving classified information,
-- reading data that triggers billing,
-- querying a system where access must itself be authorized and evidenced.
+------------------------------------------------------------------------
+
+# 9. Action Digest
+
+Every authoritative Action MUST have a deterministic cryptographic
+semantic-content identity:
+
+``` text
+action_digest =
+    H(
+        domain_separator
+        ||
+        schema_digest
+        ||
+        canonical_semantic_payload
+    )
+```
+
+The normative Canonical Encoding Profile MUST define:
+
+-   canonical byte encoding;
+-   framing;
+-   domain separation;
+-   digest-suite representation;
+-   primitive value encoding;
+-   map/object ordering;
+-   Unicode treatment;
+-   numeric representation;
+-   absent versus null semantics;
+-   canonical representation of schema descriptors.
+
+Changing `schema_digest` or any semantic field MUST change
+`action_digest`, except with negligible probability under the selected
+cryptographic digest.
+
+`action_digest` identifies exact semantic content only.
+
+It MUST NOT be interpreted as:
+
+-   occurrence identity;
+-   authorization;
+-   replay permission;
+-   idempotency identity;
+-   execution proof;
+-   commit proof.
+
+------------------------------------------------------------------------
+
+# 10. Action ID
+
+Every authoritative Action MUST have exactly one immutable `action_id`.
+
+`action_id` identifies the historical Action occurrence.
+
+It MUST:
+
+-   remain immutable;
+-   never be reassigned to a different occurrence;
+-   be unique within every context in which authoritative Action
+    histories may be compared.
+
+The generation format is protocol/profile-defined.
+
+`action_id` is not semantic-content identity.
+
+------------------------------------------------------------------------
+
+# 11. Same Content, Distinct Occurrences
+
+Two independent Actions MAY have:
+
+``` text
+same action_digest
+```
+
+while having:
+
+``` text
+different action_id
+```
+
+Example:
+
+``` text
+A1: transfer 100 CAD X -> Y
+A2: transfer 100 CAD X -> Y
+```
+
+These may represent two independently requested executions.
 
 Therefore:
 
-> **Consequentiality depends upon the effect of the operation, not merely whether the operation is syntactically a read or write.**
+``` text
+same action_digest != same Action occurrence
+```
 
----
+Digest equality MUST NOT by itself imply duplicate suppression,
+idempotency, replay, or exactly-once execution.
 
-# 10. Action Identity
+------------------------------------------------------------------------
 
-Every Action MUST have exactly one globally unique identifier.
+# 12. Occurrence/Content Binding
 
-The canonical field name is:
+Any authoritative artifact whose semantics depend on a particular Action
+occurrence carrying particular semantic content MUST cryptographically
+bind at least:
 
-```text
+``` text
+(action_id, action_digest)
+```
+
+Examples include, where occurrence-specific:
+
+``` text
+approval Claims
+Receipts
+execution evidence
+commit evidence
+signed Action records
+```
+
+If the applicable protocol defines additional authoritative Instance
+Envelope fields, it MUST state which fields participate in the
+artifact's binding.
+
+A protocol MAY derive a compact commitment over these values.
+
+Such a commitment is protocol machinery and MUST NOT be treated as a
+third universal Action identity.
+
+------------------------------------------------------------------------
+
+# 13. Instance Envelope
+
+The Instance Envelope MUST contain:
+
+``` text
 action_id
 ```
 
-The identifier MUST:
+It MAY contain protocol-defined occurrence fields such as:
 
-- be unique within all contexts in which Receipts or Events may later be compared,
-- remain immutable,
-- never be reassigned,
-- never identify a materially different Action.
-
-UUIDv7 is RECOMMENDED for the initial reference implementation.
-
-VE-001 does not require UUIDv7 as a protocol-level invariant.
-
----
-
-# 11. Action Identity and Semantic Identity
-
-Two Actions MAY request identical effects while remaining distinct Actions.
-
-Example:
-
-```text
-Action A
-Send "Hello" to alice@example.com
-
-Action B
-Send "Hello" to alice@example.com
+``` text
+instance_created_at
+correlation_id
+parent / causation reference
+instance_nonce
+envelope_version
+non-authoritative routing hints
 ```
 
-These are not necessarily duplicates.
+Every protocol-defined envelope field MUST be classified as one of:
 
-They may represent two separately requested executions.
-
-Therefore:
-
-```text
-same payload ≠ same Action
+``` text
+bound authoritative
+unbound / non-authoritative
+local implementation metadata
 ```
 
-Action identity is historical identity, not content identity.
+A field whose mutation could alter interpretation, provenance, replay
+behavior, or authoritative history relied upon by an artifact MUST
+participate in that artifact's cryptographic binding.
 
----
+Not every envelope field is automatically bound.
 
-# 12. Required Semantic Fields
+------------------------------------------------------------------------
 
-Every canonical Action MUST contain or durably reference the following semantic information.
+# 14. Time
 
-## 12.1 `action_id`
+A timestamp that merely records when an Action occurrence was created or
+accepted belongs in the Instance Envelope, for example:
 
-Unique immutable Action identity.
-
-## 12.2 `spec_version`
-
-The version of VE semantics required to interpret the Action.
-
-Example:
-
-```text
-VE-001/0.1
+``` text
+instance_created_at
 ```
 
-## 12.3 `created_at`
+A time value that constrains requested execution belongs in Semantic
+Payload, for example:
 
-The time at which the Action entered the canonical execution system.
+``` text
+execute_before
+execute_after
+effective_at
+```
 
-This field is evidentiary.
+A single field MUST NOT ambiguously serve both roles.
 
-It MUST NOT be relied upon as the sole mechanism for causal ordering.
+------------------------------------------------------------------------
 
-## 12.4 `initiator`
+# 15. Initiator and Proposer Identity
 
-The system or actor that proposed the Action.
+Initiator/proposer identity is not universally required semantic Action
+content.
+
+The same proposed effect may originate from different actors while
+retaining the same `action_digest`.
+
+Initiator identity, delegation, and authority normally belong in Claims,
+provenance, or independently verifiable context.
+
+If represented identity changes the requested effect---for example,
+publishing a statement explicitly as legal entity X---the Action Schema
+MUST include the relevant represented identity in Semantic Payload.
+
+------------------------------------------------------------------------
+
+# 16. Authority Context
+
+An Action MUST NOT establish its own authority by embedding an
+authoritative `authority_context`.
+
+Authority is established independently through verified Claims, Trust
+Context, Rule applicability, Verify, and Evaluate.
+
+An Action MAY carry non-authoritative authority or routing hints.
+
+Such hints MUST NOT become authoritative merely because they are
+present.
+
+------------------------------------------------------------------------
+
+# 17. Scope and Applicability
+
+VE-001 defines no universal semantic `scope` field.
+
+Applicability of Claims, Rules, Trust Context authority, and execution
+authority is determined through protocol-defined deterministic selectors
+over canonical schema-defined Action fields.
+
+Tenant, environment, project, jurisdiction, account, or similar values
+MAY appear in Semantic Payload when the Action Schema declares them
+effect- or applicability-relevant.
+
+They are not universal Action primitives.
+
+------------------------------------------------------------------------
+
+# 18. Operation, Target, and Arguments
+
+Operation, target, destination, capability, and argument structures are
+schema-defined Semantic Payload.
+
+VE-001 does not impose a universal representation for these concepts.
+
+Operation names SHOULD represent semantic intent rather than vendor
+transport when practical.
+
+Provider independence SHOULD be preferred over artificial abstraction.
+
+------------------------------------------------------------------------
+
+# 19. Claims and Governance References
+
+Claims are independent of Action semantic content.
+
+A Claim MAY bind:
+
+``` text
+action_digest
+```
+
+when it concerns exact semantic content.
+
+A Claim whose semantics concern one particular occurrence MUST bind:
+
+``` text
+(action_id, action_digest)
+```
+
+Rule, selector, Trust Context, or execution-authority references carried
+with an Action are non-authoritative unless independently established.
+
+An Action MUST NOT choose the Rule or authority under which it is
+accepted.
+
+------------------------------------------------------------------------
+
+# 20. Immutability
+
+Once an Action becomes authoritative:
+
+-   Semantic Payload MUST be immutable.
+-   `schema_digest` MUST be immutable.
+-   `action_digest` MUST be immutable.
+-   `action_id` MUST be immutable.
+-   authoritative bound Instance Envelope fields MUST be immutable for
+    the history/artifacts that rely upon them.
+
+A material semantic change requires a new Action.
+
+------------------------------------------------------------------------
+
+# 21. Non-Canonical Metadata
+
+Purely local implementation or display metadata MAY evolve without
+creating a new Action.
 
 Examples:
 
-```text
-agent:billing-assistant
-model-session:abc123
-human:user-482
-service:workflow-engine
+``` text
+database row ID
+UI label
+storage path
+cache key
+worker assignment
+local processing status
+log formatting
 ```
 
-## 12.5 `authority_context`
+Such values MUST NOT affect `action_digest`.
 
-A durable reference to the authority under which the initiator is attempting to act.
+------------------------------------------------------------------------
 
-The Action does not determine whether that authority is valid.
+# 22. Lifecycle Status
 
-It records the claimed or resolved execution context so downstream systems can evaluate it.
+Mutable lifecycle status MUST NOT be authoritative Action content.
 
-## 12.6 `target`
+Lifecycle state is derived from authoritative Event history.
 
-The logical external system or capability to be affected.
+Cached projections MAY exist but MUST NOT redefine the Action.
 
-Example:
+------------------------------------------------------------------------
 
-```text
-gmail
-stripe
-github
-production-database
-warehouse-robot
-```
+# 23. Structural Validation
 
-## 12.7 `operation`
+Before governed execution, an Action MUST be structurally validated.
 
-The requested semantic operation.
+Validation MUST establish at minimum:
 
-Example:
-
-```text
-send_email
-transfer_funds
-merge_pull_request
-delete_record
-unlock_door
-```
-
-## 12.8 `arguments`
-
-The parameters necessary to describe the requested operation.
-
-Arguments MUST be sufficient for downstream components to understand what effect is being requested.
-
-## 12.9 `scope`
-
-The deployment or protection scope under which the Action is governed.
-
-This MAY reference:
-
-- organization,
-- tenant,
-- environment,
-- project,
-- account,
-- jurisdiction.
-
----
-
-# 13. Recommended Fields
-
-A canonical Action SHOULD support the following where relevant.
-
-## 13.1 `correlation_id`
-
-Groups related Actions belonging to one larger business process.
-
-## 13.2 `parent_action_id`
-
-Identifies an Action that caused or delegated creation of this Action.
-
-## 13.3 `request_context`
-
-References contextual evidence relevant to the Action.
-
-## 13.4 `idempotency_key`
-
-Supports safe duplicate suppression where appropriate.
-
-## 13.5 `expires_at`
-
-Defines a time after which execution SHOULD NOT begin without renewed authorization.
-
-## 13.6 `labels`
-
-Non-authoritative metadata for indexing or classification.
-
-Labels MUST NOT silently alter Action semantics.
-
----
-
-# 14. Minimal Abstract Schema
-
-VE-001 does not yet define a final wire format.
-
-The following schema is illustrative:
-
-```json
-{
-  "action_id": "01945b8e-....",
-  "spec_version": "VE-001/0.1",
-  "created_at": "2026-08-10T19:30:00Z",
-
-  "initiator": {
-    "type": "agent",
-    "id": "billing-agent"
-  },
-
-  "authority_context": {
-    "organization_id": "org-123",
-    "principal_id": "user-456"
-  },
-
-  "scope": {
-    "environment": "production"
-  },
-
-  "target": {
-    "type": "email",
-    "provider": "gmail"
-  },
-
-  "operation": "send_email",
-
-  "arguments": {
-    "to": "customer@example.com",
-    "subject": "Invoice",
-    "body": "..."
-  }
-}
-```
-
-This representation is informative, not final.
-
-Semantics are normative.
-
-Serialization is not.
-
----
-
-# 15. Canonicalization
-
-Vendor-specific requests MUST be converted into canonical Actions before governed execution.
-
-Examples:
-
-```text
-OpenAI tool call
-        │
-        ▼
-Canonical Action
-
-Claude tool use
-        │
-        ▼
-Canonical Action
-
-MCP invocation
-        │
-        ▼
-Canonical Action
-
-Custom agent request
-        │
-        ▼
-Canonical Action
-```
-
-Once accepted into the Verified Execution lifecycle, the canonical Action becomes the authoritative representation of requested intent.
-
----
-
-# 16. Canonicalization Requirements
-
-Canonicalization MUST preserve the semantic meaning of the original request.
-
-A canonicalizer MUST NOT:
-
-- broaden authority,
-- silently add operations,
-- omit material arguments,
-- change target,
-- weaken restrictions,
-- reinterpret an ambiguous request as a more permissive one.
-
-If canonicalization cannot determine the requested effect unambiguously, the Action SHOULD be rejected or require clarification.
-
-Ambiguity MUST NOT silently resolve in favor of greater authority.
-
----
-
-# 17. Action Immutability
-
-Once an Action becomes authoritative, its semantic content MUST be immutable.
-
-Fields such as:
-
-- target,
-- operation,
-- arguments,
-- initiator,
-- authority context,
-
-MUST NOT be silently mutated.
-
-If semantic intent changes materially, a new Action MUST be created.
-
-Example:
-
-```text
-Action A:
-Transfer $1,000
-
-later changed to:
-
-Transfer $10,000
-```
-
-This MUST NOT remain Action A.
-
-A new Action is required.
-
----
-
-# 18. Non-Semantic Metadata
-
-Some metadata MAY evolve without creating a new Action if it does not alter requested intent.
-
-Examples might include:
-
-- indexes,
-- storage location,
-- local processing annotations,
-- display metadata.
-
-Such metadata MUST be clearly separated from authoritative Action semantics.
-
----
-
-# 19. Action Status
-
-A mutable `status` field MUST NOT be part of the authoritative semantic Action.
-
-Status is derived from Event history.
-
-Implementations MAY expose:
-
-```text
-current_status
-```
-
-as a projection for convenience.
-
-That projection MUST NOT redefine the Action.
-
----
-
-# 20. Validation
-
-An Action MUST undergo structural validation before execution.
-
-Validation SHOULD determine at minimum:
-
-- required fields exist,
-- operation is understood,
-- target is resolvable,
-- arguments satisfy declared schema,
-- specification version is supported.
+-   the schema contract is available;
+-   the resolved schema matches `schema_digest`;
+-   required semantic fields exist;
+-   semantic values conform to the schema;
+-   canonicalization succeeds under the required Canonical Encoding
+    Profile;
+-   `action_digest` verifies;
+-   required occurrence fields exist;
+-   Action semantics are supported.
 
 Structural validation does not establish authorization.
 
----
+------------------------------------------------------------------------
 
-# 21. Semantic Validation
+# 24. Semantic Validation
 
-A deployment MAY perform semantic validation.
+A deployment MAY validate domain semantics such as:
 
-Examples:
-
-```text
-amount > 0
-recipient has valid format
-repository exists
-resource identifier is resolvable
+``` text
+amount is a valid positive decimal
+recipient has valid syntax
+identifier format is valid
 ```
 
-Validation MUST NOT be confused with policy.
+Semantic validation MUST NOT be confused with authorization.
 
-Example:
+Permission, delegation validity, authority, thresholds, and
+time-dependent governance belong in Claims, Rules, Verify, and Evaluate
+unless the Action Schema explicitly defines a value as part of Action
+semantic validity.
 
-```text
-"amount is a valid decimal"
-```
+------------------------------------------------------------------------
 
-is validation.
+# 25. Canonicalization
 
-```text
-"agent may transfer no more than $10,000"
-```
+Vendor-specific requests MUST be converted into canonical Actions before
+governed execution.
 
-is policy or authorization.
+Canonicalization MUST preserve semantic meaning and MUST NOT:
 
-The distinction SHOULD remain explicit.
+-   broaden authority;
+-   silently add operations;
+-   omit material arguments;
+-   change target or destination;
+-   weaken explicit constraints;
+-   resolve ambiguity toward more permissive execution.
 
----
+If semantics cannot be determined unambiguously, execution MUST fail
+closed.
 
-# 22. Action Relationships
+Canonicalization is security-relevant protocol machinery and part of the
+trusted computing base.
 
-Actions MAY relate to other Actions.
+------------------------------------------------------------------------
 
-VE-001 recognizes relationships as metadata, not new primitives.
+# 26. Canonical Encoding Dependency
 
-Common relationships include:
+VE-001 defines **what** must be canonicalized and **what identity
+properties must result**.
 
-```text
+It does not define the byte-level serialization algorithm.
+
+Byte-level canonical encoding MUST be defined by a separate normative VE
+Canonical Encoding Profile.
+
+A conforming implementation MUST identify and implement the profile
+required by the applicable VE protocol version.
+
+Two implementations MUST NOT claim cryptographic Action interoperability
+unless they use the same normative canonicalization profile, schema
+contract, digest framing, and digest suite.
+
+The encoding profile is protocol machinery, not a semantic primitive.
+
+------------------------------------------------------------------------
+
+# 27. Schema Resolution
+
+Schemas MAY be resolved through multiple mechanisms, including local
+configuration, packaged descriptors, content-addressed storage, or
+registries.
+
+Resolution mechanism is non-authoritative.
+
+The resolved schema descriptor MUST match the declared `schema_digest`.
+
+Human-readable schema names or versions MUST NOT substitute for digest
+verification.
+
+------------------------------------------------------------------------
+
+# 28. Action Relationships
+
+Relationships such as:
+
+``` text
 parent
 child
 caused_by
 compensates
 retries
 supersedes
-delegated_from
 correlated_with
 ```
 
-A future specification MAY standardize relationship semantics.
+are not new primitives.
 
----
+If a relationship is observational, it belongs in occurrence metadata or
+Event history.
 
-# 23. Parent and Child Actions
+If it is a necessary condition of the proposed execution, the relevant
+commitment belongs in Semantic Payload.
 
-A high-level Action MAY require several subordinate Actions.
+------------------------------------------------------------------------
 
-Example:
+# 29. Compensation
 
-```text
-Action A
-Provision employee
+Compensation MUST create a new Action.
 
-    ├── Action B
-    │   Create email account
-    │
-    ├── Action C
-    │   Grant repository access
-    │
-    └── Action D
-        Create payroll record
-```
-
-If each subordinate operation has independent consequence or authorization requirements, each SHOULD be represented as a separate Action.
-
-The parent Action MUST NOT erase subordinate histories.
-
----
-
-# 24. Composite Intent
-
-An Action SHOULD NOT become a general-purpose workflow container.
-
-If one requested intent contains several independently consequential effects, implementations SHOULD decompose it.
+The original Action MUST remain unchanged.
 
 Example:
 
-```text
-"Terminate employee"
+``` text
+Action A: transfer X -> Y
+Action B: transfer Y -> X
 ```
 
-might imply:
+B may compensate for A, but B does not erase or mutate A.
 
-```text
-Disable account
-Revoke credentials
-Cancel payroll
-Notify manager
-Remove physical access
-```
+------------------------------------------------------------------------
 
-These may require independent Actions.
+# 30. Idempotency
 
-The high-level business operation MAY remain a parent Action or correlation context.
+Idempotency identity is distinct from:
 
----
-
-# 25. Atomicity
-
-VE-001 does not guarantee transaction-level atomicity across external systems.
-
-An Action represents semantic intent.
-
-Whether an Adapter or target can execute atomically is target-specific.
-
-Implementations MUST NOT claim atomic execution where the external system cannot provide it.
-
----
-
-# 26. Idempotency
-
-An Action MAY carry an idempotency key.
-
-The purpose is to reduce duplicate external effects.
-
-Idempotency identity and Action identity are different.
-
-```text
+``` text
 action_id
+action_digest
 ```
 
-identifies the historical request.
+An execution profile MAY define an idempotency key or equivalence class.
 
-```text
-idempotency_key
-```
+Same `action_digest` MUST NOT automatically imply one execution.
 
-identifies an execution-equivalence class for duplicate suppression.
+------------------------------------------------------------------------
 
-Two Actions MAY have different `action_id` values but the same `idempotency_key` if the deployment intentionally treats them as equivalent execution attempts.
-
-This behavior MUST be explicit.
-
----
-
-# 27. Duplicate Detection
-
-Duplicate detection MUST NOT rely solely on payload equality.
-
-Identical content can represent legitimate repeated intent.
-
-Example:
-
-```text
-Pay employee $2,000
-```
-
-may correctly occur every two weeks.
-
-Content equality alone cannot determine duplication.
-
----
-
-# 28. Retries
+# 31. Retries and Attempts
 
 A retry is not automatically a new Action.
 
-VE-001 distinguishes:
+One Action occurrence MAY have multiple execution attempts.
 
-```text
-Action
-```
+A new semantic request requires a new Action.
 
-from:
+Attempt semantics remain execution/lifecycle concerns unless later
+specification work establishes otherwise.
 
-```text
-execution attempt
-```
+------------------------------------------------------------------------
 
-The Action expresses intent.
+# 32. Sensitive Payloads
 
-An Action may require multiple execution attempts because of transient failures.
+Semantic Payload may contain sensitive information.
 
-Attempt semantics are not fully defined in VE-001 v0.1.
+Schemas and execution profiles SHOULD support commitments, encryption,
+durable references, redaction, or selective disclosure where compatible
+with execution semantics.
 
-However:
+Any commitment or reference that materially determines the requested
+effect MUST participate in canonical Semantic Payload.
 
-- every material attempt MUST remain evidentiary,
-- retry behavior MUST NOT erase previous attempts,
-- retries MUST NOT silently create duplicate external effects.
+------------------------------------------------------------------------
 
-Whether attempts become dedicated Events or a future subordinate structure remains an open question.
+# 33. Argument Integrity
 
----
+Execution machinery MUST preserve the semantics identified by
+`action_digest`.
 
-# 29. Expiration
+A semantically material transformation between canonical Action and
+executed request is prohibited unless represented as a new authorized
+Action or explicitly standardized semantic transformation.
 
-An Action MAY define an expiration time.
+Equivalent transport encoding is permitted.
 
-If present, execution SHOULD NOT begin after expiration unless the system records renewed authority or creates a replacement Action.
+------------------------------------------------------------------------
 
-Expiration does not delete the Action.
+# 34. Acceptance Point
 
-It affects whether execution remains eligible.
+A deployment MUST define the deterministic point at which a candidate
+request becomes an authoritative Action occurrence.
 
----
+Before that point, a request may be a:
 
-# 30. Cancellation
-
-Cancellation does not mutate the Action.
-
-It is a lifecycle event applied to the Action.
-
-A cancelled Action remains historical intent.
-
----
-
-# 31. Rejection
-
-Rejection does not invalidate the existence of the Action.
-
-It means the requested intent did not satisfy conditions required for execution.
-
-The Action remains part of authoritative history.
-
----
-
-# 32. Compensation
-
-A previously executed Action MUST NOT be modified to represent reversal.
-
-Compensation requires a new Action.
-
-Example:
-
-```text
-Action A
-Charge $100
-
-Action B
-Refund $100
-compensates: Action A
-```
-
-This preserves reality rather than rewriting it.
-
----
-
-# 33. Human-Originated Actions
-
-Verified Execution is not restricted to AI-originated Actions.
-
-A human MAY initiate an Action.
-
-A service MAY initiate an Action.
-
-An AI MAY initiate an Action.
-
-The architecture benefits from one canonical execution model.
-
-Example:
-
-```text
-Human
-  │
-AI
-  │
-Workflow
-  │
-Service
-  ▼
-Action
-```
-
-The initiator identity records the difference.
-
----
-
-# 34. Delegated Actions
-
-An AI may act on behalf of another principal.
-
-The Action SHOULD preserve both:
-
-```text
-initiator
-```
-
-and:
-
-```text
-authority principal
-```
-
-Example:
-
-```text
-initiator:
-travel-agent-ai
-
-authority principal:
-employee-123
-```
-
-These MUST NOT be collapsed conceptually.
-
-Identity and delegation are defined more fully elsewhere.
-
----
-
-# 35. Nested AI Systems
-
-One AI system MAY ask another AI system to propose an Action.
-
-Only the system crossing the Execution Boundary requires canonical Action representation at that moment.
-
-Internal reasoning or delegation between models does not automatically require new Actions unless it produces separately governed consequential intent.
-
-This prevents uncontrolled explosion of Action objects.
-
----
-
-# 36. Action Granularity
-
-Action granularity is one of the central design risks.
-
-Too coarse:
-
-```text
-Run the company
-```
-
-is not meaningful enough for governance.
-
-Too fine:
-
-```text
-write byte
-increment counter
-serialize field
-```
-
-creates meaningless administrative noise.
-
-The correct granularity is:
-
-> **the smallest externally consequential semantic unit that benefits from independent governance and evidence.**
-
----
-
-# 37. Granularity Test
-
-A proposed Action boundary SHOULD be split if any answer below is yes:
-
-1. Can part of the requested effect succeed while another part fails?
-2. Can different authority govern different parts?
-3. Would an auditor care which part occurred?
-4. Can part be compensated independently?
-5. Would different evidence be required?
-6. Can an external target execute the parts independently?
-
-If none apply, a single Action MAY be appropriate.
-
----
-
-# 38. Examples
-
-## 38.1 Send Email
-
-```text
-target:
-email
-
-operation:
-send
-
-arguments:
-recipient
-subject
-body
-```
-
-One externally consequential communication.
-
-Valid Action.
-
----
-
-## 38.2 Generate Email Draft
-
-If the draft exists only in ephemeral internal model memory:
-
-Not necessarily an Action.
-
-If the draft is persisted into the user's mailbox:
-
-It MAY be an Action because external state changed.
-
----
-
-## 38.3 Transfer Funds
-
-```text
-target:
-bank-account
-
-operation:
-transfer
-
-arguments:
-beneficiary
-amount
-currency
-```
-
-Valid Action.
-
----
-
-## 38.4 Explain Transfer Options
-
-No external state change.
-
-Not ordinarily an Action.
-
----
-
-## 38.5 Delete Customer
-
-A request that removes a durable external record.
-
-Valid Action.
-
----
-
-## 38.6 Query Customer
-
-Ordinarily not an Action under the default scope.
-
-MAY be governed where data-access consequences require it.
-
----
-
-## 38.7 Deploy Application
-
-One deployment creating an externally meaningful production change.
-
-Valid Action.
-
----
-
-## 38.8 Write 500 Deployment Files
-
-Those file writes SHOULD NOT automatically become 500 Actions if they are implementation mechanics of one governed deployment.
-
----
-
-# 39. Anti-Examples
-
-The following SHOULD NOT ordinarily be modeled as Actions:
-
-```text
-Think about the problem
-Summarize a document
-Rank alternatives
-Generate an internal plan
-Calculate a number
-Select a token
-Perform internal inference
-```
-
-unless the operation itself creates a governed external effect.
-
----
-
-# 40. Action Content and Reasoning
-
-An Action SHOULD describe requested execution intent.
-
-It MUST NOT require private chain-of-thought.
-
-A deployment MAY attach:
-
-- rationale,
-- reason code,
-- policy-relevant facts,
-- model-generated explanation,
-- decision summary.
-
-These SHOULD be treated as evidence or context, not hidden internal reasoning requirements.
-
----
-
-# 41. Sensitive Arguments
-
-Action arguments MAY contain sensitive data.
-
-Implementations MUST NOT assume that complete plaintext payload retention is required for verifiability.
-
-Systems SHOULD support:
-
-- redaction,
-- encryption,
-- commitments,
-- durable references,
-- selective disclosure,
-
-where compatible with execution requirements.
-
-Future evidence specifications MAY standardize these mechanisms.
-
----
-
-# 42. Argument Integrity
-
-If Action arguments are transformed before execution, the transformation MUST be evidentiary if it changes material execution semantics.
-
-Example:
-
-```text
-canonical Action amount:
-USD 100.00
-
-Adapter sends:
-USD 1,000.00
-```
-
-This is a violation.
-
-A semantically equivalent encoding transformation is permitted.
-
-Example:
-
-```text
-USD 100.00
-→
-10000 cents
-```
-
-provided the Adapter preserves semantic equivalence.
-
----
-
-# 43. Target Identity
-
-The target MUST be sufficiently specific to establish where the requested consequence is intended to occur.
-
-For high-risk systems, logical names alone MAY be insufficient.
-
-Example:
-
-```text
-target: database
-```
-
-may be ambiguous.
-
-A stronger target might identify:
-
-```text
-service:
-customer-db
-
-environment:
-production
-
-tenant:
-org-123
-```
-
-Exact target semantics are deployment-specific.
-
-Ambiguity SHOULD fail closed.
-
----
-
-# 44. Operation Semantics
-
-Operation names MUST represent semantic intent rather than vendor-specific transport when practical.
-
-Prefer:
-
-```text
-send_email
-```
-
-over:
-
-```text
-POST /gmail/v1/users/me/messages/send
-```
-
-The Adapter owns vendor-specific transport.
-
-The Action owns intent.
-
-This separation improves portability.
-
----
-
-# 45. Provider Independence
-
-A canonical Action SHOULD remain meaningful if the underlying provider changes.
-
-Example:
-
-```text
-operation:
-send_email
-```
-
-may execute through Gmail today and another provider later.
-
-Provider-specific requirements MAY still appear where necessary.
-
-Portability SHOULD be preferred over artificial abstraction.
-
----
-
-# 46. Action Schema Registry
-
-Future implementations MAY maintain registries defining valid Action types.
-
-Example:
-
-```text
-email.send
-payment.transfer
-github.merge
-database.delete
-```
-
-VE-001 does not require a global registry.
-
-A registry MUST NOT redefine core Action semantics.
-
----
-
-# 47. Versioning
-
-Action semantics MUST identify the specification version under which they are interpreted.
-
-Action type definitions SHOULD also be versionable.
-
-A semantic change to an operation MUST NOT silently reuse an incompatible schema version.
-
----
-
-# 48. Unknown Action Types
-
-An implementation MUST NOT execute an Action whose operation semantics it cannot safely interpret.
-
-Unknown semantics SHOULD fail closed.
-
----
-
-# 49. Validation Failure
-
-If an Action fails structural validation:
-
-- it MUST NOT execute,
-- the failure SHOULD become part of the execution history where an Action identity has already been assigned.
-
-Malformed incoming requests that never become canonical Actions MAY be recorded outside the Action lifecycle.
-
----
-
-# 50. Acceptance Point
-
-A deployment SHOULD define the exact point at which a request becomes an authoritative Action.
-
-Before that point, a request may be:
-
-```text
+``` text
 proposal
 draft
 candidate
@@ -1308,407 +758,419 @@ incoming request
 
 After acceptance:
 
-```text
-Action
+``` text
+action_id
+schema_digest
+semantic payload
+action_digest
 ```
 
-The acceptance point MUST be deterministic enough that implementations can determine whether an `action_id` is authoritative.
+are authoritative and immutable.
 
----
+Malformed requests rejected before Action creation MAY be logged outside
+the Action lifecycle.
 
-# 51. Pre-Action Requests
+------------------------------------------------------------------------
 
-Not every AI tool call needs to become an Action.
+# 35. Replay
 
-A gateway MAY receive a candidate request, validate and normalize it, and only then commit the authoritative Action.
+Replaying identical Action content does not automatically restore
+authority.
 
-However, consequential requests rejected before Action creation MAY still require operational security logs.
+Replay prevention, freshness, idempotency, and exactly-once execution
+remain Rule, Claim, Lifecycle, and execution-profile concerns.
 
-VE-001 separates:
+`action_digest` MUST NOT be treated as a universal replay token.
 
-```text
-execution audit
+------------------------------------------------------------------------
+
+# 36. Migration From v0.1
+
+A VE-001 v0.1 Action MUST NOT receive a v0.2 `action_digest` by implicit
+inference.
+
+A migration profile MUST explicitly classify each legacy field as:
+
+``` text
+semantic payload
+bound Instance Envelope
+external Claim / governance context
+unbound non-authoritative metadata
+local implementation metadata
 ```
 
-from:
+Only after classification under a declared schema and canonicalization
+profile may v0.2 content identity be computed.
 
-```text
-system ingress logging
-```
+------------------------------------------------------------------------
 
----
+# 37. Conformance Requirements
 
-# 52. Immutability Boundary
-
-The moment an Action becomes authoritative defines its semantic immutability boundary.
-
-Before acceptance, a candidate request MAY be transformed.
-
-After acceptance, material semantic transformation requires:
-
-- a new Action, or
-- an explicitly standardized transformation Event in a future specification.
-
-VE-001 v0.1 RECOMMENDS new Action creation for material changes.
-
----
-
-# 53. Action Hashing
-
-Implementations MAY compute a cryptographic digest of canonical Action semantics.
-
-Hashing is not yet required for Level 1 conformance.
-
-A future evidence specification is expected to define canonical hashing requirements.
-
-The architecture MUST NOT assume JSON field ordering or one serialization format before canonical encoding is standardized.
-
----
-
-# 54. Security Considerations
-
-Action construction is security-sensitive.
-
-Relevant risks include:
-
-- argument injection,
-- target substitution,
-- authority confusion,
-- operation ambiguity,
-- stale authorization context,
-- replay,
-- duplicate execution,
-- schema downgrade,
-- malicious canonicalization.
-
-Implementations SHOULD treat Action parsing and canonicalization as part of the trusted computing base.
-
----
-
-# 55. Confused Deputy Risk
-
-An Action MUST preserve enough authority context to avoid a system using its own greater privileges on behalf of a less privileged initiator without authorization.
-
-Example:
-
-```text
-AI has access to execution service
-Execution service has admin credentials
-```
-
-The presence of admin credentials MUST NOT imply the AI possesses admin authority.
-
-The Execution Boundary must evaluate the Action under the relevant principal's authority.
-
----
-
-# 56. Replay Risk
-
-An old Action MUST NOT automatically regain authority merely because its serialized representation is replayed.
-
-Execution eligibility may depend on:
-
-- lifecycle state,
-- authorization freshness,
-- expiration,
-- idempotency,
-- nonce,
-- policy state.
-
-Replay defense is defined more fully in later specifications.
-
----
-
-# 57. Conformance Requirements
-
-An implementation conforms to VE-001 v0.1 if it satisfies all of the following.
+A conforming VE-001 v0.2 implementation MUST satisfy:
 
 ### ACT-C01
 
-Every governed consequential execution request becomes a canonical Action before execution.
+Every governed consequential execution request becomes a canonical
+Action before execution.
 
 ### ACT-C02
 
-Every authoritative Action has one immutable unique `action_id`.
+Every authoritative Action has one immutable `action_id`.
 
 ### ACT-C03
 
-Canonical Action semantics include the required fields defined in Section 12.
+Every authoritative Action has one deterministic `action_digest`.
 
 ### ACT-C04
 
-Material Action semantics cannot be silently mutated after acceptance.
+`action_digest` binds the normative `schema_digest` and canonical
+Semantic Payload under the required Canonical Encoding Profile.
 
 ### ACT-C05
 
-Current lifecycle status is not authoritative Action content.
+Material Action semantics cannot be silently mutated after acceptance.
 
 ### ACT-C06
 
-Vendor-specific execution requests do not replace canonical Action semantics.
+Occurrence metadata does not pollute semantic content identity merely to
+force digest uniqueness.
 
 ### ACT-C07
 
-Unknown or ambiguous Action semantics do not execute by default.
+Initiator and authority context are not treated as universal semantic
+Action fields.
 
 ### ACT-C08
 
-Action identity is distinct from payload equality.
+VE-001 defines no universal semantic `scope`.
 
 ### ACT-C09
 
-Compensation does not rewrite original Actions.
+An Action does not select its own governing Rule, Trust Context, or
+execution authority.
 
 ### ACT-C10
 
-Action construction does not require access to private model chain-of-thought.
+Unknown or ambiguous Action semantics fail closed.
 
----
+### ACT-C11
 
-# 58. Conformance Tests
+Same `action_digest` may correspond to multiple Action occurrences.
 
-A future machine-readable conformance suite SHOULD test at least the following.
+### ACT-C12
 
-## Test 1 — Identity stability
+Digest equality does not imply idempotency, authorization, execution, or
+commit.
 
-Create Action.
+### ACT-C13
 
-Attempt to change `action_id`.
+Any authoritative artifact that depends on one occurrence carrying
+particular content binds at least `(action_id, action_digest)`.
+
+### ACT-C14
+
+No conforming implementation requires a universal third Action identity.
+
+### ACT-C15
+
+Lifecycle status is not authoritative Action content.
+
+### ACT-C16
+
+Cryptographic interoperability MUST NOT be claimed unless the normative
+Canonical Encoding Profile and digest suite are shared.
+
+------------------------------------------------------------------------
+
+# 38. Conformance Tests
+
+## Test 1 --- Identity stability
+
+Attempt to change `action_id` after acceptance.
 
 Expected:
 
-```text
+``` text
 rejected
 ```
 
-## Test 2 — Semantic mutation
+## Test 2 --- Semantic mutation
 
-Create Action:
+Change a semantic value:
 
-```text
-transfer $100
+``` text
+amount = 100
 ```
 
-Attempt to mutate:
+to:
 
-```text
-transfer $1,000
+``` text
+amount = 1000
 ```
-
-under same identity.
 
 Expected:
 
-```text
+``` text
+action_digest changes
+existing Action cannot be mutated
+```
+
+## Test 3 --- Same content, different occurrence
+
+Create two independent Action occurrences with identical schema and
+Semantic Payload.
+
+Expected:
+
+``` text
+same action_digest
+different action_id
+```
+
+## Test 4 --- Schema substitution
+
+Use identical payload values under different schema digests.
+
+Expected:
+
+``` text
+different action_digest
+```
+
+## Test 5 --- Initiator change
+
+Associate identical semantic content with a different initiator Claim.
+
+Expected:
+
+``` text
+action_digest unchanged
+```
+
+unless represented identity is explicitly part of the Action Schema's
+semantic payload.
+
+## Test 6 --- Occurrence-specific approval
+
+Create approval for:
+
+``` text
+(action_id = A1, action_digest = D)
+```
+
+Attempt to apply it to:
+
+``` text
+(action_id = A2, action_digest = D)
+```
+
+Expected:
+
+``` text
 rejected
 ```
 
-## Test 3 — Same content, different intent
+unless the Claim semantics explicitly authorize more than one
+occurrence.
 
-Submit same Action payload twice without shared idempotency semantics.
+## Test 7 --- Canonical encoding divergence
 
-Expected:
-
-```text
-two distinct Actions
-```
-
-## Test 4 — Unknown operation
-
-Submit unsupported operation.
+Encode the same logical payload using a non-normative serialization or
+canonicalization profile.
 
 Expected:
 
-```text
-no execution
+``` text
+not cryptographically interoperable
 ```
 
-## Test 5 — Vendor normalization
+The implementation MUST NOT claim equality based on locally produced
+bytes.
 
-Submit two provider-specific representations of the same semantic operation.
+## Test 8 --- Authority hint
+
+Place a candidate Trust Context or Rule reference in the Instance
+Envelope.
 
 Expected:
 
-```text
-both normalize into valid canonical Action form
+``` text
+reference does not become authoritative by inclusion
 ```
 
-## Test 6 — Compensation
+## Test 9 --- Unknown schema
 
-Execute Action A.
-
-Create compensation.
+Provide a schema reference whose descriptor cannot be resolved or whose
+digest does not match.
 
 Expected:
 
-```text
-Action B created
-Action A unchanged
+``` text
+no governed execution
 ```
 
-## Test 7 — State projection
+## Test 10 --- Status projection
 
-Change cached status without Event support.
+Change cached lifecycle status without authoritative Event support.
 
 Expected:
 
-```text
-authoritative Action semantics unchanged
+``` text
+Action semantics and identity unchanged
 ```
 
----
+------------------------------------------------------------------------
 
-# 59. Architectural Decision Test
+# 39. Security Considerations
 
-VE-001 satisfies the Verified Execution Architectural Decision Test.
+Security-sensitive areas include:
+
+-   malicious canonicalization;
+-   schema substitution;
+-   semantic mutation after approval;
+-   occurrence/content substitution;
+-   digest downgrade;
+-   authority confusion;
+-   replay;
+-   duplicate execution;
+-   ambiguous field classification;
+-   inconsistent Unicode or numeric encoding;
+-   canonicalization-profile mismatch.
+
+Implementations MUST treat schema resolution, canonicalization, digest
+computation, and structural validation as part of the trusted computing
+base.
+
+------------------------------------------------------------------------
+
+# 40. Architectural Decision Test
 
 ### Consistency
 
-The Action primitive is explicitly required by the Founding Principles and VE-000.
+**PASS.** Action remains the stable unit of governed execution intent.
 
 ### Primitive necessity
 
-Without Action, the system lacks a stable unit for governing execution intent.
+**PASS.** No new semantic primitive is introduced.
 
 ### Removability
 
-Removing Action collapses policy, lifecycle, evidence, and execution into vendor-specific requests.
-
-The architecture does not survive coherently.
+**PASS.** Removing `action_id` collapses distinct repeated occurrences.
+Removing `action_digest` removes exact semantic-content identity. A
+universal third identity is unnecessary and therefore excluded.
 
 ### Twenty-year durability
 
-The concept of bounded consequential intent is independent of current models and protocols.
+**PASS.** Content identity and occurrence identity are independent of
+current vendors and execution domains.
 
 ### Independent implementation
 
-The semantics in this specification are intended to permit independent implementation.
+**CONDITIONAL PASS.** Semantic behavior is independently specified here.
+Byte-for-byte cryptographic interoperability additionally requires the
+normative Canonical Encoding Profile.
 
 ### Complexity reduction
 
-Action reduces total conceptual complexity by providing one canonical execution object across heterogeneous agents, frameworks, and external systems.
+**PASS.** The specification removes universal Actor/authority/Scope
+assumptions while preserving deterministic semantic identity.
 
-Therefore the primitive is justified.
+------------------------------------------------------------------------
 
----
+# 41. Open Questions
 
-# 60. Open Questions
+## OQ-ACT-001 --- Exact acceptance point
 
-## OQ-ACT-001 — Exact acceptance point
+Should VE standardize the exact protocol moment at which `action_id`
+becomes authoritative?
 
-Should Action identity be assigned immediately upon ingress or only after successful canonicalization?
+## OQ-ACT-002 --- Execution attempts
 
-## OQ-ACT-002 — Execution attempts
+Should attempts remain Event structures or require future formalization?
 
-Should attempts remain Event substructures or eventually become a formal subordinate entity?
+The burden for a new primitive remains high.
 
-The burden for introducing a new primitive remains high.
+## OQ-ACT-003 --- Canonical Encoding Profile
 
-## OQ-ACT-003 — Canonical encoding
+Which concrete canonical encoding, framing, domain-separation, and
+digest-suite profile should VE standardize?
 
-What serialization supports stable hashing, portability, and implementation simplicity?
+This is a **normative protocol dependency**, not an unresolved Action
+semantic.
 
-## OQ-ACT-004 — Action type naming
+## OQ-ACT-004 --- Global operation naming
 
-Should global semantic operation namespaces exist?
+Should global semantic operation namespaces exist, or should schema
+identity alone provide sufficient interpretation?
 
-Example:
+## OQ-ACT-005 --- Read governance
 
-```text
-email.send
-payment.transfer
-```
+Should VE standardize consequential reads?
 
-## OQ-ACT-005 — Read governance
+## OQ-ACT-006 --- Parent semantics
 
-Should Verified Execution define a standard class for consequential reads?
+Should parent-child relationships have standardized authorization
+inheritance?
 
-## OQ-ACT-006 — Parent semantics
-
-Should parent-child relationships have standardized authorization inheritance?
-
-## OQ-ACT-007 — Idempotency lifetime
+## OQ-ACT-007 --- Idempotency lifetime
 
 How long does an idempotency key remain authoritative?
 
-## OQ-ACT-008 — Expiration semantics
+## OQ-ACT-008 --- Expiration semantics
 
-Does expiration prohibit execution completely or require re-authorization?
+Does expiration prohibit execution completely or require
+re-authorization?
 
-## OQ-ACT-009 — Action transformation
+## OQ-ACT-009 --- Action transformation
 
-Do we ever need first-class transformation semantics, or should all material changes always create new Actions?
+Should material semantic transformations always create new Actions?
 
-## OQ-ACT-010 — Composite Actions
+## OQ-ACT-010 --- Composite Actions
 
-Is a formal composite Action category necessary, or are correlation and parent-child relationships sufficient?
+Are correlation and parent-child relationships sufficient without a
+Composite Action primitive?
 
-The default assumption is that no new primitive is required.
+------------------------------------------------------------------------
 
----
+# 42. Revision History
 
-# 61. Criteria for v0.2
+## v0.2
 
-VE-001 SHOULD advance to v0.2 only after the reference implementation has exercised:
+Implemented RFC-004 v0.2 and ADR-004.
 
-- at least three materially different Action categories,
-- at least two different external target systems,
-- repeated Actions,
-- retries,
-- cancellation,
-- compensation,
-- parent-child relationships,
-- validation failures,
-- and sensitive payload handling.
+Established:
 
-Implementation evidence SHOULD determine whether the current Action boundary is sufficiently general.
-
----
-
-# 62. Revision History
+-   dual Action identity: `action_id` and `action_digest`;
+-   schema-digest-bound semantic content identity;
+-   Semantic Payload / Instance Envelope separation;
+-   occurrence/content binding invariant;
+-   no mandatory `instance_digest`;
+-   removal of universal semantic `initiator`;
+-   removal of universal semantic `authority_context`;
+-   removal of universal semantic `scope`;
+-   schema-defined effect fields rather than a VE domain ontology;
+-   normative dependence on canonical encoding for cryptographic
+    interoperability.
 
 ## v0.1
 
 Initial formal definition of the Action primitive.
 
-Established:
+------------------------------------------------------------------------
 
-- semantic Action definition,
-- canonicalization,
-- Action identity,
-- immutability,
-- Action boundary,
-- consequentiality,
-- required fields,
-- target and operation semantics,
-- relationships,
-- compensation,
-- idempotency distinction,
-- retry implications,
-- privacy requirements,
-- conformance requirements,
-- conformance tests,
-- open questions.
+# 43. Foundational Rule
 
----
+The Action primitive preserves two questions before consequence begins:
 
-# 63. Foundational Rule
-
-The Action primitive exists to preserve one distinction:
-
-```text
-An intelligent system may want something to happen.
-
-That does not mean it has happened.
-
-That does not mean it may happen.
+``` text
+What exactly is being proposed?
+Which occurrence of that proposal is this?
 ```
 
-Verified Execution represents that intent explicitly before consequence begins.
+Neither answer establishes that the Action may execute or that reality
+changed.
 
-The canonical form is:
-
-```text
+``` text
 INTENT
   │
   ▼
@@ -1718,6 +1180,6 @@ ACTION
 EXECUTION BOUNDARY
 ```
 
-Everything downstream depends upon the Action retaining a precise, immutable meaning.
-
-If the meaning of an Action cannot be determined, governed execution MUST NOT proceed.
+If the meaning or cryptographic identity of an Action cannot be
+determined under the required protocol profile, governed execution MUST
+NOT proceed.
