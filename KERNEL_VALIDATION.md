@@ -2,7 +2,7 @@
 
 **Project:** Verified Execution\
 **Document:** Kernel Validation Record\
-**Version:** 0.14\
+**Version:** 0.15\
 **Status:** Draft / Active Validation\
 **Date:** 2026-08-19
 
@@ -5026,6 +5026,527 @@ specific normalization profile distinct from human-readable text?
 Is the evidence now sufficient to open an RFC for
 `VE Canonical Representation Profile 1`, or should integer/resource
 bounds and identifier normalization be pressure-tested first?
+
+**Status:** NEXT GOVERNANCE DECISION CANDIDATE.
+
+------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------
+
+## 52. Pressure Test: Universal Resource Bounds vs. Implementation Limits
+
+### Question
+
+Should VE canonical identity define universal resource bounds—integer
+size, Decimal exponent/coefficient size, nesting depth, collection
+length, and total object bytes—or may those limits remain
+implementation/profile-specific without breaking interoperability?
+
+### Result
+
+**PASS — VE requires a universal conformance resource envelope at the
+Canonical Representation Profile layer, but resource limits are not
+semantic identity fields and local implementation quotas must not
+silently redefine protocol validity.**
+
+Three classes of limits must be kept distinct:
+
+```text
+1. Canonical Representation Profile bounds
+2. Object-schema semantic bounds
+3. Local operational quotas
+```
+
+Only the first two define protocol validity.
+
+The third defines whether a particular deployment is willing or able to
+process an otherwise valid object.
+
+### 52.1 Why purely implementation-specific limits fail interoperability
+
+Assume Profile 1 permits an arbitrarily large Integer.
+
+Implementation A supports:
+
+```text
+integer magnitude <= 256 bits
+```
+
+Implementation B supports:
+
+```text
+integer magnitude <= 1,000,000 bits
+```
+
+Both receive the same canonical bytes.
+
+If A says:
+
+```text
+invalid VE object
+```
+
+while B says:
+
+```text
+valid VE object
+```
+
+then "VE Profile 1 conformance" no longer has one portable acceptance
+domain.
+
+The same problem applies to:
+
+- Decimal coefficient size;
+- Decimal exponent magnitude;
+- nesting depth;
+- array/map length;
+- text/byte-string length;
+- total object size.
+
+Therefore the representation profile needs one **minimum guaranteed
+portable domain**.
+
+### 52.2 Why resource bounds do not belong in semantic identity
+
+Resource limits answer:
+
+> Is this value inside the portable processing envelope of this protocol
+> profile?
+
+They do not answer:
+
+> What does this value mean?
+
+For example, lowering the maximum canonical object size from 16 MiB to
+8 MiB does not change the semantic meaning of a 100-byte Action.
+
+Therefore resource bounds belong to the versioned Canonical
+Representation Profile, not to the Action/Claim/Receipt semantic kernel
+and not inside object digests as ordinary fields.
+
+The profile identifier is enough to identify which representation
+envelope applies.
+
+### 52.3 Universal Profile bounds
+
+VE Canonical Representation Profile 1 SHOULD define finite normative
+upper bounds for at least:
+
+```text
+maximum top-level encoded bytes
+maximum nesting depth
+maximum text-string bytes
+maximum byte-string bytes
+maximum array element count
+maximum map entry count
+maximum map-key bytes
+maximum Integer magnitude / encoded bignum bytes
+maximum Decimal coefficient magnitude / encoded bytes
+maximum Decimal exponent magnitude
+```
+
+A value exceeding a Profile-1 bound is **out of Profile 1**.
+
+This makes portable acceptance deterministic.
+
+### 52.4 Why total object bytes alone are insufficient
+
+A total-byte cap mitigates many memory attacks but does not fully bound
+computation.
+
+A small canonical object can contain values that induce pathological
+processing.
+
+Example:
+
+```text
+Decimal:
+    coefficient = 1
+    exponent = 10^18
+```
+
+The encoded object can be small while downstream decimal expansion or
+comparison code performs excessive work.
+
+Likewise, deeply nested small containers can cause stack pressure.
+
+Therefore Profile 1 needs both:
+
+```text
+byte-size bounds
+structural / numeric complexity bounds
+```
+
+### 52.5 Integer bounds
+
+RFC 8949 permits arbitrarily sized bignums through tags 2 and 3, and its
+security considerations explicitly warn that arbitrary-precision number
+processing can exceed linear effort.
+
+Profile 1 SHOULD therefore cap canonical Integer magnitude.
+
+The bound SHOULD be expressed in representation-neutral terms such as:
+
+```text
+maximum magnitude bits
+```
+
+or equivalently a maximum canonical bignum byte length.
+
+Within the bound, every conforming implementation MUST support the
+value.
+
+Above the bound, the value is out of profile.
+
+### 52.6 Decimal coefficient and exponent bounds
+
+Decimal requires separate bounds.
+
+Coefficient magnitude is bounded for the same reason as Integer.
+
+Exponent magnitude needs an independent bound because:
+
+```text
+small coefficient + enormous exponent
+```
+
+can be compactly encoded yet operationally pathological.
+
+Therefore Profile 1 SHOULD normatively bound:
+
+```text
+abs(decimal_exponent)
+decimal_coefficient_magnitude
+```
+
+The profile does not need to prescribe application-specific decimal
+precision.
+
+An Action schema may impose tighter constraints such as:
+
+```text
+currency amount:
+    at most 2 fractional decimal places
+```
+
+That is a schema semantic rule, not a representation bound.
+
+### 52.7 Nesting depth
+
+Profile 1 MUST define a maximum canonical nesting depth.
+
+RFC 8949 warns that deeply nested input can exhaust decoder stack or
+other resources.
+
+All conforming implementations MUST support valid Profile-1 objects up
+to that depth.
+
+Schemas SHOULD normally impose much shallower structures.
+
+### 52.8 Collection lengths
+
+Profile 1 SHOULD bound:
+
+```text
+array elements
+map entries
+```
+
+even when total object bytes are bounded.
+
+This limits:
+
+- allocation counts;
+- map-key comparison work;
+- duplicate-key checking;
+- per-element validation overhead.
+
+### 52.9 String and byte-string lengths
+
+Profile 1 SHOULD bound individual Text and Bytes values in addition to
+total object bytes.
+
+This gives implementations predictable per-field allocation ceilings
+and improves streaming validation.
+
+Object schemas may impose tighter limits.
+
+### 52.10 Local operational quotas
+
+Deployments MAY impose local operational limits for:
+
+- rate limiting;
+- memory pressure;
+- tenant quotas;
+- API request caps;
+- risk controls;
+- constrained hardware.
+
+But a local quota MUST NOT redefine a Profile-1 canonical value as
+malformed or noncanonical.
+
+A compliant implementation encountering a canonical in-profile object
+that it refuses solely because of local capacity SHOULD report a
+distinct condition such as:
+
+```text
+RESOURCE_LIMIT
+CAPACITY_EXCEEDED
+LOCAL_POLICY_REJECTED
+```
+
+rather than:
+
+```text
+INVALID_CANONICAL_ENCODING
+```
+
+This preserves the distinction between:
+
+```text
+protocol invalidity
+```
+
+and:
+
+```text
+deployment refusal
+```
+
+### 52.11 Full-profile conformance
+
+An implementation claiming full support for VE Canonical Representation
+Profile 1 MUST be capable of parsing, canonicality-checking, and
+representing every Profile-1 value up to the normative Profile-1 bounds.
+
+An implementation with lower hard capabilities MUST NOT advertise full
+Profile-1 conformance for interfaces that can receive values above its
+supported domain.
+
+It may instead implement a separately identified constrained deployment
+profile or gateway limit.
+
+### 52.12 Object-schema bounds
+
+Object schemas MAY and often SHOULD impose tighter semantic bounds.
+
+Examples:
+
+```text
+bank.transfer amount:
+    Decimal precision <= domain rule
+
+action operation name:
+    Text <= 128 bytes
+
+Receipt evidence list:
+    Array <= 32 entries
+```
+
+These constraints are object semantics / validation rules.
+
+Two implementations using the same schema MUST apply the same
+schema-defined limits.
+
+Therefore:
+
+```text
+Profile bounds
+    define universal representable envelope
+
+Schema bounds
+    define valid values for an object type
+
+Local quotas
+    define deployment willingness/capacity
+```
+
+### 52.13 Hashing and rejected oversized values
+
+A value outside Profile 1 does not have a valid Profile-1 canonical
+representation and therefore cannot acquire a Profile-1 object digest.
+
+An in-profile canonical object remains cryptographically identical
+regardless of whether a deployment later refuses to process it due to a
+local quota.
+
+This distinction prevents local capacity from changing object identity.
+
+### 52.14 Negotiation attack
+
+VE SHOULD NOT allow arbitrary per-message negotiation such as:
+
+```text
+"this object uses Profile 1 but with 4x larger integers"
+```
+
+while retaining the same profile identifier.
+
+That would destroy the fixed portable domain.
+
+If VE later needs larger bounds, it should use:
+
+```text
+new representation profile version
+```
+
+or a separately identified extension profile.
+
+Profile identity commits to the bound set.
+
+### 52.15 Exact numerical bounds
+
+This pressure test establishes **where** bounds belong and that they must
+exist.
+
+It does not yet justify exact values.
+
+Exact maxima should be chosen only after:
+
+- representative object sizing;
+- constrained-device feasibility;
+- server-side implementation tests;
+- denial-of-service analysis;
+- cross-language library capability review.
+
+The values should be generous enough for foreseeable VE objects but
+small enough to guarantee predictable validation.
+
+### 52.16 Architectural conclusion
+
+The correct architecture is:
+
+```text
+VE Canonical Representation Profile
+    |
+    +-- canonical value model
+    +-- exact byte encoding
+    +-- universal finite resource envelope
+            |
+            v
+Object Schema
+    |
+    +-- tighter semantic/value constraints
+            |
+            v
+Deployment
+    |
+    +-- local capacity / rate / tenant quotas
+```
+
+Only Profile and Schema constraints define interoperable object
+validity.
+
+Local quotas define processing availability, not canonical meaning.
+
+------------------------------------------------------------------------
+
+## 53. New Validated Architectural Findings
+
+### KV-F91 — Profile-Level Resource Bounds Are Required
+
+A canonical representation profile needs finite universal processing
+bounds to define a portable conformance domain.
+
+**Status:** PASS.
+
+### KV-F92 — Resource Bounds Are Not Semantic Identity Fields
+
+Representation limits belong to the versioned canonical profile rather
+than Action/Claim/Receipt semantic payloads.
+
+**Status:** PASS.
+
+### KV-F93 — Total Bytes Alone Are Insufficient
+
+Canonical profile security requires structural and numeric complexity
+bounds in addition to total encoded bytes.
+
+**Status:** PASS.
+
+### KV-F94 — Decimal Exponent Requires an Independent Bound
+
+Small encodings can contain extreme decimal exponents that cause
+pathological downstream computation.
+
+**Status:** PASS.
+
+### KV-F95 — Local Quotas Must Not Redefine Canonical Validity
+
+A deployment may refuse an otherwise canonical in-profile object for
+capacity reasons, but that refusal must remain distinct from protocol
+invalidity.
+
+**Status:** PASS.
+
+### KV-F96 — Full Profile Conformance Implies Support Through Profile Bounds
+
+An implementation cannot claim full Profile-1 conformance on an
+interface while being structurally incapable of accepting valid values
+inside the Profile-1 envelope.
+
+**Status:** PASS.
+
+### KV-F97 — Schema Bounds May Be Tighter
+
+Object schemas may impose deterministic semantic limits inside the
+larger representation-profile envelope.
+
+**Status:** PASS.
+
+### KV-F98 — Profile Bounds Are Versioned, Not Negotiated Per Object
+
+A different universal resource envelope requires a separately
+identified representation profile/version.
+
+**Status:** PASS.
+
+------------------------------------------------------------------------
+
+## 54. Updated Validation Backlog
+
+### HYP-037 — Profile-1 exact bounds
+
+What exact Profile-1 maxima should VE choose for:
+
+```text
+encoded object bytes
+nesting depth
+text bytes
+byte-string bytes
+array elements
+map entries
+map-key bytes
+integer magnitude bits
+Decimal coefficient bits
+Decimal exponent magnitude
+```
+
+**Status:** OPEN — REQUIRES IMPLEMENTATION / DOS ANALYSIS.
+
+### HYP-038 — Constrained conformance profiles
+
+Does VE need formally named constrained profiles for embedded or
+resource-limited implementations, or is full Profile-1 conformance plus
+deployment-level refusal sufficient?
+
+**Status:** OPEN.
+
+### HYP-039 — Streaming verification
+
+Can Profile-1 canonicality, hashing, duplicate-map-key detection, and
+resource-bound enforcement be performed in bounded memory for the
+largest permitted objects?
+
+**Status:** NEXT PRESSURE TEST CANDIDATE.
+
+### HYP-040 — Canonical Representation RFC readiness
+
+Is the architecture now mature enough to open an RFC establishing
+VE Canonical Representation Profile 1 while leaving exact numeric bounds
+as an implementation-validation gate before final approval?
 
 **Status:** NEXT GOVERNANCE DECISION CANDIDATE.
 
