@@ -2,7 +2,7 @@
 
 **Project:** Verified Execution\
 **Document:** Kernel Validation Record\
-**Version:** 0.12\
+**Version:** 0.13\
 **Status:** Draft / Active Validation\
 **Date:** 2026-08-19
 
@@ -4089,5 +4089,523 @@ digest contract identifies executable Rule logic without embedding a
 general-purpose language into the canonical representation layer?
 
 **Status:** OPEN.
+
+------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------
+
+## 46. Pressure Test: Minimum Canonical Data Model
+
+### Question
+
+What is the smallest canonical data model VE actually needs, especially
+for integers, decimals, timestamps, text, bytes, arrays, maps,
+null/absence, and tagged values, and can enough types be eliminated that
+an existing deterministic encoding standard already satisfies the need?
+
+### Result
+
+**PASS — the VE canonical data model can remain very small, and an
+existing deterministic CBOR profile is the strongest current candidate.**
+
+The minimum VE canonical data model currently justified is:
+
+```text
+boolean
+integer
+decimal
+text
+bytes
+array
+map
+null
+```
+
+with **no generic floating-point type** and **no generic tagged-value
+escape hatch** in the initial profile.
+
+Time is not a primitive canonical data-model type.
+
+Timestamps are represented using a schema-defined canonical structural
+representation built from existing primitive types.
+
+Absence is not a value.
+
+An absent field and a field whose value is `null` are distinct.
+
+### 46.1 Boolean
+
+Boolean is irreducible.
+
+Many VE objects require exact binary state without overloading integers
+or strings.
+
+Canonical values:
+
+```text
+true
+false
+```
+
+### 46.2 Integer
+
+Integer is irreducible.
+
+It is required for:
+
+- counters;
+- sequence positions;
+- version components;
+- threshold counts;
+- enumerated numeric identifiers where specified;
+- exact whole quantities.
+
+The canonical model SHOULD support arbitrary-magnitude integers or a
+protocol-defined bounded range large enough that implementations do not
+silently lose precision.
+
+Binary floating point MUST NOT substitute for integer identity.
+
+### 46.3 Decimal
+
+Exact decimal is justified as a distinct semantic numeric type.
+
+Examples include:
+
+```text
+money
+rates
+quantities
+limits
+```
+
+Representing decimal values as binary floating point creates rounding and
+cross-language identity hazards.
+
+Representing them as ordinary text is possible, but then every schema
+must reinvent:
+
+- decimal grammar;
+- sign rules;
+- exponent rules;
+- leading zero rules;
+- trailing zero equivalence;
+- canonical normalization.
+
+Therefore exact decimal deserves one common canonical representation.
+
+A decimal value SHOULD be represented semantically as:
+
+```text
+coefficient × 10^exponent
+```
+
+with one canonical normalization rule.
+
+### 46.4 Floating point
+
+A generic IEEE floating-point value type is **rejected from the initial
+canonical model**.
+
+Reasons include:
+
+- multiple NaN encodings;
+- positive and negative zero;
+- precision variation;
+- shortest-form choices;
+- cross-language conversion differences;
+- poor fit for money and exact authorization thresholds.
+
+If a future domain genuinely requires floating-point identity, it must
+justify a dedicated profile extension.
+
+### 46.5 Text
+
+Unicode text is irreducible.
+
+However, the canonical representation layer MUST choose one rule:
+
+```text
+preserve code points exactly
+```
+
+or:
+
+```text
+normalize under one specified Unicode normalization form
+```
+
+Implementations MUST NOT normalize text opportunistically.
+
+The schema layer determines whether a field permits further semantic
+normalization such as ASCII case folding.
+
+### 46.6 Bytes
+
+Byte string is irreducible.
+
+It is required for:
+
+- hashes;
+- signatures;
+- public keys;
+- proofs;
+- encrypted payloads;
+- opaque binary identifiers.
+
+Encoding binary values as text/base64 merely moves canonicalization into
+another convention and should not be required by the canonical data
+model.
+
+### 46.7 Array
+
+Ordered array is irreducible.
+
+Order can be semantically meaningful and must be preserved.
+
+An array is:
+
+```text
+[value_0, value_1, ...]
+```
+
+No automatic sorting is permitted unless an object schema explicitly
+defines a set-like field and its canonicalization rule.
+
+### 46.8 Map
+
+Map is irreducible for structured protocol objects.
+
+The common canonical encoding profile MUST define deterministic key
+encoding and key ordering.
+
+The initial VE profile SHOULD strongly consider restricting map keys to
+canonical text strings rather than arbitrary canonical values.
+
+This materially simplifies:
+
+- field-path selectors;
+- schema descriptors;
+- implementation;
+- human inspection;
+- duplicate-key rejection.
+
+Map key uniqueness is mandatory.
+
+### 46.9 Null
+
+`null` is useful but should be used sparingly.
+
+It means:
+
+> this field is explicitly present with no value.
+
+It MUST NOT mean:
+
+```text
+field absent
+unknown
+not applicable
+redacted
+failed to resolve
+```
+
+unless an object specification explicitly assigns such semantics.
+
+Where an optional field is unnecessary, omission SHOULD generally be
+preferred to `null`.
+
+### 46.10 Absence
+
+Absence is not a canonical value type.
+
+It is structural non-presence.
+
+Therefore:
+
+```text
+{}
+```
+
+and:
+
+```text
+{"x": null}
+```
+
+are distinct canonical objects.
+
+This distinction MUST be preserved.
+
+### 46.11 Timestamp
+
+A universal timestamp primitive is **not justified**.
+
+Time has multiple semantics:
+
+- UTC instant;
+- local civil time;
+- date;
+- duration;
+- monotonic time;
+- trusted observation time.
+
+Collapsing them into one generic `timestamp` type would hide semantic
+differences.
+
+Instead, schemas define exact structural forms.
+
+For a UTC instant, a future common schema convention might use:
+
+```text
+{
+  "seconds": integer,
+  "nanoseconds": integer
+}
+```
+
+or another explicitly standardized representation.
+
+The canonical data model itself need only encode the integers/map.
+
+### 46.12 Tagged values
+
+A generic open-ended `tag(type, value)` mechanism is **rejected from the
+initial VE canonical data model**.
+
+Although tags are powerful, unrestricted tags create a back door through
+which every domain can invent new canonical types, undermining the goal
+of one small representation layer.
+
+If VE later needs a new semantic canonical type, it should be added
+through protocol governance rather than arbitrary per-object tags.
+
+Encoding standards may use internal tags as part of a pinned profile
+implementation, but VE object schemas MUST NOT gain open-ended semantic
+extensibility merely because the wire format supports tags.
+
+### 46.13 Candidate minimum model
+
+The resulting value grammar is conceptually:
+
+```text
+Value :=
+    Null
+  | Boolean
+  | Integer
+  | Decimal
+  | Text
+  | Bytes
+  | Array<Value>
+  | Map<Text, Value>
+```
+
+This is deliberately smaller than the full data model of many generic
+serialization formats.
+
+### 46.14 Why JSON/JCS is not the best semantic fit
+
+JSON Canonicalization Scheme provides deterministic JSON serialization,
+but its native numeric model is constrained by the JSON/ECMAScript number
+ecosystem.
+
+For exact large integers, exact decimals, byte strings, and other
+non-JSON-native data, applications must introduce string conventions or
+additional schema mappings.
+
+That would push canonical semantics back into every VE object schema.
+
+JCS remains useful for human-facing or JSON-native integrations, but it
+is not the strongest candidate for VE's cryptographic canonical layer.
+
+### 46.15 Why deterministic CBOR is a strong candidate
+
+CBOR already has native structural representations for:
+
+- integers;
+- byte strings;
+- text strings;
+- arrays;
+- maps;
+- tagged values;
+- simple values.
+
+RFC 8949 also defines core deterministic encoding requirements that can
+serve as the base of a protocol-specific deterministic format.
+
+VE would still need a constrained profile because full CBOR is broader
+than VE needs.
+
+A VE profile could:
+
+```text
+allow:
+    null
+    booleans
+    integers
+    exact decimal representation
+    text
+    bytes
+    arrays
+    text-keyed maps
+
+forbid:
+    generic floating point
+    undefined
+    arbitrary simple values
+    indefinite-length encoding
+    arbitrary semantic tags
+    non-text map keys
+```
+
+and define one exact deterministic decimal encoding.
+
+### 46.16 Existing standard vs. custom encoding
+
+The current evidence strongly favors:
+
+> **Adopt a constrained deterministic profile of an existing standard
+> rather than invent a VE-specific byte encoding.**
+
+This reduces:
+
+- implementation burden;
+- parser risk;
+- test burden;
+- standards work;
+- interoperability friction.
+
+A custom format should require evidence that the constrained existing
+standard cannot satisfy VE's requirements.
+
+### 46.17 Architectural conclusion
+
+The minimum canonical data model is smaller than CBOR's generic data
+model but maps naturally onto it.
+
+Therefore the next standards decision should compare a **VE deterministic
+CBOR profile** against any credible alternative rather than designing new
+bytes from first principles.
+
+------------------------------------------------------------------------
+
+## 47. New Validated Architectural Findings
+
+### KV-F73 — Eight Canonical Value Classes Are Currently Sufficient
+
+The initial canonical model requires:
+
+```text
+null
+boolean
+integer
+decimal
+text
+bytes
+array
+map
+```
+
+**Status:** PASS.
+
+### KV-F74 — Generic Floating Point Is Excluded
+
+Floating point is not required for the initial VE canonical identity
+model and introduces avoidable determinism hazards.
+
+**Status:** PASS FOR EXCLUSION.
+
+### KV-F75 — Absence Is Structural, Not a Value
+
+Absent fields and explicitly null fields are distinct.
+
+**Status:** PASS.
+
+### KV-F76 — Timestamp Is Not a Canonical Primitive
+
+Time semantics are schema-defined structural values rather than one
+universal canonical timestamp type.
+
+**Status:** PASS.
+
+### KV-F77 — Open-Ended Tagged Values Are Excluded
+
+The initial canonical data model does not permit arbitrary schema-defined
+semantic tags.
+
+**Status:** PASS FOR EXCLUSION.
+
+### KV-F78 — Text-Keyed Maps Are Preferred
+
+Restricting canonical maps to text keys materially reduces complexity and
+aligns with Action schemas and selector field paths.
+
+**Status:** PASS AS CURRENT CANDIDATE.
+
+### KV-F79 — Exact Decimal Is Justified
+
+A shared exact-decimal type avoids repeated per-schema string
+canonicalization conventions.
+
+**Status:** PASS.
+
+### KV-F80 — Existing Deterministic Encoding Is Preferred
+
+Current evidence favors a constrained deterministic profile of an
+existing standard over a new VE-specific wire encoding.
+
+**Status:** PASS.
+
+### KV-F81 — Deterministic CBOR Is the Leading Candidate
+
+RFC 8949 deterministic CBOR maps naturally to the minimum VE data model,
+subject to a restrictive VE profile.
+
+**Status:** LEADING CANDIDATE; NOT YET NORMATIVE.
+
+------------------------------------------------------------------------
+
+## 48. Updated Validation Backlog
+
+### HYP-029 — Deterministic CBOR profile
+
+Can a tightly constrained RFC 8949 deterministic CBOR profile encode the
+entire minimum VE canonical data model with exactly one representation
+per VE value, including exact decimal, while forbidding problematic CBOR
+features?
+
+**Status:** NEXT PRESSURE TEST CANDIDATE.
+
+### HYP-030 — Decimal canonical form
+
+What exact normalization should define VE decimal identity?
+
+For example, should:
+
+```text
+1
+1.0
+1.00
+10e-1
+```
+
+map to one semantic Decimal value and one canonical encoding?
+
+**Status:** OPEN — SECURITY RELEVANT.
+
+### HYP-031 — Unicode treatment
+
+Should VE preserve Unicode code points exactly or require one
+normalization form before canonical representation?
+
+**Status:** OPEN.
+
+### HYP-032 — Map key restriction
+
+Can every foreseeable VE protocol object use text-keyed maps without
+material loss of expressiveness?
+
+**Status:** OPEN; STRONG CURRENT HYPOTHESIS.
 
 ------------------------------------------------------------------------
