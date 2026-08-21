@@ -2,7 +2,7 @@
 
 **Project:** Verified Execution\
 **Document:** Kernel Validation Record\
-**Version:** 0.11\
+**Version:** 0.12\
 **Status:** Draft / Active Validation\
 **Date:** 2026-08-19
 
@@ -3335,653 +3335,759 @@ without unnecessary cryptographic negotiation complexity?
 
 ### Question
 
-What belongs in the Action envelope versus the canonical semantic
-payload, and which envelope fields must themselves be cryptographically
-bound to the content/instance relationship?
+What belongs in the Action envelope versus the canonical semantic payload,
+and which occurrence fields must be cryptographically bound to the
+content/occurrence relationship?
 
 ### Result
 
-**PASS — use a two-layer Action commitment.**
+**PASS — separate semantic content identity from occurrence identity, but
+do not require a third universal Action identity.**
 
-The Action SHOULD be modeled as:
+The Action is modeled logically as:
 
 ```text
-Action Instance
-    |
-    +-- Instance Envelope
-    |
-    +-- Semantic Payload
+Action
+├── Instance Envelope
+│   └── action_id
+└── Semantic Payload
+    ├── schema_digest
+    └── schema-defined semantic fields
 ```
 
-with two distinct cryptographic identities:
+The required identities are:
 
 ```text
-action_digest
-    = H(schema_digest || canonical_semantic_payload)
-
-instance_digest
-    = H(action_digest || canonical_instance_envelope)
+action_id     = historical Action occurrence identity
+action_digest = deterministic semantic content identity
 ```
 
-The exact framing, domain separation, and digest-suite identifiers remain
-protocol details to specify normatively.
-
-`action_digest` identifies **what is proposed**.
-
-`instance_digest` identifies **this cryptographically bound occurrence of
-that proposal**.
-
-`action_id` remains the protocol-visible instance identifier and SHOULD
-be bound inside the canonical instance envelope.
-
-### 38.1 Semantic payload inclusion rule
-
-A field MUST be part of the canonical semantic payload if changing that
-field can change:
-
-- the requested external effect;
-- the target or destination of the effect;
-- the quantity, object, capability, method, or operation requested;
-- applicability of Claims, Rules, Trust Context authority, or execution
-  authority;
-- the completion semantics of the Action;
-- any constraint that is part of the proposal itself.
-
-The test is:
-
-> If two Actions differ only in field X, could a rational authority
-> legitimately authorize one but not the other because the proposed
-> execution is different?
-
-If yes, X belongs in the semantic payload.
-
-### 38.2 Candidate semantic payload fields
-
-Depending on the Action schema, examples include:
+with:
 
 ```text
-operation / action type
-target identifiers
-destination identifiers
-amount / quantity
-currency
-requested capability
-parameters
-payload commitment / message hash
-requested execution constraints
-domain-specific semantic arguments
-```
-
-The semantic payload is schema-defined.
-
-VE does not mandate a universal field list.
-
-### 38.3 Schema identity
-
-`schema_ref.digest` MUST participate in `action_digest`.
-
-Human-readable schema ID and version MAY remain envelope metadata for
-discovery and audit, provided the normative schema digest is bound to
-the content identity.
-
-### 38.4 Instance envelope inclusion rule
-
-A field belongs in the instance envelope when it distinguishes or
-governs the occurrence of a semantic proposal without changing the
-proposal's underlying effect.
-
-Candidate instance-envelope fields include:
-
-```text
-action_id
-created_at, when it records proposal-instance creation
-correlation_id
-parent / causation reference
-retry / attempt reference
-instance nonce, when used for occurrence uniqueness or replay control
-originating protocol version
-```
-
-These fields do not belong in `action_digest` merely to make content
-unique.
-
-### 38.5 Why the envelope still needs cryptographic binding
-
-Leaving the instance envelope entirely unsigned/uncommitted creates
-substitution attacks.
-
-Example:
-
-```text
-semantic Action digest = D
-
-Action instance A1 -> approved once
-Action instance A2 -> not approved
-```
-
-If `action_id` is not cryptographically bound to the occurrence, an
-attacker may be able to associate Claims, Lifecycle history, or Receipts
-with the wrong instance.
-
-Therefore the protocol needs a second commitment:
-
-```text
-instance_digest =
+action_digest =
     H(
-        action_digest
+        domain_separator
         ||
-        canonical_instance_envelope
+        schema_digest
+        ||
+        canonical_semantic_payload
     )
 ```
 
-This binds occurrence identity to exact content without polluting content
-identity with occurrence metadata.
+Any authoritative artifact whose meaning depends on one particular Action
+occurrence carrying particular semantic content MUST cryptographically
+bind at least:
 
-### 38.6 Action ID
+```text
+(action_id, action_digest)
+```
 
-`action_id` SHOULD be included in the canonical instance envelope.
+A protocol MAY derive a compact commitment over this tuple plus additional
+bound occurrence fields, but such a commitment is protocol machinery and
+is **not** a third universal Action identity.
 
-Therefore:
+### 38.1 Semantic payload inclusion rule
+
+A field MUST be part of canonical Semantic Payload if changing it can
+change:
+
+- the requested external effect;
+- target or destination;
+- quantity, capability, method, or operation;
+- deterministic applicability of Claims, Rules, Trust Context authority,
+  or execution authority;
+- completion semantics;
+- an explicit constraint that is part of the proposal.
+
+The test is:
+
+> If two Actions differ only in field X, could a legitimate authority
+> distinguish them because the proposed execution, deterministic
+> applicability, or completion semantics differ?
+
+If yes, X is semantic Action content.
+
+### 38.2 Occurrence fields
+
+Occurrence-level fields MAY include:
 
 ```text
 action_id
-  -> instance_digest
-  -> action_digest
-  -> exact semantic payload
-```
-
-A verifier can establish both:
-
-> Which occurrence is this?
-
-and:
-
-> What exact content does that occurrence carry?
-
-`action_id` remains useful as a human/system reference but is no longer
-the sole cryptographic binding between occurrence and content.
-
-### 38.7 Created time
-
-`created_at` has two possible meanings.
-
-#### Occurrence timestamp
-
-If it only means:
-
-> this Action instance was created at time T
-
-then it belongs in the instance envelope.
-
-#### Semantic timing constraint
-
-If the Action means:
-
-> execute at / before / after T
-
-then that timing value changes proposed semantics and belongs in the
-semantic payload.
-
-A single field MUST NOT ambiguously serve both meanings.
-
-Schemas SHOULD distinguish:
-
-```text
 instance_created_at
-```
-
-from semantic fields such as:
-
-```text
-execute_after
-execute_before
-effective_at
-```
-
-### 38.8 Expiration
-
-If expiration is merely a processing policy applied externally to the
-Action, it is not semantic payload.
-
-If the proposer explicitly constrains the Action:
-
-```text
-this transfer MUST NOT execute after T
-```
-
-then `execute_before = T` is part of the semantic proposal and MUST
-affect `action_digest`.
-
-### 38.9 Nonce
-
-A nonce has to be classified by purpose.
-
-#### Instance nonce
-
-Used only to distinguish occurrences or provide replay-control context:
-
-```text
+correlation_id
+parent / causation reference
 instance_nonce
+envelope_version
+non-authoritative routing hints
 ```
 
-belongs in the instance envelope.
-
-#### Semantic challenge/session binding
-
-If execution is meaningful only relative to challenge/session C:
+Protocols defining such fields MUST classify them as:
 
 ```text
-required_challenge = C
+bound authoritative
+unbound / non-authoritative
+local implementation metadata
 ```
 
-that constraint belongs in the semantic payload.
+Not every occurrence field is automatically bound.
 
-The protocol MUST NOT add random nonces to semantic payload merely to
-force unique Action digests.
+A field whose mutation could alter interpretation, provenance, replay
+behavior, or authoritative history relied upon by an artifact MUST
+participate in that artifact's cryptographic binding.
 
-### 38.10 Correlation and causation references
+### 38.3 Timing and nonces
 
-A `correlation_id` used for tracing belongs in the instance envelope.
+Timing and nonce fields are classified by purpose.
 
-A `caused_by_action_id` used only for observability belongs in the
-instance envelope.
+If a value changes the proposed execution semantics, it belongs in
+Semantic Payload and affects `action_digest`.
 
-However, if the Action's semantics explicitly require execution as a
-consequence of a particular prior semantic Action, the required
-predecessor commitment MAY belong in semantic payload.
+If it merely distinguishes or records an occurrence, it belongs in the
+Instance Envelope.
 
-Again, purpose determines layer.
+Random occurrence values MUST NOT be inserted into Semantic Payload merely
+to force unique `action_digest` values.
 
-### 38.11 Actor / proposer identity
+### 38.4 Actor / proposer identity
 
-Actor identity SHOULD NOT automatically be part of semantic Action
-content.
+Actor or proposer identity is not universally semantic Action content.
 
-The same proposed effect can be proposed by different actors while
+The same proposed effect may originate from different actors while
 retaining the same `action_digest`.
 
-Authority for who may propose or authorize it belongs in Claims and
-Rule evaluation.
+Identity becomes semantic only when represented identity changes the
+requested external effect itself.
 
-If an Action schema explicitly makes actor identity part of the proposed
-effect—for example, "publish statement as legal entity X"—then the
-relevant represented identity is semantic and belongs in the payload.
+### 38.5 Governance references
 
-This avoids smuggling `Actor` back as a universal Action primitive.
+An Action-carried Rule, selector, Trust Context, authority, or execution
+authority reference cannot establish its own applicability or authority.
 
-### 38.12 Claims and approvals
+Such references are non-authoritative hints unless independently
+established.
 
-Claims are not Action payload fields merely because they accompany an
-Action.
+### 38.6 Receipts and execution evidence
 
-Claims SHOULD bind either:
-
-```text
-action_digest
-```
-
-when they concern exact semantic content, or:
-
-```text
-instance_digest / action_id
-```
-
-when they concern a particular occurrence.
-
-An approval that is valid for one occurrence only SHOULD bind the
-instance commitment, not merely the content digest.
-
-### 38.13 Rule and selector references
-
-The Action SHOULD NOT generally embed the Rule or selector that will
-govern it.
-
-Doing so risks allowing the proposal to choose its own governance.
-
-Rule applicability and authority binding remain independently derived.
-
-If a protocol needs to carry candidate references for efficiency, those
-references MUST NOT be treated as authoritative merely because they are
-present in the Action envelope.
-
-### 38.14 Trust Context reference
-
-A candidate Trust Context reference MAY be carried as routing metadata,
-but MUST NOT become authoritative because the Action selected it.
-
-The independently accepted Trust Context remains external to the
-proposal.
-
-Therefore a Trust Context hint belongs, if anywhere, in the instance
-envelope and MUST be treated as non-authoritative input until accepted
-by the boundary.
-
-### 38.15 Execution profile reference
-
-An execution profile may affect how the Action is interpreted or what
-constitutes completion.
-
-If changing the execution profile can change the meaning of the proposed
-effect or completion contract, its normative identifier/digest belongs in
-the semantic payload.
-
-If it merely identifies a transport/Adapter implementation that can
-perform the same semantics, it belongs outside semantic content.
-
-This distinction must be explicit in profile specifications.
-
-### 38.16 Protocol version
-
-Protocol or envelope serialization version SHOULD be bound in the
-instance-envelope commitment or through digest-suite domain separation.
-
-A version that changes semantic payload interpretation MUST instead be
-bound through the schema digest.
-
-### 38.17 Receipts
-
-A strong Receipt SHOULD bind:
+A Receipt or execution artifact concerning a particular Action occurrence
+SHOULD bind:
 
 ```text
 action_id
 action_digest
-instance_digest
 ```
 
-or an equivalent cryptographic structure establishing all three
-relationships.
+plus any additional authoritative occurrence fields on which that
+artifact's semantics rely.
 
-This lets the Receipt answer:
+No `instance_digest` field is required by the architecture.
 
-```text
-Which instance?
-What exact content?
-Was this envelope-content pairing the one that resolved?
-```
-
-### 38.18 Execution evidence
-
-Execution evidence SHOULD bind at minimum `action_digest`.
-
-Where execution semantics are occurrence-sensitive, it SHOULD also bind
-`instance_digest` or an authoritative occurrence identifier bound to it.
-
-This prevents a valid commit fact for one instance from being
-silently transplanted onto another identical-content instance.
-
-### 38.19 What does not belong in either digest
-
-Purely local mutable implementation data MUST NOT affect canonical
-Action identity.
-
-Examples:
-
-```text
-database row ID
-UI display label
-cache key
-local processing status
-worker assignment
-retry backoff timer
-log formatting
-local storage path
-```
-
-Such values are implementation state, not protocol Action state.
-
-### 38.20 Two-layer identity model
-
-The resulting structure is:
-
-```text
-                 Action Instance
-                       |
-          +------------+------------+
-          |                         |
-          v                         v
- Instance Envelope            Semantic Payload
-          |                         |
-          |                         +-- schema_digest
-          |                         +-- canonical fields
-          |                                  |
-          |                                  v
-          |                           action_digest
-          |                                  |
-          +---------------+------------------+
-                          |
-                          v
-                   instance_digest
-```
-
-This provides:
-
-- stable semantic content identity;
-- distinct execution-instance identity;
-- cryptographic binding between them;
-- freedom for identical semantic Actions to occur multiple times.
-
-### 38.21 Architectural conclusion
+### 38.7 Architectural conclusion
 
 The minimum robust model is:
 
-> **Hash semantic meaning once, then cryptographically bind occurrence
-> metadata to that semantic digest in a separate instance commitment.**
+> **Give semantic content one deterministic cryptographic identity, retain
+> a separate historical occurrence identity, and require authoritative
+> artifacts to bind those identities together whenever their association
+> matters.**
 
-This avoids both failure modes:
-
-```text
-one digest containing everything
-    -> destroys useful content equivalence
-```
-
-and:
-
-```text
-semantic digest + unbound envelope
-    -> permits instance/content substitution
-```
+This preserves content equivalence without leaving occurrence/content
+association cryptographically ambiguous.
 
 ------------------------------------------------------------------------
 
-## 39. New Validated Architectural Findings
+## 39. Corrected Validated Architectural Findings
 
-### KV-F53 — Action Requires Two-Layer Commitment
+### KV-F53 — Action Has Two Required Identities
 
-Semantic content identity and cryptographically bound occurrence identity
-should be represented separately.
+Every authoritative Action requires:
+
+```text
+action_id
+action_digest
+```
+
+for occurrence identity and semantic content identity respectively.
 
 **Status:** PASS.
 
 ### KV-F54 — Semantic Payload Is Defined by Effect-Relevance
 
-Any field whose change can change the proposed execution, applicability,
-or completion semantics belongs in the canonical semantic payload.
+Any field whose change can change the proposed execution, deterministic
+applicability, or completion semantics belongs in canonical Semantic
+Payload.
 
 **Status:** PASS.
 
-### KV-F55 — Action ID Belongs in the Bound Instance Envelope
+### KV-F55 — Occurrence and Content Must Be Bindable
 
-`action_id` remains an instance identifier and should be
-cryptographically bound to `action_digest`.
-
-**Status:** PASS.
-
-### KV-F56 — Occurrence Metadata Must Not Pollute Content Identity
-
-Pure instance fields must not be inserted into semantic payload merely
-to force digest uniqueness.
+Authoritative artifacts whose meaning depends on a particular occurrence
+carrying particular content must cryptographically bind
+`(action_id, action_digest)`.
 
 **Status:** PASS.
 
-### KV-F57 — Timing and Nonces Are Purpose-Dependent
+### KV-F56 — A Universal `instance_digest` Is Not Required
 
-Timing values and nonces belong in semantic payload only when they change
-the proposal's semantics; otherwise they are instance-envelope fields.
+A derived occurrence/content commitment may be useful protocol machinery,
+but it is removable without loss of architecture and therefore is not a
+third universal Action identity.
 
-**Status:** PASS.
+**Status:** PASS FOR EXCLUSION.
 
-### KV-F58 — Actor Is Not Automatically Semantic Action Content
+### KV-F57 — Occurrence Metadata Must Not Pollute Content Identity
 
-Proposer identity remains Claim/governance information unless the Action
-schema explicitly makes represented identity part of the proposed
-effect.
-
-**Status:** PASS.
-
-### KV-F59 — Governance References in the Envelope Are Non-Authoritative
-
-Rule, Trust Context, or authority hints carried with an Action cannot
-establish their own applicability.
+Pure occurrence fields must not enter Semantic Payload merely to force
+digest uniqueness.
 
 **Status:** PASS.
 
-### KV-F60 — Receipt Should Bind Instance and Content
+### KV-F58 — Timing and Nonces Are Purpose-Dependent
 
-Portable execution resolution should cryptographically bind the Action
-instance to its exact semantic content.
+Timing values and nonces are semantic only when they change the proposal;
+otherwise they are occurrence-level fields.
+
+**Status:** PASS.
+
+### KV-F59 — Actor Is Not Automatically Semantic Action Content
+
+Proposer identity remains Claim/provenance information unless represented
+identity changes the requested effect.
+
+**Status:** PASS.
+
+### KV-F60 — Governance References Carried by an Action Are Non-Authoritative
+
+Rule, Trust Context, selector, or authority hints cannot establish their
+own applicability by inclusion.
 
 **Status:** PASS.
 
 ------------------------------------------------------------------------
 
-## 40. Updated Validation Backlog
-
-### HYP-020 — Receipt Action identity requirements
-
-Should VE-004 v0.2 normatively require:
-
-```text
-action_id
-action_digest
-instance_digest
-```
-
-for every Receipt, or can `instance_digest` remain reconstructable from
-authoritative Action history?
-
-**Status:** NEXT CROSS-SPECIFICATION DECISION.
-
-### HYP-021 — Digest suite
-
-What minimum digest-suite representation provides algorithm agility
-without unnecessary cryptographic negotiation complexity?
-
-**Status:** OPEN.
-
-### HYP-022 — VE-001 revision
-
-Does the approved/current VE-001 Action specification already distinguish
-semantic Action payload from occurrence envelope strongly enough to
-support `action_digest` and `instance_digest`?
-
-**Status:** REQUIRES DIRECT SPECIFICATION COMPARISON BEFORE RFC.
-
-------------------------------------------------------------------------
-
-------------------------------------------------------------------------
-
-## 41. Direct Specification Comparison: VE-001 v0.1
+## 40. Direct Specification Comparison: VE-001 v0.1
 
 ### Result
 
 **SUBSTANTIVE GAP CONFIRMED.**
 
-VE-001 v0.1 correctly establishes Action immutability, historical Action identity, same-content/different-Action semantics, separation from idempotency identity, retry-vs-Action distinction, and the future need for canonical hashing.
+VE-001 v0.1 correctly established Action immutability, historical Action
+identity, same-content/different-Action semantics, separation from
+idempotency identity, retry-vs-Action distinction, and the future need
+for canonical hashing.
 
-However, it conflicts with the reduced architecture by treating the following as universal required semantic fields:
+The required v0.2 corrections are:
 
-```text
-action_id
-created_at
-initiator
-authority_context
-target
-operation
-arguments
-scope
-```
-
-### Required corrections
-
-1. Add required `action_digest`.
-2. Add required `instance_digest`.
-3. Retain `action_id` as historical occurrence identity.
-4. Bind `schema_ref.digest` into `action_digest`.
-5. Move occurrence-only `created_at` into the Instance Envelope.
-6. Remove initiator as universally required semantic payload.
-7. Remove authority context as universally required semantic payload.
-8. Remove universal `scope`.
-9. Make effect fields schema-defined rather than a universal ontology.
-10. Make Action hashing normative rather than optional.
+1. add required `action_digest`;
+2. retain `action_id` as historical occurrence identity;
+3. require cryptographic binding of `(action_id, action_digest)` where an
+   authoritative artifact depends on that association;
+4. bind `schema_digest` into `action_digest`;
+5. move occurrence-only creation time out of Semantic Payload;
+6. remove initiator as universally required semantic payload;
+7. remove authority context as universally required semantic payload;
+8. remove universal `scope`;
+9. make effect fields schema-defined rather than a VE domain ontology;
+10. make Action hashing normative;
+11. do **not** introduce a mandatory `instance_digest`.
 
 ### Governance consequence
 
-RFC-004 and ADR-004 are justified.
+RFC-004 v0.2 and ADR-004 were justified and accepted.
 
-VE-001 SHOULD advance to v0.2 before VE-004 v0.2 is finalized because Receipt identity requirements depend on the finalized Action identity model.
+VE-001 v0.2 implements the corrected dual-identity model.
 
 ------------------------------------------------------------------------
 
-## 42. New Validated Architectural Findings
+## 41. Validated VE-001 Findings
 
-### KV-F61 — VE-001 v0.1 Has an Identity-Layer Gap
+### KV-F61 — VE-001 v0.1 Had an Identity-Layer Gap
 
-The current specification lacks required canonical content identity and instance/content cryptographic binding.
+The v0.1 specification lacked required canonical content identity and an
+explicit occurrence/content binding invariant.
 
 **Status:** PASS.
 
 ### KV-F62 — Existing Action ID Semantics Remain Valuable
 
-VE-001 v0.1 historical identity maps cleanly to `action_id` as occurrence identity.
+VE-001 v0.1 historical identity maps cleanly to `action_id` as occurrence
+identity.
 
 **Status:** PASS.
 
-### KV-F63 — Initiator Is Over-Specified in VE-001 v0.1
+### KV-F63 — Initiator Was Over-Specified
 
-Initiator identity should not be universally required semantic Action content.
-
-**Status:** PASS.
-
-### KV-F64 — Authority Context Is Over-Specified in VE-001 v0.1
-
-Authority must be established independently rather than embedded as universal Action semantics.
+Initiator identity should not be universally required semantic Action
+content.
 
 **Status:** PASS.
 
-### KV-F65 — Universal Action Scope Must Be Removed
+### KV-F64 — Authority Context Was Over-Specified
 
-Applicability selectors over schema-defined canonical Action fields replace universal semantic `scope`.
+Authority must be established independently rather than embedded as
+universal Action semantics.
 
 **Status:** PASS.
 
-### KV-F66 — Action Hashing Must Become Normative
+### KV-F65 — Universal Action Scope Was Removed
 
-Optional hashing is insufficient for interoperable binding across Claims, Rules, Receipts, and execution evidence.
+Applicability selectors over schema-defined canonical Action fields
+replace universal semantic `scope`.
+
+**Status:** PASS.
+
+### KV-F66 — Action Hashing Is Normative
+
+Optional hashing is insufficient for interoperable binding across Claims,
+Rules, Receipts, and execution evidence.
 
 **Status:** PASS.
 
 ------------------------------------------------------------------------
 
-## 43. Updated Validation Backlog
+## 42. Pressure Test: Canonical Encoding Placement
 
-### HYP-023 — VE-004 Action binding after VE-001 v0.2
+### Result
 
-Once RFC-004 / ADR-004 are accepted, should VE-004 v0.2 require all of:
+**PASS WITH NORMATIVE EXTERNAL DEPENDENCY.**
+
+Canonical encoding MUST be normative for cryptographic interoperability,
+but it does not need to be embedded inside the Action semantic
+specification.
+
+VE-001 defines:
 
 ```text
-action_id
-action_digest
-instance_digest
+what values form semantic identity
+which identity properties are required
 ```
 
-or may a Receipt omit `instance_digest` when it is independently reconstructable from canonical Action history?
+A separate Canonical Encoding Profile defines:
 
-**Status:** NEXT CROSS-SPECIFICATION DECISION AFTER VE-001.
+```text
+exact bytes
+framing
+domain separation
+primitive representation
+ordering
+Unicode treatment
+numeric representation
+null/absence semantics
+digest-suite representation
+schema-descriptor encoding
+```
 
-### HYP-024 — Canonical encoding profile
+VE-001 MUST NOT claim complete cryptographic interoperability unless the
+same normative profile is pinned.
 
-Which canonical encoding profile should be used for schema descriptors, semantic payloads, and instance envelopes?
+------------------------------------------------------------------------
 
-**Status:** OPEN — BLOCKS FINAL DIGEST NORMATIVITY.
+## 43. Pressure Test: One Canonical Profile Across VE Object Classes
+
+### Question
+
+Can one canonical encoding profile safely canonicalize Action schemas,
+Action payloads, Claims, Rules, Receipts, and Trust Context history, or
+do separate object classes require separate canonicalization profiles
+over one common canonical data model?
+
+### Result
+
+**PASS FOR ONE SHARED CANONICAL REPRESENTATION LAYER.**
+
+The architecture does **not** require a separate byte-encoding profile
+for each protocol object class.
+
+The stronger model is:
+
+```text
+Common Canonical Data Model
+          |
+          v
+One Canonical Byte Encoding Profile
+          |
+          +--> Action Schema descriptor
+          +--> Action Semantic Payload
+          +--> Claim
+          +--> Rule descriptor / Rule artifact reference
+          +--> Receipt
+          +--> Trust transition record
+```
+
+Object-specific specifications still define:
+
+- which fields exist;
+- which fields are semantic;
+- required/optional fields;
+- validation rules;
+- object-specific hash domain separator;
+- which substructure is included in a given digest.
+
+The shared representation layer defines only how already-determined
+canonical values become deterministic bytes.
+
+### 43.1 Why one common data model is desirable
+
+If Action, Claim, Receipt, and Trust history each invent their own
+canonical encoding, VE inherits multiple independent disagreement
+surfaces:
+
+```text
+JSON canonicalization for Actions
+CBOR profile for Claims
+custom binary Receipt encoding
+different Trust-history encoding
+```
+
+This increases:
+
+- implementation complexity;
+- parser attack surface;
+- normalization inconsistencies;
+- cross-object signature complexity;
+- audit complexity;
+- long-term migration cost.
+
+One shared canonical representation layer reduces total conceptual
+complexity.
+
+### 43.2 The shared data model must be deliberately small
+
+The canonical data model SHOULD support only deterministic structural
+values required by VE objects.
+
+Candidate value classes:
+
+```text
+null
+boolean
+signed / unsigned integer
+canonical decimal
+text string
+byte string
+array
+map with canonical key rules
+```
+
+Time SHOULD be represented through a protocol-defined canonical type or
+schema-defined structural representation.
+
+Unrestricted binary floating point SHOULD NOT be part of the canonical
+identity model unless a future profile proves deterministic semantics
+across implementations.
+
+### 43.3 Object semantics remain outside the encoding layer
+
+The encoding layer MUST NOT know that:
+
+```text
+amount means money
+issuer means authority
+predecessor_state means trust history
+```
+
+Those meanings belong to object schemas/specifications.
+
+The encoder only knows:
+
+```text
+this is an integer
+this is text
+this is bytes
+this is an array
+this is a map
+```
+
+This prevents the representation layer from becoming a domain ontology.
+
+### 43.4 Domain separation is mandatory
+
+The same canonical bytes MUST NOT imply the same cryptographic object
+across object classes.
+
+Each hashed object class MUST use an explicit domain separator or typed
+hash context.
+
+Conceptually:
+
+```text
+H("VE:ACTION:v1"  || canonical_bytes)
+H("VE:CLAIM:v1"   || canonical_bytes)
+H("VE:RECEIPT:v1" || canonical_bytes)
+H("VE:RULE:v1"    || canonical_bytes)
+```
+
+This prevents cross-type substitution.
+
+Object-specific domain separation does not require object-specific byte
+encoding.
+
+### 43.5 Schema descriptor bootstrap
+
+`schema_digest` requires the schema descriptor itself to be canonical.
+
+Therefore the schema descriptor MUST be expressible in the same common
+canonical data model.
+
+The descriptor MUST NOT include its own digest inside the bytes over
+which that digest is computed unless a future specification defines an
+explicit self-reference construction.
+
+Preferred model:
+
+```text
+schema_descriptor_body
+        |
+        v
+canonical bytes
+        |
+        v
+schema_digest
+```
+
+with the digest carried as a reference **to** the descriptor, not as a
+self-hashed field inside the descriptor body.
+
+This terminates the canonicalization bootstrap cleanly.
+
+### 43.6 Claims
+
+Claims may contain signatures, proofs, subject references, or embedded
+structured values.
+
+The common model can represent:
+
+```text
+structured fields
+byte-string proofs
+content digests
+```
+
+Cryptographic verification semantics remain Claim/Verify concerns.
+
+No Claim-specific serializer is required.
+
+### 43.7 Rules
+
+Rules create the strongest attack because Rule may eventually be
+represented as executable deterministic logic.
+
+The common representation layer SHOULD NOT attempt to canonicalize the
+semantics of arbitrary source code.
+
+Instead, Rule identity SHOULD bind one of:
+
+```text
+a canonical declarative Rule representation
+```
+
+or:
+
+```text
+a content digest of a separately specified deterministic Rule artifact
+format
+```
+
+The shared encoder canonicalizes the Rule descriptor/reference.
+
+The Rule artifact format, if executable, is a separate protocol format
+with its own deterministic byte identity.
+
+This exception does not justify separate canonical encodings for all VE
+objects.
+
+### 43.8 Receipts
+
+Receipts are naturally structured protocol records and fit the common
+canonical model.
+
+Receipt specifications determine which fields are required and which are
+included in Receipt identity or signatures.
+
+### 43.9 Trust Context history
+
+Trust history is an ordered sequence of committed transition records and
+state commitments.
+
+Each transition record can use the same canonical representation layer.
+
+Ordering and canonical-chain semantics belong to the Trust-history
+protocol, not to byte serialization.
+
+### 43.10 Object-specific profiles vs. one universal profile
+
+A dangerous design would be:
+
+```text
+one profile containing semantic rules for every VE object
+```
+
+That would make canonical encoding own object semantics.
+
+The preferred design is:
+
+```text
+VE Canonical Representation Profile
+    -> common value model
+    -> canonical bytes
+    -> framing/versioning rules
+
+VE-001
+    -> Action fields and digest inputs
+
+Claim specification
+    -> Claim fields and digest inputs
+
+VE-004
+    -> Receipt fields and digest inputs
+
+Trust protocol
+    -> transition fields and chain semantics
+```
+
+Therefore "one profile" means one **representation profile**, not one
+monolithic object schema.
+
+### 43.11 Extension rule
+
+An object class that cannot be represented safely in the common model
+MUST justify an extension explicitly.
+
+The default MUST NOT be:
+
+```text
+new object type -> new serializer
+```
+
+The burden of proof is on introducing additional representation
+machinery.
+
+### 43.12 Versioning
+
+The canonical representation profile MUST be explicitly versioned.
+
+An object digest or signature context MUST identify, directly or through
+protocol versioning/domain separation, the representation profile used.
+
+Profile upgrades MUST NOT silently reinterpret historical bytes.
+
+### 43.13 Architectural conclusion
+
+The minimum architecture is:
+
+```text
+Object Semantics
+(Action / Claim / Receipt / Trust / Rule descriptor)
+          |
+          v
+Common Canonical Data Model
+          |
+          v
+Versioned Canonical Byte Encoding
+          |
+          v
+Object-Specific Domain Separation
+          |
+          v
+Digest / Signature / Commitment
+```
+
+This yields one reusable **VE Canonical Representation Layer** without
+making that layer a semantic primitive or domain ontology.
+
+------------------------------------------------------------------------
+
+## 44. New Validated Architectural Findings
+
+### KV-F67 — One Shared Representation Layer Is Preferred
+
+Action schemas, Action payloads, Claims, Receipts, and Trust-transition
+records can share one canonical structural representation layer.
+
+**Status:** PASS.
+
+### KV-F68 — Object Semantics Remain Object-Specific
+
+A shared encoder does not own field meaning, requiredness, governance, or
+validation semantics.
+
+**Status:** PASS.
+
+### KV-F69 — Domain Separation Is Required
+
+Object-specific hash/signature domain separation is required even when
+objects share one byte encoding.
+
+**Status:** PASS.
+
+### KV-F70 — Schema Descriptor Uses the Same Canonical Layer
+
+Schema descriptors can be canonicalized by the common representation
+layer, terminating the `schema_digest` bootstrap without a separate
+serializer.
+
+**Status:** PASS.
+
+### KV-F71 — Rule Executable Format Is a Separate Concern
+
+Arbitrary executable Rule artifacts must not force the common VE
+representation layer to canonicalize programming-language semantics.
+
+**Status:** PASS.
+
+### KV-F72 — New Serializers Carry a High Burden of Proof
+
+New object classes should use the shared representation layer by default.
+A separate canonical encoding requires explicit justification.
+
+**Status:** PASS.
+
+------------------------------------------------------------------------
+
+## 45. Updated Validation Backlog
+
+### HYP-025 — Canonical data model
+
+What exact primitive value model should the VE Canonical Representation
+Layer permit?
+
+Candidate:
+
+```text
+null
+boolean
+integer
+decimal
+text
+bytes
+array
+map
+```
+
+How should timestamps, tagged values, and large integers be represented?
+
+**Status:** NEXT PRESSURE TEST CANDIDATE.
+
+### HYP-026 — Canonical encoding choice
+
+Should the first VE Canonical Representation Profile use an existing
+deterministic encoding standard or define a minimal VE-specific encoding?
+
+**Status:** OPEN — REQUIRES STANDARDS COMPARISON.
+
+### HYP-027 — Domain-separation registry
+
+What is the minimum interoperable mechanism for assigning object-type
+domain separators without creating a centralized semantic registry?
+
+**Status:** OPEN.
+
+### HYP-028 — Rule artifact identity
+
+If Rule remains a primitive, what exact deterministic artifact format or
+digest contract identifies executable Rule logic without embedding a
+general-purpose language into the canonical representation layer?
+
+**Status:** OPEN.
 
 ------------------------------------------------------------------------
