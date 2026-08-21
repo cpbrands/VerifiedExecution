@@ -2,7 +2,7 @@
 
 **Project:** Verified Execution\
 **Document:** Kernel Validation Record\
-**Version:** 0.18\
+**Version:** 0.19\
 **Status:** Draft / Active Validation\
 **Date:** 2026-08-19
 
@@ -7163,5 +7163,363 @@ cryptographic representation RFC, or split Signature Record into a
 follow-on RFC?
 
 **Status:** NEXT GOVERNANCE-SCOPE DECISION.
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+## 64. Pressure Test: Minimum Signature Record and Verification Reference
+
+### Question
+
+What is the minimum canonical `SignatureRecord` schema, and should the
+record identify a cryptographic key directly, a Claim subject, or a
+generic verifier-resolvable signer identifier without turning VE into an
+identity system?
+
+### Result
+
+**PASS — replace `signer_reference` with
+`verification_material_reference`.**
+
+The Signature Record should identify the exact cryptographic verification
+material required by the signature suite.
+
+It SHOULD NOT identify a human, organization, account, DID, Claim
+subject, or other semantic principal as part of signature mechanics.
+
+The minimum record is:
+
+```text
+SignatureRecord := {
+    signed_object_reference,
+    signature_suite,
+    verification_material_reference,
+    signature_bytes
+}
+```
+
+where:
+
+```text
+signed_object_reference := {
+    object_type,
+    representation_profile,
+    digest_reference
+}
+```
+
+A record version need not be repeated as a semantic field when the
+SignatureRecord schema identity/version already determines record format.
+
+### 64.1 Why `signer_reference` is rejected
+
+`signer_reference` is semantically ambiguous. It could denote a human,
+organization, credential subject, DID, certificate subject, key
+identifier, public key, or device.
+
+The signature layer only needs to answer:
+
+> Which exact verification material validates these signature bytes?
+
+Therefore cryptographic mechanics should reference verification material,
+not the principal behind it.
+
+### 64.2 Why a Claim subject is rejected
+
+A Claim subject is whatever the Claim is about; it is not necessarily a
+cryptographic key.
+
+For example:
+
+```text
+Claim:
+    subject = Human H
+    predicate = controls
+    object = Key K
+```
+
+The signature verifies under K. Whether K belongs to, represents, or is
+authorized by H is separately established through Claims and Trust
+Context.
+
+### 64.3 Why a generic resolver identifier is insufficient
+
+URI, DID URL, certificate subject name, `kid`, database identifier, or
+local alias may help discovery, but can be mutable, non-unique,
+resolver-dependent, namespace-dependent, reassigned, or unavailable
+offline.
+
+Such values MAY be non-authoritative hints but SHOULD NOT be the
+normative cryptographic identity of verification material.
+
+### 64.4 Verification material should be content-addressed
+
+The preferred normative reference is a Digest Reference to canonical
+verification material.
+
+Conceptually:
+
+```text
+verification_material_reference :=
+    DigestReference(
+        object_type = VERIFICATION_MATERIAL,
+        canonical verification material body
+    )
+```
+
+The signature suite defines the verification-material body semantics.
+Examples may include Ed25519 public keys, P-256 public keys,
+post-quantum public keys, or threshold/group verification keys.
+
+The reference identifies exact cryptographic material without asserting
+who controls it.
+
+### 64.5 Discovery hints may still exist
+
+A transport or optional non-authoritative field MAY carry `kid`, URI,
+DID URL, certificate locator, or local key alias to help retrieve
+candidate verification material.
+
+Verification succeeds only when the resolved material matches the
+normative `verification_material_reference`.
+
+### 64.6 Embedded verification material
+
+A Signature Record MAY optionally embed canonical verification material
+for portability.
+
+If embedded:
+
+```text
+Digest(embedded_verification_material)
+    MUST equal
+verification_material_reference
+```
+
+The reference remains normative. Embedding does not create authority.
+
+### 64.7 Trust and identity resolution
+
+After cryptographic verification:
+
+```text
+SignatureRecord
+    -> verification_material_reference = K
+    -> signature verifies under K
+```
+
+Claims and Trust Context may then establish:
+
+```text
+K is controlled by H
+K is delegated by Organization O
+K is authorized for scope S
+K was revoked at time T
+K is a recognized root
+```
+
+Thus:
+
+```text
+SignatureRecord
+    -> proves use of verification material K
+
+Claims + Trust Context
+    -> establish what K means and what authority K has
+```
+
+### 64.8 Key rotation
+
+Content-addressed verification material handles rotation naturally.
+Historical Signature Records remain bound to old material K1; new records
+bind K2. Trust history determines when either was recognized, revoked,
+or replaced.
+
+### 64.9 Minimum record reduction
+
+The earlier candidate:
+
+```text
+record_version
+object_type
+representation_profile
+digest_reference
+signature_suite
+signer_reference
+signature_bytes
+```
+
+reduces to:
+
+```text
+signed_object_reference
+signature_suite
+verification_material_reference
+signature_bytes
+```
+
+with `signed_object_reference` carrying object type, representation
+profile, and Digest Reference.
+
+### 64.10 Candidate reusable ObjectReference
+
+This exposes a possible reusable protocol structure:
+
+```text
+ObjectReference := {
+    object_type,
+    representation_profile,
+    digest_reference
+}
+```
+
+`ObjectReference` is protocol machinery, not a semantic primitive. Its
+reuse should be pressure-tested separately before standardization.
+
+### 64.11 Non-self-authorization
+
+The Signature Record MUST NOT contain a field whose mere presence means:
+
+```text
+this key belongs to Alice
+this key is authorized
+this signer is trusted
+```
+
+Such assertions must derive independently through Claims and Trust
+Context.
+
+### 64.12 Architectural conclusion
+
+The minimum robust Signature Record names:
+
+```text
+what cryptographic object was signed
+which signature suite was used
+which exact verification material validates the signature
+what signature bytes were produced
+```
+
+It does not name:
+
+```text
+who the signer is
+what authority the signer has
+what identity system governs the signer
+```
+
+Those belong above the cryptographic layer.
+
+------------------------------------------------------------------------
+
+## 65. New Validated Architectural Findings
+
+### KV-F124 — `signer_reference` Is Too Semantically Broad
+
+The Signature Record should not directly identify a person,
+organization, Claim subject, or generic principal.
+
+**Status:** PASS FOR REJECTION.
+
+### KV-F125 — Verification Material Is the Correct Cryptographic Reference
+
+The normative signature reference should identify the exact verification
+material needed by the signature suite.
+
+**Status:** PASS.
+
+### KV-F126 — Verification Material Should Be Content-Addressed
+
+Mutable or non-unique discovery identifiers are insufficient as the
+normative cryptographic reference.
+
+**Status:** PASS.
+
+### KV-F127 — Key Discovery and Key Identity Are Distinct
+
+`kid`, URI, DID URL, certificate locator, or local aliases may assist
+discovery but do not replace the normative verification-material
+reference.
+
+**Status:** PASS.
+
+### KV-F128 — Signature Record Does Not Bind Identity Semantics
+
+Identity, control, delegation, revocation, and authority of verification
+material derive from Claims and Trust Context.
+
+**Status:** PASS.
+
+### KV-F129 — Key Rotation Requires No Mutable Signer Identity
+
+Historical records remain bound to old verification material while trust
+history determines validity across rotation and revocation.
+
+**Status:** PASS.
+
+### KV-F130 — Minimum Signature Record Has Four Semantic Components
+
+The current minimum is:
+
+```text
+signed_object_reference
+signature_suite
+verification_material_reference
+signature_bytes
+```
+
+**Status:** PASS.
+
+### KV-F131 — Record Version Need Not Be a Semantic Field
+
+SignatureRecord schema identity/version can provide format identity; a
+duplicate `record_version` field is not currently justified.
+
+**Status:** PASS FOR ELIMINATION.
+
+------------------------------------------------------------------------
+
+## 66. Updated Validation Backlog
+
+### HYP-052 — Verification Material representation
+
+What exact canonical structure should represent public verification
+material across Ed25519, P-256, RSA, threshold/group keys, and future
+post-quantum suites without creating a universal key ontology?
+
+**Status:** NEXT PRESSURE TEST CANDIDATE.
+
+### HYP-053 — ObjectReference
+
+Should VE standardize a reusable:
+
+```text
+ObjectReference = {
+    object_type,
+    representation_profile,
+    digest_reference
+}
+```
+
+to eliminate repeated framing metadata across SignatureRecord, Claims,
+Receipts, and trust history?
+
+**Status:** OPEN — HIGH LEVERAGE.
+
+### HYP-054 — Embedded verification material
+
+Should SignatureRecord permit optional embedded verification material in
+Profile 1, or should embedding remain transport-level only?
+
+**Status:** OPEN.
+
+### HYP-055 — SignatureRecord object identity
+
+Is a content-addressed `SIGNATURE_RECORD` object class now justified, or
+should the record remain a leaf until a reference scenario needs to
+reference signatures directly?
+
+**Status:** OPEN.
 
 ------------------------------------------------------------------------
