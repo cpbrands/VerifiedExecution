@@ -2,7 +2,7 @@
 
 **Project:** Verified Execution\
 **Document:** Kernel Validation Record\
-**Version:** 0.15\
+**Version:** 0.16\
 **Status:** Draft / Active Validation\
 **Date:** 2026-08-19
 
@@ -5549,5 +5549,526 @@ VE Canonical Representation Profile 1 while leaving exact numeric bounds
 as an implementation-validation gate before final approval?
 
 **Status:** NEXT GOVERNANCE DECISION CANDIDATE.
+
+------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------
+
+## 55. Pressure Test: Streaming Canonical Verification in Bounded Memory
+
+### Question
+
+Can VE Canonical Representation Profile 1 canonicality checking, hashing,
+duplicate-map-key detection, and resource-bound enforcement be performed
+in bounded memory without materializing the full VE object?
+
+### Result
+
+**PASS — Profile-1 verification can be implemented as a bounded-memory
+single-pass streaming validator, subject to the finite Profile-1 resource
+envelope.**
+
+The verifier does not need to construct the complete application object
+before establishing:
+
+- CBOR well-formedness;
+- Profile-1 canonicality;
+- resource-bound compliance;
+- map-key uniqueness and ordering;
+- UTF-8 validity;
+- allowed-tag compliance;
+- Integer / bignum canonicality;
+- Decimal canonical normalization;
+- cryptographic digest over the canonical bytes.
+
+The required working memory is bounded by Profile-1 limits and is
+independent of total object size except for explicitly bounded per-depth
+state and bounded map-key buffering.
+
+### 55.1 Streaming architecture
+
+Conceptually:
+
+```text
+input bytes
+    |
+    +--> byte-count / resource limiter
+    |
+    +--> streaming CBOR parser
+    |       |
+    |       +--> canonicality checks
+    |       +--> depth / collection counters
+    |       +--> UTF-8 validation
+    |       +--> tag/type validation
+    |       +--> map-order / duplicate checks
+    |       +--> Integer / Decimal checks
+    |
+    +--> cryptographic hash state
+    |
+    +--> optional schema/application callbacks
+```
+
+The canonical validator may reject as soon as any Profile-1 rule is
+violated.
+
+No complete in-memory object tree is required.
+
+### 55.2 Hashing
+
+Cryptographic hashing is naturally streaming.
+
+Once the protocol has established the exact domain-separation framing,
+a hash state can consume canonical bytes incrementally.
+
+Conceptually:
+
+```text
+hash.init(domain_separator)
+hash.update(canonical_input_chunk_1)
+hash.update(canonical_input_chunk_2)
+...
+digest = hash.final()
+```
+
+The hash function requires constant-size working state independent of
+object size.
+
+For object identities that hash only a canonical substructure, the
+streaming parser can start and stop the appropriate hash context at the
+declared structural boundary.
+
+### 55.3 Definite lengths enable early bound enforcement
+
+Profile 1 prohibits indefinite-length strings, arrays, and maps.
+
+Therefore each collection/string header exposes its declared length
+before its contents are consumed.
+
+The verifier can reject immediately if a value exceeds:
+
+```text
+MAX_TEXT_BYTES
+MAX_BYTE_STRING_BYTES
+MAX_ARRAY_ELEMENTS
+MAX_MAP_ENTRIES
+```
+
+without allocating the declared object.
+
+The parser also maintains:
+
+```text
+total encoded bytes consumed
+current nesting depth
+```
+
+and rejects when the Profile-1 maxima are exceeded.
+
+### 55.4 Nesting state
+
+A streaming parser needs one small frame for each currently open array,
+map, or tagged structured value.
+
+A frame may contain:
+
+```text
+container type
+remaining element/pair count
+map key/value phase
+previous map key, if map
+schema-validation state, if applicable
+```
+
+Memory is therefore bounded by:
+
+```text
+O(MAX_DEPTH × frame_state)
+```
+
+plus bounded key storage and parser/hash state.
+
+Because `MAX_DEPTH` is a Profile-1 constant, verifier memory is
+protocol-bounded.
+
+### 55.5 Duplicate-map-key detection
+
+RFC 8949 notes that generic streaming decoders may not retain enough
+state to notice duplicate map keys.
+
+Profile 1 changes the problem.
+
+Canonical Profile-1 maps require keys to appear in strict bytewise
+lexicographic order of their deterministic encodings.
+
+Therefore, for each map, the verifier need retain only the immediately
+previous encoded key.
+
+For each incoming key:
+
+```text
+current_key_bytes > previous_key_bytes
+```
+
+MUST hold.
+
+Then:
+
+```text
+current == previous
+    -> duplicate -> reject
+
+current < previous
+    -> noncanonical ordering -> reject
+
+current > previous
+    -> continue
+```
+
+Because a deterministically sorted sequence places equal keys adjacent,
+a set of all prior keys is unnecessary.
+
+### 55.6 Memory cost of map-key validation
+
+Profile 1 restricts keys to Text.
+
+The verifier may buffer one canonical encoded previous key for each open
+map.
+
+Worst-case map-key working memory is bounded by:
+
+```text
+MAX_DEPTH × MAX_MAP_KEY_BYTES
+```
+
+plus small framing overhead.
+
+An implementation may optimize this further, but Profile-1
+interoperability does not depend on the optimization.
+
+### 55.7 UTF-8 validation
+
+Text strings can be validated incrementally.
+
+A UTF-8 validator needs only bounded decoder state across input chunks.
+
+The verifier need not materialize the complete Text value solely to
+establish valid UTF-8.
+
+Map keys are the exception because the previous key must be retained for
+ordering comparison, but their size is bounded by `MAX_MAP_KEY_BYTES`.
+
+### 55.8 Integer and bignum validation
+
+Direct CBOR integers can be checked immediately from their head and
+argument.
+
+For tag-2/tag-3 bignums, canonicality can be checked while streaming the
+byte string:
+
+- definite length;
+- within `MAX_INTEGER_BITS`;
+- no leading zero byte;
+- direct integer representation required when the magnitude fits the
+  direct CBOR integer range.
+
+The verifier does not need to construct an arbitrary-precision integer
+merely to validate canonical representation.
+
+Small values near the direct/bignum boundary may be accumulated in a
+fixed-width register for the direct-representation check.
+
+### 55.9 Decimal normalization
+
+VE Decimal canonicality requires:
+
+```text
+tag 4
+[exponent, coefficient]
+```
+
+with:
+
+```text
+zero -> exponent 0, coefficient 0
+
+nonzero coefficient -> not divisible by 10
+```
+
+The exponent is checked against the Profile-1 exponent bound.
+
+For a direct Integer coefficient, divisibility by 10 is trivial.
+
+For a bignum coefficient, the verifier can compute the coefficient
+modulo 10 incrementally from the magnitude bytes.
+
+For a negative tag-3 coefficient, the verifier applies tag-3 numeric
+semantics when calculating the mathematical coefficient modulo 10.
+
+Thus Decimal normalization can be validated without materializing the
+full arbitrary-precision coefficient.
+
+### 55.10 Map ordering comparison
+
+RFC 8949 core deterministic ordering compares the deterministic encoded
+key bytes lexicographically.
+
+Because Profile 1 permits text keys only, a verifier can capture the
+encoded key bytes while simultaneously:
+
+- validating its definite-length header;
+- enforcing `MAX_MAP_KEY_BYTES`;
+- validating UTF-8;
+- comparing the completed key with the previous key.
+
+No full map needs to exist in memory.
+
+### 55.11 Schema validation
+
+Canonical representation verification and object-schema validation are
+distinct.
+
+Many schema checks can also be streamed.
+
+A schema-aware validator may maintain bounded state such as:
+
+```text
+required-field bitset
+current field descriptor
+array element schema
+object-specific counters
+```
+
+Text-key canonical ordering may further simplify required-field tracking.
+
+However, an object schema that requires arbitrary cross-field computation
+may require retaining selected values.
+
+That does not invalidate streaming **canonical representation**
+verification.
+
+Such memory belongs to the higher semantic-validation layer.
+
+### 55.12 Selector evaluation
+
+Profile-1 selectors were deliberately limited to:
+
+```text
+eq
+in
+prefix
+```
+
+over declared canonical Action fields.
+
+A streaming schema-aware Action validator can evaluate many selectors as
+matching fields arrive and retain only relevant bounded values/state.
+
+Selectors do not require materialization of the entire Action solely for
+applicability matching.
+
+### 55.13 Receipt and trust-history verification
+
+Receipts and individual trust-transition records are structured
+Profile-1 objects and can be canonicality-checked and hashed as streams.
+
+A trust **history** need not be one giant materialized object.
+
+The higher-level trust protocol can process one committed transition
+record at a time:
+
+```text
+previous state commitment
+        |
+        v
+next canonical transition record
+        |
+        v
+verify / apply
+        |
+        v
+next state commitment
+```
+
+This preserves bounded memory across arbitrarily long histories,
+provided each individual record remains within Profile-1 bounds.
+
+### 55.14 What cannot always be streamed with constant memory
+
+The claim is **bounded-memory verification**, not universal O(1)-memory
+semantic processing.
+
+Some higher layers may legitimately require memory proportional to
+explicitly bounded protocol values.
+
+Examples:
+
+- retaining the previous map key for each nested map;
+- holding a signature/proof value for later cryptographic verification;
+- object schemas requiring comparison of two distant fields;
+- evaluation requiring a set of established Claims;
+- execution adapters needing the complete payload.
+
+These do not require materializing the entire canonical object for
+representation verification.
+
+The relevant guarantee is:
+
+> Verifier memory has a finite upper bound derived from Profile-1 limits,
+> rather than scaling without protocol-defined bound with attacker input.
+
+### 55.15 Single-pass property
+
+Profile-1 canonicality verification can be performed in one forward pass
+over the original bytes.
+
+No canonical re-encoding pass is required.
+
+No sorting pass is required because map keys arrive already in canonical
+order or the object is rejected.
+
+No duplicate-key hash table is required because strict ordering makes
+duplicates adjacent.
+
+No full-object buffering is required for hashing.
+
+### 55.16 Failure atomicity
+
+A streaming verifier MUST NOT expose partially verified object semantics
+as authoritative before the complete relevant canonical object has
+passed verification.
+
+Implementations may emit tentative parsing callbacks, but downstream
+authoritative effects MUST be deferred until canonicality and required
+validation complete.
+
+This prevents a late malformed byte sequence from leaving partial
+authoritative state.
+
+### 55.17 Architectural conclusion
+
+Profile 1 can support constrained gateways and streaming Execution
+Boundaries without weakening canonical identity.
+
+The strongest current implementation model is:
+
+```text
+single pass
++
+strict canonical decoder
++
+streaming hash
++
+bounded container stack
++
+one previous key per open map
++
+finite numeric state
++
+profile resource counters
+```
+
+The representation layer therefore does not require whole-object
+materialization as an architectural assumption.
+
+------------------------------------------------------------------------
+
+## 56. New Validated Architectural Findings
+
+### KV-F99 — Profile-1 Canonicality Is Stream-Verifiable
+
+Canonical representation validity can be established in a single forward
+pass without constructing the full object tree.
+
+**Status:** PASS.
+
+### KV-F100 — Canonical Map Ordering Eliminates Global Duplicate-Key State
+
+Strict deterministic key ordering makes equal keys adjacent, so duplicate
+detection requires only the previous key for each open map.
+
+**Status:** PASS.
+
+### KV-F101 — Hashing Is Naturally Streaming
+
+Canonical object digests can be computed incrementally over accepted
+canonical bytes.
+
+**Status:** PASS.
+
+### KV-F102 — Definite Lengths Enable Pre-Allocation Rejection
+
+Profile bounds for strings and collections can be enforced from CBOR
+headers before allocating their contents.
+
+**Status:** PASS.
+
+### KV-F103 — Numeric Canonicality Does Not Require Full Big-Number Materialization
+
+Bignum and Decimal canonical-form checks can be performed with bounded
+streaming state.
+
+**Status:** PASS.
+
+### KV-F104 — Streaming Verification Is Bounded, Not Universally Constant-Memory
+
+Memory may scale with Profile-1 bounded depth, map-key size, and selected
+higher-layer validation state, but it does not require unbounded
+whole-object materialization.
+
+**Status:** PASS.
+
+### KV-F105 — Higher Semantic Validation Remains Separate
+
+Object schemas or Rule evaluation may require retaining selected values;
+that does not alter the bounded-memory property of canonical
+representation verification.
+
+**Status:** PASS.
+
+### KV-F106 — Partial Parse Must Not Become Partial Authority
+
+Streaming implementations must defer authoritative effects until the
+relevant canonical object and required validation have completed.
+
+**Status:** PASS.
+
+------------------------------------------------------------------------
+
+## 57. Updated Validation Backlog
+
+### HYP-037 — Profile-1 exact bounds
+
+What exact Profile-1 maxima should VE choose for encoded bytes, depth,
+collections, strings, Integer magnitude, Decimal coefficient, and
+Decimal exponent?
+
+**Status:** OPEN — IMPLEMENTATION VALIDATION REQUIRED.
+
+### HYP-041 — Canonical Representation RFC readiness
+
+Do KV-F67 through KV-F106 now provide sufficient architectural evidence
+to open RFC-005 for `VE Canonical Representation Profile 1`, with exact
+resource-bound numbers remaining an explicit pre-approval validation
+gate?
+
+**Status:** NEXT GOVERNANCE DECISION CANDIDATE.
+
+### HYP-042 — Cryptographic streaming framing
+
+What exact domain-separation and framing construction allows object
+digests and signatures to be streamed safely without ambiguity across
+Action, Claim, Rule descriptor, Receipt, Schema, and Trust-transition
+objects?
+
+**Status:** OPEN; SHOULD BE RESOLVED INSIDE / ALONGSIDE RFC-005.
+
+### HYP-043 — Streaming schema descriptor validation
+
+Can the minimum Action Schema descriptor itself be validated and hashed
+using the same bounded-memory machinery while supporting all required
+field and selector semantics?
+
+**Status:** OPEN.
 
 ------------------------------------------------------------------------
