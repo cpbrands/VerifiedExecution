@@ -2,7 +2,7 @@
 
 **Project:** Verified Execution\
 **Document:** Kernel Validation Record\
-**Version:** 0.13\
+**Version:** 0.14\
 **Status:** Draft / Active Validation\
 **Date:** 2026-08-19
 
@@ -4607,5 +4607,426 @@ Can every foreseeable VE protocol object use text-keyed maps without
 material loss of expressiveness?
 
 **Status:** OPEN; STRONG CURRENT HYPOTHESIS.
+
+------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------
+
+## 49. Pressure Test: Exactly-One-Byte Deterministic CBOR Profile
+
+### Question
+
+Can a constrained RFC 8949 CBOR profile guarantee exactly one legal
+byte representation for every VE canonical value, including Decimal,
+Unicode text, map ordering, large integers, and rejection of
+out-of-profile CBOR?
+
+### Result
+
+**PASS — but only with a VE acceptance profile stricter than RFC 8949's
+core deterministic encoding requirements.**
+
+RFC 8949 provides the correct encoding substrate and deterministic
+building blocks. VE must additionally define which CBOR values are in
+profile, how VE semantic values map to CBOR, and require decoders to
+reject any alternative encoding of an in-profile VE value.
+
+The resulting rule is:
+
+> **For every VE canonical value V, exactly one byte string B is valid
+> under VE Canonical Representation Profile 1, and decoding B yields V.**
+
+Any other well-formed CBOR encoding of the same apparent application
+value is out of profile and MUST be rejected for cryptographic use.
+
+### 49.1 Base deterministic rules
+
+The VE profile MUST inherit RFC 8949 core deterministic encoding
+requirements:
+
+- preferred serialization;
+- shortest integer/length/tag arguments;
+- no indefinite-length items;
+- map keys sorted by bytewise lexicographic order of their deterministic
+  encodings.
+
+The VE profile MUST treat these as decoder acceptance requirements, not
+merely encoder recommendations.
+
+### 49.2 Decoder strictness
+
+A generic CBOR decoder may accept multiple equivalent or non-preferred
+representations.
+
+That is insufficient for VE cryptographic identity.
+
+A conforming VE canonical decoder MUST reject:
+
+- non-preferred integer encodings;
+- indefinite-length strings, arrays, or maps;
+- out-of-order map keys;
+- duplicate map keys;
+- invalid UTF-8;
+- disallowed simple values;
+- disallowed tags;
+- disallowed floating-point values;
+- bignum encodings that violate VE normalization;
+- decimal encodings that violate VE normalization;
+- trailing bytes after the single top-level object.
+
+A variation-tolerant decoder MAY be used internally only if the
+implementation separately verifies that the original bytes satisfy the
+VE profile before accepting them as canonical.
+
+### 49.3 Boolean and null
+
+Only these major-type-7 values are permitted in the initial VE profile:
+
+```text
+false
+true
+null
+```
+
+`undefined`, unassigned simple values, floating-point numbers, NaN,
+Infinity, and break outside prohibited indefinite-length structures are
+out of profile.
+
+### 49.4 Integer canonicalization
+
+For integers within CBOR major types 0 and 1, preferred shortest
+serialization is mandatory.
+
+For integers outside the direct 64-bit CBOR integer range, VE MAY use
+only RFC 8949 tags:
+
+```text
+2 = positive bignum
+3 = negative bignum
+```
+
+with these additional rules:
+
+1. a value representable by major type 0 or 1 MUST use that direct
+   representation and MUST NOT use a bignum tag;
+2. a bignum byte string MUST contain no leading zero byte;
+3. zero MUST never be represented as a bignum;
+4. the byte string MUST use definite length and preferred length
+   encoding.
+
+This yields one representation for every permitted Integer value.
+
+### 49.5 Decimal canonicalization
+
+VE Decimal uses RFC 8949 tag 4 only:
+
+```text
+tag(4, [exponent, coefficient])
+```
+
+representing:
+
+```text
+coefficient × 10^exponent
+```
+
+The following canonical normalization is required.
+
+For a nonzero coefficient:
+
+```text
+while coefficient is divisible by 10:
+    coefficient = coefficient / 10
+    exponent = exponent + 1
+```
+
+For zero:
+
+```text
+coefficient = 0
+exponent = 0
+```
+
+The exponent MUST be a direct CBOR integer using major type 0 or 1.
+
+The coefficient MUST use the canonical VE Integer representation,
+including bignum tags 2/3 only when the value is outside the direct CBOR
+integer range.
+
+Therefore these Decimal lexical forms, when parsed as VE Decimal values:
+
+```text
+1.0
+1.00
+10e-1
+100e-2
+```
+
+all normalize to:
+
+```text
+tag(4, [0, 1])
+```
+
+The VE Integer value `1` remains a different canonical type and is
+encoded as integer `1`, not as Decimal.
+
+Tag 5 bigfloat is prohibited.
+
+### 49.6 Text canonicalization
+
+VE Text is defined as an exact sequence of Unicode scalar values.
+
+Canonical encoding is the unique valid UTF-8 encoding of that scalar
+sequence.
+
+The canonical representation layer performs **no Unicode normalization**.
+
+Therefore canonically distinct scalar sequences remain distinct even if
+they are visually or linguistically equivalent.
+
+If a domain schema requires NFC, case folding, identifier
+normalization, or another semantic normalization, that transformation
+MUST occur before creation of the VE canonical Text value and MUST be
+defined by the schema.
+
+This avoids hidden Unicode-version-dependent equivalence inside the
+representation layer.
+
+Invalid UTF-8 is rejected.
+
+### 49.7 Byte strings
+
+VE Bytes maps directly to definite-length CBOR byte string.
+
+No text/base64 alternative is permitted for the same VE Bytes value.
+
+Preferred length encoding is mandatory.
+
+### 49.8 Arrays
+
+VE Array maps to a definite-length CBOR array.
+
+Element order is preserved exactly.
+
+Indefinite-length arrays are prohibited.
+
+No implicit sorting or set semantics exist at the representation layer.
+
+### 49.9 Maps
+
+VE Map is restricted to:
+
+```text
+Map<Text, Value>
+```
+
+Requirements:
+
+1. keys MUST be VE Text values;
+2. keys MUST be unique as exact VE Text values;
+3. duplicate encoded keys are invalid;
+4. keys MUST be ordered by bytewise lexicographic order of their
+   deterministic CBOR encodings, following RFC 8949 core deterministic
+   ordering;
+5. maps MUST use definite length and preferred length encoding;
+6. missing and explicit `null` values remain distinct.
+
+A decoder encountering duplicate keys MUST reject the object.
+
+### 49.10 Tags
+
+The initial VE profile permits only fixed protocol-internal tags needed
+to encode the VE data model:
+
+```text
+2 = positive bignum
+3 = negative bignum
+4 = Decimal
+```
+
+All other CBOR semantic tags are prohibited in Profile 1 unless a later
+VE profile revision explicitly adds them.
+
+Object type identity is provided by VE cryptographic domain separation,
+not by arbitrary CBOR tags.
+
+### 49.11 Floating point
+
+All CBOR floating-point encodings are prohibited.
+
+This includes values that happen to be mathematically integral.
+
+A VE Integer or Decimal MUST use its respective canonical representation.
+
+### 49.12 One top-level item
+
+A canonical VE object encoding consists of exactly one top-level CBOR
+data item.
+
+Trailing bytes are prohibited.
+
+CBOR sequences are not canonical VE object encodings unless a separate
+protocol explicitly defines a sequence container above this profile.
+
+### 49.13 Out-of-profile rejection
+
+VE cryptographic verification MUST operate on canonical bytes.
+
+A decoder MUST NOT:
+
+```text
+accept noncanonical CBOR
+decode to an application object
+re-encode canonically
+then treat the original bytes as canonical
+```
+
+for signature/digest verification.
+
+The original byte string either satisfies the VE profile or it does not.
+
+An application MAY normalize imported noncanonical CBOR into a **new**
+canonical VE object before authoritative acceptance, but that is a
+canonicalization transformation, not verification of the original
+encoding.
+
+### 49.14 Exactly-one representation argument
+
+For each VE value class:
+
+```text
+Null       -> one CBOR simple-value encoding
+Boolean    -> one encoding per value
+Integer    -> direct preferred integer or uniquely normalized bignum
+Decimal    -> tag 4 + uniquely normalized exponent/coefficient pair
+Text       -> exact scalar sequence -> unique valid UTF-8
+Bytes      -> definite-length preferred byte string
+Array      -> definite-length ordered canonical child encodings
+Map        -> definite-length, unique text keys, deterministically sorted
+```
+
+By induction over arrays and maps, every finite VE canonical value has
+exactly one allowed Profile-1 byte representation.
+
+### 49.15 Architectural conclusion
+
+RFC 8949 does not need to be replaced.
+
+VE needs a strict subset/profile that turns RFC 8949's deterministic
+building blocks into a **closed canonical language**.
+
+The strongest current candidate is:
+
+> **VE Canonical Representation Profile 1 = RFC 8949 deterministic CBOR
+> + a closed VE value model + strict decoder rejection + canonical
+> bignum and Decimal normalization.**
+
+No VE-specific binary wire format is justified.
+
+------------------------------------------------------------------------
+
+## 50. New Validated Architectural Findings
+
+### KV-F82 — RFC 8949 Core Determinism Is Necessary but Insufficient
+
+VE requires additional protocol-specific restrictions beyond RFC 8949
+core deterministic encoding.
+
+**Status:** PASS.
+
+### KV-F83 — Canonicality Is an Acceptance Property
+
+VE decoders must reject out-of-profile encodings rather than merely
+produce canonical output when encoding.
+
+**Status:** PASS.
+
+### KV-F84 — Bignums Can Be Canonicalized Uniquely
+
+Tags 2/3 can support arbitrary-size Integer values if direct integers are
+required whenever possible and leading-zero bignums are rejected.
+
+**Status:** PASS.
+
+### KV-F85 — Decimal Has a Unique Normal Form
+
+Tag 4 Decimal values can be made unique by stripping powers of ten from
+nonzero coefficients and canonicalizing zero as exponent 0,
+coefficient 0.
+
+**Status:** PASS.
+
+### KV-F86 — Text Preserves Exact Unicode Scalar Sequences
+
+The representation layer performs no Unicode normalization; any semantic
+normalization belongs to the schema before canonical encoding.
+
+**Status:** PASS.
+
+### KV-F87 — Maps Require Strict Duplicate-Key Rejection
+
+Canonical VE maps use unique text keys and RFC 8949 deterministic
+bytewise key ordering.
+
+**Status:** PASS.
+
+### KV-F88 — Profile 1 Uses a Closed Tag Set
+
+Only tags 2, 3, and 4 are permitted for the initial VE value model.
+
+**Status:** PASS AS CURRENT CANDIDATE.
+
+### KV-F89 — Out-of-Profile CBOR Cannot Be Silently Normalized During Verification
+
+Canonical verification applies to the original bytes. Re-encoding a
+noncanonical source creates a new canonical representation rather than
+validating the original one.
+
+**Status:** PASS.
+
+### KV-F90 — No Custom VE Wire Format Is Justified
+
+A constrained RFC 8949 deterministic CBOR profile can provide a unique
+representation for the current VE canonical data model.
+
+**Status:** PASS.
+
+------------------------------------------------------------------------
+
+## 51. Updated Validation Backlog
+
+### HYP-033 — Integer bounds
+
+Should VE Profile 1 support arbitrary-size Integer values using tags 2/3,
+or deliberately cap integers to the direct CBOR range to reduce
+implementation burden?
+
+**Status:** OPEN.
+
+### HYP-034 — Decimal exponent/coefficient bounds
+
+Should Profile 1 permit arbitrary-size Decimal coefficients and
+unbounded exponents, or define resource limits / semantic bounds to
+prevent denial-of-service and pathological values?
+
+**Status:** OPEN — SECURITY RELEVANT.
+
+### HYP-035 — Text normalization boundary
+
+Is exact Unicode scalar preservation sufficient for all VE protocol
+identifiers, or should identifier schemas be required to define a
+specific normalization profile distinct from human-readable text?
+
+**Status:** OPEN.
+
+### HYP-036 — Canonical profile standardization
+
+Is the evidence now sufficient to open an RFC for
+`VE Canonical Representation Profile 1`, or should integer/resource
+bounds and identifier normalization be pressure-tested first?
+
+**Status:** NEXT GOVERNANCE DECISION CANDIDATE.
 
 ------------------------------------------------------------------------
