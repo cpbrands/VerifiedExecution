@@ -1,23 +1,43 @@
-# Verified Execution — Open Decision Register
+---
+id: OPEN-DECISIONS
+title: Verified Execution Open Decision Register
+version: 1.0
+status: Active
+document_type: Decision Register
+category: Governance
+author: Verified Execution Editorial Board
+created: 2026-08-22
+updated: 2026-08-22
+depends_on:
+  - SPECIFICATION-GOVERNANCE
+related_documents:
+  - SPECIFICATION-TASKS
+  - RFC-005
+supersedes: null
+superseded_by: null
+---
 
-## Purpose
+# Verified Execution Open Decision Register
 
-This register distinguishes unresolved architectural questions from accepted decisions and from remaining normative specification tasks.
+| ID | Question | State | Authority/evidence | Disposition or next evidence |
+|---|---|---|---|---|
+| ENC-001 | Canonical serialization family | Resolved | ADR-ENC-001 | VE-CBOR-1 selected; exact profile details are specification tasks. |
+| RULE-001 | Portable v0.1 Rule representation | Resolved | ADR-RULE-001/002 | VE-CEL-1 selected. |
+| RULE-002 | Deterministic Rule execution | Resolved | ADR-RULE-001/002 | Explicit immutable inputs; no hidden side effects. |
+| VERIFY-001 | Mandatory algorithms/profiles | Open | RFC-005 Draft | Requires interoperability and lifecycle evidence. |
+| VERIFY-002 | COSE status | Resolved — limited | ADR-VERIFY-002 | Optional profiles only; not sole VE signature representation. |
+| VERIFY-003 | Verifier and key-material resolution | Narrowed | ADR-VERIFY-002 | Outside Claim fields; exact mechanism remains profile work. |
+| VERIFY-004 | Revocation semantics | Open | Kernel-validation backlog | Requires scenarios and trust-history analysis. |
+| SIG-001 | Native signature frame and record | Open | RFC-005 Draft | Resolve through RFC-005 acceptance gates. |
+| REP-001 | Exact Profile-1 universal resource bounds | Open | RFC-005 Draft | Benchmarks, constrained-device review, and DoS testing. |
+| DIGEST-001 | Initial mandatory digest suite | Open | RFC-005 Draft | Standards and cryptographic-agility review. |
+| SIG-002 | Initial mandatory signature suite | Open | RFC-005 Draft | Decide whether a mandatory suite is required for v0.1. |
+| REF-001 | ObjectReference identity and reuse | Open | RFC-005 Draft | Cross-object reduction and interoperability tests. |
+| VMAT-001 | Verification-material representation | Open | RFC-005 Draft | Content-addressing, embedding, discovery, and rotation tests. |
 
-| Identifier | Question | State | Authority | Dependency / next evidence | Disposition |
-| --- | --- | --- | --- | --- | --- |
-| ENC-001 | What canonical serialization profile applies to byte-sensitive VE kernel objects? | Resolved | ADR-ENC-001-VE-CBOR-1 (Accepted; narrow v0.1 scope) | SPEC-CBOR-001 through SPEC-CBOR-003 | VE-CBOR-1 selected; exact schemas remain tasks. |
-| RULE-001 | What portable Rule representation is mandatory for v0.1? | Resolved | ADR-RULE-001-002-VE-CEL-1 (Accepted; narrow v0.1 scope) | SPEC-CEL-001 through SPEC-CEL-004 | VE-CEL-1 selected. |
-| RULE-002 | How is Rule execution made deterministic? | Resolved | ADR-RULE-001-002-VE-CEL-1 (Accepted; narrow v0.1 scope) | SPEC-CEL-002 through SPEC-CEL-005 | Side-effect-free VE-CEL-1 with explicit inputs selected. |
-| VERIFY-001 | Which verification algorithms/profiles are mandatory to implement? | Open | None | Profile interoperability evidence; future RFC-005 | No mandatory algorithm suite selected. |
-| VERIFY-002 | What is the status of detached COSE verification? | Resolved — profile-limited | ADR-VERIFY-002 (Accepted; profile-limited) | Native VE signature framing and record work; future RFC-005 | COSE is optional; it is not the sole VE signature representation. |
-| VERIFY-003 | How are verifiers and key material resolved? | Narrowed | ADR-VERIFY-002 | VerificationContext and profile specification work | Kept outside Claim fields and universal key ontology. |
-| VERIFY-004 | How is revocation represented and evaluated? | Open | None | Scenario and verification-profile evidence | No architectural selection yet. |
-| SIG-001 | What native VE signature-binding frame and minimum Signature Record are required? | Open | KERNEL_VALIDATION.md and signature pressure tests are non-normative evidence | Future RFC-005 | Must reconcile typed framing, object references, and optional profiles. |
+## Register rules
 
-## Rules
-
-- An item marked **Resolved** MUST link to an accepted ADR or approved specification.
-- A **Narrowed** item is not a settled architectural choice; it records scope that has been excluded from the core.
-- Remaining implementability work MUST be listed in SPECIFICATION_TASKS.md rather than duplicated here.
-- A new finding MUST NOT alter an accepted decision without an RFC/ADR disposition.
+- Resolved items link to an Accepted ADR or Approved specification.
+- Narrowed items record excluded scope but are not fully resolved.
+- Implementability work belongs in `SPECIFICATION_TASKS.md`.
+- Non-normative validation cannot change a resolved item without RFC/ADR disposition.

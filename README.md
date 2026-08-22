@@ -1,233 +1,104 @@
+---
+id: README
+title: Verified Execution Repository Guide
+version: 1.0
+status: Active
+document_type: Repository Guide
+category: Navigation
+author: Verified Execution Editorial Board
+created: 2026-08-22
+updated: 2026-08-22
+depends_on:
+  - ARCHITECTURE-INDEX
+  - SPECIFICATION-GOVERNANCE
+supersedes: null
+superseded_by: null
+---
+
 # Verified Execution
 
-> **Every AI action is provably legitimate.**
+> **Intelligence may propose. Legitimacy determines what may act.**
 
-Verified Execution is the trust infrastructure between autonomous AI systems and the real world.
+Verified Execution is an open specification project for governing consequential execution initiated by AI systems, humans, and services.
 
-As artificial intelligence becomes capable of taking consequential actions—moving money, modifying databases, deploying software, controlling physical systems, approving decisions, or communicating on behalf of organizations—a new requirement emerges:
+It defines an **Execution Boundary** between proposed intent and protected external effects. The boundary validates an Action, applies independently established authority and rules, records authoritative history, mediates execution, and produces inspectable evidence of the result.
 
-**How can an organization prove that an AI action was authorized, policy-compliant, and executed exactly as intended?**
+The canonical repository is [`cpbrands/VerifiedExecution`](https://github.com/cpbrands/VerifiedExecution).
 
-Verified Execution exists to answer that question.
+## What Verified Execution is
 
----
+Verified Execution defines interoperable semantics and protocol machinery for answering:
 
-# The Problem
+> Was this particular consequential Action legitimate under the applicable authority, and what actually happened when execution was attempted?
 
-Modern AI systems are rapidly evolving from information generators into execution engines.
+VE is not an AI model, identity provider, workflow engine, universal policy authority, or replacement for external systems. Resources and protected systems remain authoritative for the authorities they recognize and for the state transitions they accept.
 
-Today, a language model can:
+## Current authority
 
-- send emails
-- execute code
-- call APIs
-- access enterprise systems
-- operate cloud infrastructure
-- interact with financial services
-- coordinate autonomous workflows
+The currently authoritative architectural family contains:
 
-These capabilities create a new class of infrastructure problem.
+- **Action** — a bounded request for a governed consequential effect.
+- **Event** — an immutable historical fact about an Action.
+- **Lifecycle** — deterministic rules for deriving an Action's semantic state.
+- **Execution Boundary** — the mandatory control point before protected execution.
+- **Adapter** — the translation and invocation boundary for an external system.
+- **Receipt** — a portable representation of an Action's resolved outcome.
 
-Organizations can often observe that an action occurred, but they cannot always answer fundamental questions such as:
+The reduced model `Action / Claim / Rule / Verify / Evaluate` remains non-normative kernel-validation work unless formally adopted through RFC, ADR, specification revision, and changelog.
 
-- Which AI system requested this action?
-- Which identity did it act under?
-- Which policies were evaluated?
-- Why was execution permitted?
-- Was human approval required?
-- Can the action be independently verified?
-- Can the complete execution history be reconstructed?
+Read [ARCHITECTURE_INDEX.md](ARCHITECTURE_INDEX.md) before interpreting any specification, proposal, patch, or validation record.
 
-Traditional application logs are not designed to answer these questions.
+## Repository map
 
-As AI systems become increasingly autonomous, execution itself becomes a security boundary.
+| Path | Purpose | Authority |
+|---|---|---|
+| `FOUNDING_PRINCIPLES.md` | Long-lived architectural commitments | Foundational |
+| `SPECIFICATION_GOVERNANCE.md` | Change control and decision process | Foundational |
+| `ARCHITECTURE_INDEX.md` | Canonical authority and status map | Active governance |
+| `OPEN_DECISIONS.md` | Architectural decision register | Active governance |
+| `SPECIFICATION_TASKS.md` | Implementability work after decisions | Active planning |
+| `specifications/` | VE normative specifications | Per-document status |
+| `standards/` | Supporting standards such as DOC-001 | Per-document status |
+| `rfcs/` | Proposed architectural or protocol changes | Per-document status |
+| `adrs/` | Accepted or proposed decisions and rationale | Per-document status |
+| `reference-scenarios/` | Scenario-based validation inputs | Non-normative unless explicitly adopted |
+| `kernel-analysis/` | Pressure tests, gap analysis, historical patches | Non-normative |
+| `implementation/` | Future implementation material | Non-normative |
 
----
-
-# Our Thesis
-
-Authentication became foundational once users began interacting across the Internet.
-
-Payment infrastructure became foundational once commerce moved online.
-
-Cloud observability became foundational once applications became distributed.
-
-We believe **Verified Execution** will become foundational as autonomous AI becomes responsible for consequential actions.
-
-Every AI action that affects the external world should pass through an independent execution layer that provides:
-
-- Identity
-- Verification
-- Policy enforcement
-- Evidence
-- Auditability
-- Receipts
-- Cryptographic extensibility
-
-Trust should not depend on the reputation of a model.
-
-Trust should be derived from evidence.
-
----
-
-# What Verified Execution Is
-
-Verified Execution is an execution infrastructure platform.
-
-It provides a standardized trust boundary between AI systems and external systems.
-
-Instead of allowing AI systems to directly execute actions, Verified Execution mediates every external side effect.
+## Development cadence
 
 ```text
-AI System
-
-        │
-
-        ▼
-
-Verified Execution
-
-        │
-
-        ▼
-
-External Systems
+Kernel Specification
+        ↓
+Reference Scenario
+        ↓
+Gap Analysis
+        ↓
+RFC if needed
+        ↓
+ADR
+        ↓
+Specification revision + version increment + changelog
 ```
 
-This architecture enables organizations to observe, validate, govern, and eventually cryptographically prove every consequential AI action.
+Approved specifications are not edited informally. A semantic change requires the governance trail defined in `SPECIFICATION_GOVERNANCE.md`.
 
----
+## Current phase
 
-# What Verified Execution Is Not
+VE is in specification and protocol-validation work. Current priorities are:
 
-Verified Execution is not:
+1. complete VE-CBOR-1 and VE-CEL-1 specification tasks;
+2. define canonical representation, digest framing, and portable Signature Record semantics through Draft RFC-005;
+3. keep COSE as an optional profile rather than the sole VE signature representation;
+4. validate the architecture through substantive reference scenarios;
+5. begin implementation only when two independent implementations can plausibly interoperate from the written specifications.
 
-- an AI model
-- an orchestration framework
-- a workflow engine
-- an application platform
-- a compliance product
-- a logging system
+## Contributing
 
-Those technologies solve adjacent problems.
+Every significant proposal must pass the Architectural Decision Test in `SPECIFICATION_GOVERNANCE.md`. In particular, a proposal must reduce total conceptual complexity, remain implementation-independent, and avoid creating a new primitive without exceptional justification.
 
-Verified Execution defines a new execution layer.
+## Status and license
 
----
+This repository contains draft and approved specification material. Each document's metadata determines its status. No implementation may claim conformance beyond the requirements of approved normative documents and completed mandatory profiles.
 
-# Core Concepts
-
-The platform is built around a small set of fundamental primitives.
-
-- **Action** — a request to affect the external world.
-- **Event** — an immutable fact describing an Action's lifecycle.
-- **Receipt** — permanent evidence describing a completed Action.
-- **Adapter** — a translation layer between canonical Actions and external systems.
-- **Lifecycle** — the deterministic progression of an Action.
-- **Gateway** *(working name)* — the execution runtime responsible for coordinating Actions.
-
-These concepts are defined formally within the project specifications.
-
----
-
-# Project Structure
-
-This organization is intentionally divided into separate repositories.
-
-## verified-execution-specs
-
-The canonical specifications.
-
-Contains:
-
-- Vision
-- Principles
-- Specifications
-- RFCs
-- Architecture
-- Security Model
-- Architecture Decision Records
-
-No production code exists in this repository.
-
-It defines the language and rules of the platform.
-
----
-
-## verified-execution
-
-The reference implementation.
-
-Contains:
-
-- Runtime
-- SDKs
-- APIs
-- Adapters
-- Tests
-- User Interfaces
-
-This repository implements the specifications.
-
-It does not redefine them.
-
----
-
-# Design Philosophy
-
-Verified Execution is guided by several architectural beliefs.
-
-- Architecture precedes implementation.
-- Specifications outlive code.
-- Simplicity scales better than complexity.
-- Trust must be evidence-based.
-- Every consequential action deserves an immutable history.
-- Execution should be observable by design.
-- Models are replaceable.
-- Evidence is permanent.
-
----
-
-# Status
-
-The project is currently in the specification phase.
-
-The objective of this phase is to define a coherent execution model before implementing any production code.
-
-Current work includes:
-
-- Core Specifications
-- System Architecture
-- Action Model
-- Event Model
-- Receipt Model
-- Security Model
-- Reference Implementation Design
-
----
-
-# Long-Term Goal
-
-Enable organizations to answer a simple question with cryptographic confidence:
-
-> **"Can you prove this AI action was legitimate?"**
-
-Our goal is that the answer is always:
-
-**Yes.**
-
----
-
-# Contributing
-
-During the early stages of the project, architectural consistency is prioritized over implementation speed.
-
-All significant changes should begin with a specification, RFC, or Architecture Decision Record before code is introduced.
-
----
-
-# License
-
-This project will adopt an open development model.
-
-Licensing decisions will be made before the first public release.
+Licensing must be finalized before the first public standard release.

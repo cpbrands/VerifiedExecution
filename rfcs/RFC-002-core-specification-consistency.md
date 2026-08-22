@@ -1,225 +1,51 @@
+---
+id: RFC-002
+title: Core Specification Consistency Requirements
+version: 0.1
+status: Proposed
+document_type: RFC
+category: Governance
+author: Verified Execution Editorial Board
+created: null
+updated: 2026-08-22
+depends_on:
+  - SPECIFICATION-GOVERNANCE
+related_documents:
+  - ARCHITECTURE-INDEX
+recovery_note: Original creation date was not recorded; placeholder removed during metadata normalization.
+supersedes: null
+superseded_by: null
+---
+
 # RFC-002 — Core Specification Consistency Requirements
 
-**RFC Identifier:** RFC-002
+## Summary
 
-**Status:** Proposed
+Before any Core Specification advances from Draft or Review to Approved, the Editorial Board SHALL complete an integrated consistency review across the full normative corpus.
 
-**Author:** Verified Execution Editorial Board
+## Required review areas
 
-**Type:** Governance
+1. **Authority:** every normative statement agrees with the current authority index.
+2. **Terminology:** every normative term has one authoritative definition.
+3. **Primitive ownership:** every responsibility has one unambiguous owner.
+4. **Relationships:** cross-specification relationships are mutually consistent.
+5. **References:** every normative reference resolves to an existing document and version.
+6. **Artifacts:** tables, diagrams, pseudocode, schemas, and examples express equivalent semantics.
+7. **Layering:** semantic concepts do not silently absorb runtime or deployment mechanisms.
+8. **Complexity:** every retained concept passes the complexity budget.
+9. **Conformance:** simultaneous compliance with all applicable requirements is possible.
+10. **Change trail:** semantic changes have RFC, ADR, version increment, and changelog.
 
-**Created:** YYYY-MM-DD
+## Outcomes
 
-**Supersedes:** None
+- **PASS:** no unresolved inconsistency.
+- **PASS WITH EDITORIAL CHANGES:** no semantic changes; corrections are documented.
+- **FAIL:** semantic or ownership conflict requires formal resolution.
 
----
+## Deliverable
 
-# Summary
+The review SHALL produce a dated consistency report identifying reviewed versions, findings, resolutions, and remaining blockers.
 
-Introduce a mandatory consistency review before any Core Specification advances from Draft to Approved.
+## Status
 
-This RFC establishes objective editorial requirements that ensure the Core Standard behaves as one coherent specification rather than a collection of independent documents.
-
----
-
-# Motivation
-
-The Verified Execution Standard now consists of multiple interdependent specifications.
-
-Architectural correctness depends not only on the quality of each specification individually, but also on the consistency of their interactions.
-
-Without explicit consistency requirements, the standard risks:
-
-- contradictory terminology,
-- duplicated responsibilities,
-- conflicting ownership,
-- incompatible normative artifacts,
-- implementation divergence.
-
----
-
-# Proposal
-
-Before any Core Specification may advance to **Approved**, the Editorial Board SHALL complete a Core Specification Consistency Review.
-
-The review SHALL evaluate every approved and draft Core Specification as a single integrated standard.
-
----
-
-# Required Review Areas
-
-## 1. Terminology Consistency
-
-Every normative term SHALL have exactly one authoritative definition.
-
-Duplicate definitions SHALL be eliminated.
-
----
-
-## 2. Primitive Ownership
-
-Every responsibility SHALL belong to exactly one primitive.
-
-No responsibility SHALL have ambiguous ownership.
-
----
-
-## 3. Relationship Consistency
-
-The "Relationship to Other Core Primitives" sections SHALL be mutually consistent.
-
-Example:
-
-If VE-004 states:
-
-> Receipts are derived by the Execution Boundary
-
-VE-006 SHALL express an equivalent relationship.
-
----
-
-## 4. Cross-Reference Integrity
-
-Every reference between specifications SHALL point to an existing normative concept.
-
-Broken references SHALL be corrected.
-
----
-
-## 5. Normative Artifact Consistency
-
-Normative artifacts SHALL express equivalent semantics across:
-
-- tables,
-- diagrams,
-- machine-readable representations,
-- pseudocode,
-- examples.
-
----
-
-## 6. Vocabulary Review
-
-Normative vocabulary SHALL remain consistent.
-
-Preferred terminology SHALL replace synonymous alternatives where possible.
-
-Example:
-
-Use:
-
-Execution Observation
-
-instead of alternating between:
-
-- Adapter Result
-- Adapter Response
-- Adapter Output
-
-unless distinctions are explicitly defined.
-
----
-
-## 7. Responsibility Review
-
-Every primitive SHALL answer:
-
-What does this primitive own?
-
-What does it explicitly not own?
-
-No ownership overlap SHALL remain unresolved.
-
----
-
-## 8. Architectural Layer Review
-
-Specifications SHALL remain consistent with the current architectural model.
-
-Semantic concepts SHALL not leak implementation concerns.
-
-Execution concerns SHALL not redefine semantic truth.
-
----
-
-## 9. Complexity Review
-
-Every specification SHALL satisfy the Complexity Budget.
-
-Redundant concepts SHALL be removed.
-
-New concepts SHALL justify their existence.
-
----
-
-## 10. Conformance Review
-
-Conformance requirements SHALL not contradict one another.
-
-Equivalent implementation behavior SHALL satisfy all applicable specifications simultaneously.
-
----
-
-# Review Outcomes
-
-The review produces one of:
-
-## PASS
-
-No inconsistencies detected.
-
----
-
-## PASS WITH EDITORIAL CHANGES
-
-Editorial clarification required.
-
-No semantic changes.
-
----
-
-## REQUIRES RFC
-
-Semantic inconsistency detected.
-
-Formal architectural change required.
-
----
-
-## REJECT
-
-Specification cannot advance until inconsistencies are resolved.
-
----
-
-# Compatibility
-
-No architectural semantics change.
-
-This RFC introduces governance requirements only.
-
----
-
-# Expected Benefits
-
-- stronger interoperability,
-- improved readability,
-- clearer ownership,
-- reduced implementation ambiguity,
-- greater long-term stability.
-
----
-
-# Decision
-
-Pending.
-
-Recommended for acceptance immediately after completion of the first Core Specification review.
-
----
-
-# Related Specifications
-
-SPECIFICATION_GOVERNANCE.md
-
-VE-000 through VE-006
+Proposed. This RFC does not become governance authority until accepted and recorded by an ADR or incorporated into `SPECIFICATION_GOVERNANCE.md` through the required change process.

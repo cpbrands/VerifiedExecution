@@ -1,155 +1,50 @@
+---
+id: RFC-001
+title: Clarify the Architectural Role of Evidence
+version: 1.0
+status: Accepted
+document_type: RFC
+category: Architecture
+author: Verified Execution Editorial Board
+created: null
+updated: 2026-08-22
+depends_on:
+  - VE-000
+related_documents:
+  - ADR-001
+recovery_note: Original creation date was not recorded; placeholder removed during metadata normalization.
+supersedes: null
+superseded_by: null
+---
+
 # RFC-001 — Clarify the Architectural Role of Evidence
 
-**RFC Identifier:** RFC-001
+## Summary
 
-**Status:** Accepted
+Evidence SHALL remain a derived architectural concern rather than a seventh core primitive.
 
-**Author:** Verified Execution Editorial Board
+## Decision
 
-**Type:** Architecture
+Evidence is information derived from authoritative execution artifacts and applicable context that supports inspection, verification, audit, or compliance.
 
-**Created:** YYYY-MM-DD
+Evidence may draw from Actions, Events, Receipts, verified Claims, Rule evaluations, approval records, cryptographic artifacts, and authoritative external references.
 
-**Supersedes:** None
+Evidence does not own an independent lifecycle or create historical truth. A Receipt is one evidentiary artifact but is not synonymous with all Evidence.
 
----
+## Rationale
 
-# Summary
+Promoting Evidence to a primitive would duplicate responsibilities already owned by existing artifacts and would increase total conceptual complexity without adding irreducible semantics.
 
-Clarify the architectural role of Evidence within the Verified Execution Standard.
+## Alternatives
 
-Evidence SHALL NOT become a new core primitive.
+- **Evidence as a seventh primitive:** rejected; no independent semantic ownership.
+- **Evidence merged into Receipt:** rejected; evidence can include more than terminal summaries.
+- **Evidence as a derived concern:** accepted.
 
-Instead, Evidence SHALL be defined as a derived architectural concern composed from authoritative artifacts produced by the existing primitives.
+## Compatibility and impact
 
----
+No primitive is added or removed. VE-000, VE-004, VE-006, and `ARCHITECTURE.md` must preserve this classification.
 
-# Motivation
+## Decision record
 
-Early architectural discussions treated Evidence as a possible seventh primitive.
-
-Further analysis showed that this unnecessarily increased conceptual complexity.
-
-Evidence does not introduce independent semantics.
-
-Instead, Evidence is derived from:
-
-- Action
-- Event history
-- Receipt
-- Identity assertions
-- Policy evaluations
-- Approval records
-- Cryptographic artifacts
-- External references
-
-Promoting Evidence to a primitive would duplicate responsibilities already owned elsewhere.
-
----
-
-# Proposal
-
-The standard SHALL retain six core primitives:
-
-- Action
-- Event
-- Lifecycle
-- Receipt
-- Adapter
-- Execution Boundary
-
-Evidence SHALL be defined as:
-
-> Information derived from authoritative execution artifacts that supports inspection, verification, audit, or compliance.
-
-Evidence SHALL remain an architectural concern rather than a primitive.
-
----
-
-# Rationale
-
-This proposal:
-
-- preserves minimality,
-- reduces conceptual complexity,
-- keeps primitive ownership clear,
-- prevents semantic duplication,
-- improves long-term extensibility.
-
----
-
-# Alternatives Considered
-
-## Alternative A
-
-Introduce Evidence as a seventh primitive.
-
-Rejected.
-
-Reason:
-
-Evidence owns no independent lifecycle or semantics.
-
----
-
-## Alternative B
-
-Merge Evidence into Receipt.
-
-Rejected.
-
-Reason:
-
-Receipts summarize execution.
-
-Evidence includes considerably more than Receipts.
-
----
-
-## Alternative C
-
-Treat Evidence as a derived architectural concern.
-
-Accepted.
-
----
-
-# Compatibility
-
-No breaking changes.
-
-No primitive definitions change.
-
-Only architectural clarification.
-
----
-
-# Impact
-
-Affected specifications:
-
-- VE-000
-- VE-004
-- VE-006
-- ARCHITECTURE.md
-
-Future specifications:
-
-- VE-010 Evidence
-- VE-011 Verification
-
----
-
-# Decision
-
-Accepted.
-
-Evidence remains a derived architectural concern.
-
-Primitive count remains six.
-
----
-
-# Related ADR
-
-ADR-001 — Architectural Role of Evidence
+See `adrs/ADR-001-architectural-role-of-evidence.md`.

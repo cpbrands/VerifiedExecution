@@ -1,13 +1,13 @@
 ---
 id: CONFORMANCE
 title: Verified Execution Conformance Specification
-version: 1.0
+version: 0.2
 status: Draft
-
-kind: Standard
-domain: Ecosystem
-topic: Conformance
-
+document_type: Standard
+category: Conformance
+author: Verified Execution Editorial Board
+created: null
+updated: 2026-08-22
 depends_on:
   - VE-000
   - VE-001
@@ -16,346 +16,86 @@ depends_on:
   - VE-004
   - VE-005
   - VE-006
-  - KERNEL_VALIDATION
-
-author: Verified Execution Editorial Board
+related_documents:
+  - RS-INDEX
+recovery_note: Original creation date not established from the document.
+supersedes: CONFORMANCE-0.1
+superseded_by: null
 ---
 
-# CONFORMANCE.md
+# Verified Execution Conformance Specification
 
----
+## 1. Status
 
-# Purpose
+This document is Draft. No implementation may claim complete VE conformance until every mandatory dependency and mandatory protocol profile it uses is Approved and accompanied by normative test vectors.
 
-This document defines the requirements an implementation MUST satisfy in order to claim conformance with the Verified Execution Standard.
+`KERNEL_VALIDATION.md`, pressure tests, and reference scenarios are evidence inputs, not normative dependencies.
 
-The purpose of conformance is to ensure that independently developed implementations produce equivalent semantic behavior.
+## 2. Conformance principle
 
-Verified Execution standardizes **behavior**, not technology.
+VE standardizes observable semantic and protocol behavior, not programming language, storage system, operating system, deployment topology, or cloud provider.
 
----
+Equivalent implementation is not required. Equivalent accepted inputs, decisions, lifecycle projections, evidence bindings, and failure behavior are required within the claimed profile.
 
-# Scope
+## 3. Conformance claim
 
-Conformance applies to:
+A conformance claim MUST identify:
 
-- implementations
-- SDKs
-- gateways
-- execution boundaries
-- adapters
-- verification services
-- testing tools
+- each specification identifier and version;
+- each canonical representation profile;
+- each Rule profile;
+- each verification/signature profile;
+- supported object and scenario profiles;
+- any permitted implementation limits;
+- the exact conformance-vector release passed.
 
-Programming language, database, operating system, deployment model, and cloud provider are explicitly out of scope.
+An implementation MUST NOT claim conformance to an incomplete profile.
 
----
+## 4. Core requirements
 
-# Core Principle
+A conforming implementation, within its claimed scope, MUST:
 
-A conforming implementation is one that preserves the semantic guarantees of the Verified Execution Standard.
+1. preserve Action immutability and two-layer identity requirements;
+2. reject non-canonical or out-of-profile representations before authoritative use;
+3. preserve Event immutability and append-only history;
+4. derive Lifecycle state exclusively from authoritative ordered Events;
+5. prevent an Adapter from creating semantic authorization;
+6. mediate every claimed protected effect through an Execution Boundary;
+7. preserve the distinction among authorization, execution attempt, authoritative commit, uncertainty, and Receipt;
+8. fail closed when required authority, verification, Rule inputs, or profile support is absent;
+9. prevent a candidate object from authorizing the authority required to trust itself;
+10. produce sufficient evidence to reproduce the claimed semantic result.
 
-Equivalent behavior is required.
+## 5. Conformance classes
 
-Equivalent implementation is not.
+### 5.1 Representation conformance
 
----
+Parses and validates the claimed canonical profile, including canonicality, resource bounds, object schema, and digest computation. This class is unavailable until the corresponding profile is Approved.
 
-# Normative Language
+### 5.2 Semantic replay conformance
 
-The terms
+Validates Actions and Events, replays Lifecycle rules, and derives Receipts without performing external execution.
 
-- MUST
-- MUST NOT
-- REQUIRED
-- SHALL
-- SHALL NOT
-- SHOULD
-- SHOULD NOT
-- MAY
+### 5.3 Execution Boundary conformance
 
-are interpreted according to RFC 2119.
+Adds protected execution mediation, Adapter invocation, authoritative Event production, and outcome handling.
 
----
+### 5.4 Governance conformance
 
-# General Requirements
+Adds Claim verification and deterministic Rule evaluation using declared profiles. It does not make VE an identity provider or policy authority.
 
-A conforming implementation MUST:
+### 5.5 Independent verification conformance
 
-- preserve Action immutability;
-- preserve Event immutability;
-- derive Lifecycle exclusively from Events;
-- generate Receipts from authoritative history;
-- prohibit Adapter authority over semantic decisions;
-- require protected execution through the Execution Boundary.
+Adds portable Digest References, Signature Records, verification-material references, and applicable commit-evidence verification after those mechanisms are Approved.
 
-Failure to satisfy any mandatory requirement invalidates conformance.
+## 6. Reference scenarios
 
----
+Only scenarios marked **Normative** in `reference-scenarios/README.md` are mandatory conformance vectors. Placeholder, Draft, Substantive, and Validated scenarios do not become normative merely by existing.
 
-# Conformance Levels
+## 7. Failure semantics
 
-Verified Execution defines four conformance levels.
+Unsupported profile, invalid canonical encoding, failed verification, missing required input, Rule evaluation error, uncertain external outcome, and invalid Event transition MUST remain distinguishable. None may be silently converted into authorization or success.
 
----
+## 8. Technology independence
 
-## Level 0 — Semantic Conformance
-
-Purpose
-
-Semantic understanding.
-
-Requirements
-
-Implementation MUST:
-
-- parse canonical Actions;
-- replay Lifecycle;
-- validate Event ordering;
-- derive Receipts.
-
-Execution is NOT required.
-
-Typical implementations:
-
-- documentation
-- educational tools
-- validators
-- simulators
-
----
-
-## Level 1 — Execution Conformance
-
-Adds:
-
-- Execution Boundary
-- Adapter execution
-
-Implementation MUST:
-
-- execute Actions;
-- produce authoritative Events;
-- derive Receipts.
-
-Protected execution is required.
-
----
-
-## Level 2 — Governance Conformance
-
-Adds:
-
-- Policy
-- Identity
-- Approval
-
-Implementation MUST:
-
-- enforce policy;
-- evaluate authority;
-- require approvals where appropriate.
-
----
-
-## Level 3 — Enterprise Conformance
-
-Adds:
-
-- interoperability
-- distributed verification
-- audit APIs
-- cryptographic verification
-- compliance reporting
-
-This level targets enterprise deployments.
-
----
-
-# Reference Scenarios
-
-Reference Scenarios define normative behavior.
-
-Every conforming implementation SHALL correctly execute the applicable scenarios.
-
-Current scenarios:
-
-- RS-001
-- RS-002
-- RS-003
-- RS-004
-
-Future scenarios extend conformance coverage.
-
----
-
-# Replay Requirement
-
-For every executed Reference Scenario:
-
-An implementation MUST derive:
-
-- identical Lifecycle progression;
-- equivalent Event semantics;
-- equivalent Receipt semantics.
-
-Internal implementation details may differ.
-
-Semantic results SHALL NOT.
-
----
-
-# Technology Independence
-
-Conformance SHALL NOT depend upon:
-
-- programming language;
-- runtime;
-- database;
-- message bus;
-- cloud provider;
-- deployment platform.
-
-Only observable semantic behavior is normative.
-
----
-
-# Adapter Independence
-
-Different Adapters MAY target:
-
-- SMTP
-- Gmail
-- Kubernetes
-- AWS
-- Azure
-- Banking APIs
-
-Provided that:
-
-canonical semantic behavior remains equivalent.
-
----
-
-# Receipt Conformance
-
-A Receipt MUST:
-
-- identify the Action;
-- identify terminal resolution;
-- reference authoritative history;
-- avoid asserting information not established by Events.
-
-Receipts are semantic artifacts.
-
-They are not execution logs.
-
----
-
-# Lifecycle Conformance
-
-Lifecycle SHALL be derived exclusively from Event history.
-
-Implementations SHALL NOT maintain mutable lifecycle state independently.
-
-Replay MUST always reconstruct the same semantic result.
-
----
-
-# Event Conformance
-
-Events SHALL:
-
-- remain immutable;
-- preserve historical truth;
-- never be rewritten.
-
-Implementations MAY append Events.
-
-They SHALL NOT modify historical Events.
-
----
-
-# Execution Boundary Conformance
-
-Protected execution SHALL occur exclusively through the Execution Boundary.
-
-A conforming implementation MUST prevent protected capabilities from bypassing the Boundary.
-
----
-
-# Conformance Testing
-
-Conformance SHALL be evaluated through the Verified Execution Technology Compatibility Kit (VE-TCK).
-
-The VE-TCK defines:
-
-- canonical inputs;
-- expected Event histories;
-- expected Lifecycle replay;
-- expected Receipts.
-
-Implementations either pass or fail.
-
----
-
-# Compliance Claims
-
-An implementation SHALL declare:
-
-Example:
-
-Verified Execution
-
-Conformance Level: 1
-
-VE Version:
-
-0.1
-
-Reference Scenarios Passed:
-
-RS-001
-
-RS-002
-
-RS-003
-
-RS-004
-
----
-
-# Non-Conformance
-
-Implementations SHALL NOT claim Verified Execution conformance if:
-
-- Lifecycle differs from specification;
-- Event semantics differ;
-- Receipt semantics differ;
-- protected execution bypasses the Execution Boundary;
-- mandatory Reference Scenarios fail.
-
----
-
-# Evolution
-
-New Reference Scenarios extend conformance.
-
-Previously conforming implementations remain conforming unless a specification revision explicitly changes normative behavior.
-
-Breaking semantic changes require:
-
-- RFC
-- ADR
-- specification revision
-- changelog
-
----
-
-# Guiding Principle
-
-> Implementations may differ in construction.
-
-> They must not differ in meaning.
-
-Conformance exists to guarantee that Verified Execution is a semantic standard rather than an implementation framework.
+Conformance MUST NOT depend on a particular language, database, message bus, model provider, cloud provider, identity provider, or signature envelope unless the conformance claim explicitly names that optional profile.
