@@ -1,3 +1,22 @@
+---
+id: "VE-004"
+title: "Receipt Specification"
+version: "0.2"
+status: "Draft"
+document_type: "Core Primitive Specification"
+category: "Specification"
+author: "Verified Execution Editorial Board"
+created: 2026-08-10
+updated: 2026-08-20
+depends_on:
+  - VE-000
+  - VE-001
+  - VE-002
+  - VE-003
+related_documents: []
+supersedes: null
+superseded_by: null
+---
 # VE-004 — Receipt Specification
 
 **Version:** 0.2  

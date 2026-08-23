@@ -1,3 +1,18 @@
+---
+id: "ADR-VERIFY-002"
+title: "Claim Verification Envelope"
+version: "0.1"
+status: "Accepted"
+document_type: "Architectural Decision Record"
+category: "Verification"
+author: "Verified Execution Editorial Board"
+created: 2026-08-21
+updated: 2026-08-22
+depends_on: []
+related_documents: []
+supersedes: null
+superseded_by: null
+---
 # ADR-VERIFY-002 — Claim Verification Envelope
 
 **Status:** Accepted — profile-limited  

@@ -1,3 +1,19 @@
+---
+id: "KERNEL-VALIDATION"
+title: "Verified Execution Kernel Validation"
+version: "0.19"
+status: "Draft"
+document_type: "Validation Ledger"
+category: "Non-normative Validation"
+author: "Verified Execution Editorial Board"
+created: 2026-08-11
+updated: 2026-08-21
+depends_on: []
+related_documents: []
+maturity: "Active Validation"
+supersedes: null
+superseded_by: null
+---
 # KERNEL_VALIDATION.md
 
 **Project:** Verified Execution\

@@ -1,3 +1,18 @@
+---
+id: "VISION"
+title: "Verified Execution Vision"
+version: "1.0"
+status: "Active"
+document_type: "Vision Statement"
+category: "Governance"
+author: "Verified Execution Editorial Board"
+created: 2026-08-08
+updated: 2026-08-09
+depends_on: []
+related_documents: []
+supersedes: null
+superseded_by: null
+---
 # VISION.md
 
 # Verified Execution

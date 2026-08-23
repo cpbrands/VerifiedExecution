@@ -1,3 +1,18 @@
+---
+id: "PRESSURE-TEST-MINIMUM-CANONICAL-DATA-MODEL"
+title: "Minimum VE Canonical Data Model Pressure Test"
+version: "0.1"
+status: "Active"
+document_type: "Pressure Test"
+category: "Non-normative Validation"
+author: "Verified Execution Editorial Board"
+created: 2026-08-20
+updated: 2026-08-20
+depends_on: []
+related_documents: []
+supersedes: null
+superseded_by: null
+---
 # Pressure Test — Minimum VE Canonical Data Model
 
 **Date:** 2026-08-20  

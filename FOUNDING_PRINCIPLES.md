@@ -1,3 +1,18 @@
+---
+id: "FOUNDING-PRINCIPLES"
+title: "Verified Execution Founding Principles"
+version: "1.0"
+status: "Active"
+document_type: "Foundational Principles"
+category: "Governance"
+author: "Verified Execution Editorial Board"
+created: 2026-08-09
+updated: 2026-08-09
+depends_on: []
+related_documents: []
+supersedes: null
+superseded_by: null
+---
 # FOUNDING_PRINCIPLES.md
 
 # Verified Execution

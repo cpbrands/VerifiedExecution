@@ -1,3 +1,23 @@
+---
+id: "VE-005"
+title: "Adapter Specification"
+version: "0.1"
+status: "Draft"
+document_type: "Core Primitive Specification"
+category: "Specification"
+author: "Verified Execution Editorial Board"
+created: 2026-08-10
+updated: 2026-08-10
+depends_on:
+  - VE-000
+  - VE-001
+  - VE-002
+  - VE-003
+  - VE-004
+related_documents: []
+supersedes: null
+superseded_by: null
+---
 # VE-005 — Adapter Specification
 
 **Version:** 0.1  

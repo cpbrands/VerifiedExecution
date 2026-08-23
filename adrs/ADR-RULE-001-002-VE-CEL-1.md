@@ -1,3 +1,18 @@
+---
+id: "ADR-RULE-001-002"
+title: "Portable Deterministic Rule Execution"
+version: "0.1"
+status: "Accepted"
+document_type: "Architectural Decision Record"
+category: "Protocol"
+author: "Verified Execution Editorial Board"
+created: 2026-08-21
+updated: 2026-08-22
+depends_on: []
+related_documents: []
+supersedes: null
+superseded_by: null
+---
 # ADR-RULE-001/002 — Portable Deterministic Rule Execution
 
 **Status:** Accepted — narrow VE Kernel Protocol v0.1 scope  

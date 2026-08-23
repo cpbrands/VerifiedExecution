@@ -1,3 +1,18 @@
+---
+id: "SPECIFICATION-GOVERNANCE"
+title: "Verified Execution Specification Governance"
+version: "1.0"
+status: "Active"
+document_type: "Governance Policy"
+category: "Governance"
+author: "Verified Execution Editorial Board"
+created: 2026-08-10
+updated: 2026-08-10
+depends_on: []
+related_documents: []
+supersedes: null
+superseded_by: null
+---
 # SPECIFICATION_GOVERNANCE.md
 
 # Verified Execution Specification Governance

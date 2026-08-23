@@ -1,3 +1,18 @@
+---
+id: "VE-000"
+title: "Verified Execution Core Specification"
+version: "0.1"
+status: "Draft"
+document_type: "Core Specification"
+category: "Specification"
+author: "Verified Execution Editorial Board"
+created: 2026-08-10
+updated: 2026-08-10
+depends_on: []
+related_documents: []
+supersedes: null
+superseded_by: null
+---
 # VE-000 — Verified Execution Core Specification
 
 **Version:** 0.1  

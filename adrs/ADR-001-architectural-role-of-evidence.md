@@ -1,3 +1,23 @@
+---
+id: "ADR-001"
+title: "Architectural Role of Evidence"
+version: "0.1"
+status: "Accepted"
+document_type: "Architectural Decision Record"
+category: "Architecture"
+author: "Verified Execution Editorial Board"
+created: 2026-08-22
+updated: 2026-08-22
+depends_on: []
+related_documents:
+  - RFC-001
+  - VE-000
+  - VE-004
+  - VE-006
+  - ARCHITECTURE
+supersedes: null
+superseded_by: null
+---
 # ADR-001 — Architectural Role of Evidence
 
 **Status:** Accepted  

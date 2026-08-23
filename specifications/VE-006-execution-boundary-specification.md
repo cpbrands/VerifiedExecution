@@ -1,3 +1,24 @@
+---
+id: "VE-006"
+title: "Execution Boundary Specification"
+version: "0.1"
+status: "Draft"
+document_type: "Core Primitive Specification"
+category: "Specification"
+author: "Verified Execution Editorial Board"
+created: 2026-08-10
+updated: 2026-08-10
+depends_on:
+  - VE-000
+  - VE-001
+  - VE-002
+  - VE-003
+  - VE-004
+  - VE-005
+related_documents: []
+supersedes: null
+superseded_by: null
+---
 # VE-006 — Execution Boundary Specification
 
 **Version:** 0.1  

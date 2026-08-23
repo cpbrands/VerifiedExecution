@@ -1,3 +1,20 @@
+---
+id: "RFC-003"
+title: "Authoritative Commit Evidence in Receipts"
+version: "0.2"
+status: "Proposed"
+document_type: "RFC"
+category: "Architecture"
+author: "Verified Execution Editorial Board"
+created: 2026-08-19
+updated: 2026-08-20
+depends_on: []
+related_documents:
+  - VE-004
+  - KERNEL-VALIDATION
+supersedes: null
+superseded_by: null
+---
 # RFC-003 — Authoritative Commit Evidence in Receipts
 
 **Status:** Proposed  

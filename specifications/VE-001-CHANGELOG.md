@@ -1,3 +1,18 @@
+---
+id: "VE-001-CHANGELOG"
+title: "VE-001 Changelog"
+version: "0.2"
+status: "Approved"
+document_type: "Specification Changelog"
+category: "Specification"
+author: "Verified Execution Editorial Board"
+created: 2026-08-20
+updated: 2026-08-20
+depends_on: []
+related_documents: []
+supersedes: null
+superseded_by: null
+---
 # VE-001 Changelog
 
 ## v0.2 --- 2026-08-20
