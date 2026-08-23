@@ -1,3 +1,20 @@
+---
+id: "ADR-004"
+title: "Separate Action Content Identity From Action Occurrence Identity"
+version: "0.2"
+status: "Accepted"
+document_type: "Architectural Decision Record"
+category: "Architecture"
+author: "Verified Execution Editorial Board"
+created: 2026-08-20
+updated: 2026-08-20
+depends_on: []
+related_documents:
+  - RFC-004
+  - VE-001
+supersedes: null
+superseded_by: null
+---
 # ADR-004 --- Separate Action Content Identity From Action Occurrence Identity
 
 **Status:** Accepted\

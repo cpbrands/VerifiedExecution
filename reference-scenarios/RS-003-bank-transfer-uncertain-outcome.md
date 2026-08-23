@@ -1,3 +1,25 @@
+---
+id: "RS-003"
+title: "Bank Transfer Uncertain Outcome"
+version: "0.1"
+status: "Active"
+document_type: "Reference Scenario"
+category: "Reference Scenario"
+author: "Verified Execution Editorial Board"
+created: 2026-08-11
+updated: 2026-08-11
+depends_on: []
+related_documents:
+  - VE-001
+  - VE-002
+  - VE-003
+  - VE-004
+  - VE-005
+  - VE-006
+maturity: "Executed as specification-based simulation"
+supersedes: null
+superseded_by: null
+---
 # RS-003 — Bank Transfer (Uncertain Outcome)
 
 **Status:** Executed as specification-based simulation  

@@ -1,3 +1,18 @@
+---
+id: "ADR-ENC-001"
+title: "VE Canonical Serialization Profile"
+version: "0.1"
+status: "Accepted"
+document_type: "Architectural Decision Record"
+category: "Protocol"
+author: "Verified Execution Editorial Board"
+created: 2026-08-21
+updated: 2026-08-22
+depends_on: []
+related_documents: []
+supersedes: null
+superseded_by: null
+---
 # ADR-ENC-001 — VE Canonical Serialization Profile
 
 **Status:** Accepted — narrow VE Kernel Protocol v0.1 scope  

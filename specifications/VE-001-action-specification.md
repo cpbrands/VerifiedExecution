@@ -1,3 +1,18 @@
+---
+id: "VE-001"
+title: "Action Specification"
+version: "0.2"
+status: "Approved"
+document_type: "Core Primitive Specification"
+category: "Specification"
+author: "Verified Execution Editorial Board"
+created: 2026-08-10
+updated: 2026-08-20
+depends_on: []
+related_documents: []
+supersedes: null
+superseded_by: null
+---
 # VE-001 --- Action Specification
 
 **Version:** 0.2\

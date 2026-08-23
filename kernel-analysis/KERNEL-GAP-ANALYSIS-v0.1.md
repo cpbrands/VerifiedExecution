@@ -1,3 +1,19 @@
+---
+id: "KERNEL-GAP-ANALYSIS-0.1"
+title: "Kernel Gap Analysis"
+version: "0.1"
+status: "Active"
+document_type: "Analysis Record"
+category: "Non-normative Validation"
+author: "Verified Execution Editorial Board"
+created: 2026-08-11
+updated: 2026-08-11
+depends_on: []
+related_documents: []
+maturity: "Observation and hypothesis record"
+supersedes: null
+superseded_by: null
+---
 GAP-001
 
 Status:

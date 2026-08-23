@@ -1,3 +1,20 @@
+---
+id: "VE-002"
+title: "Event Specification"
+version: "0.1"
+status: "Draft"
+document_type: "Core Primitive Specification"
+category: "Specification"
+author: "Verified Execution Editorial Board"
+created: 2026-08-10
+updated: 2026-08-10
+depends_on:
+  - VE-000
+  - VE-001
+related_documents: []
+supersedes: null
+superseded_by: null
+---
 # VE-002 — Event Specification
 
 **Version:** 0.1  

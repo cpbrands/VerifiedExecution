@@ -1,3 +1,18 @@
+---
+id: "VE-004-CHANGELOG"
+title: "VE-004 Changelog"
+version: "0.2"
+status: "Proposed"
+document_type: "Specification Changelog"
+category: "Specification"
+author: "Verified Execution Editorial Board"
+created: 2026-08-20
+updated: 2026-08-20
+depends_on: []
+related_documents: []
+supersedes: null
+superseded_by: null
+---
 # VE-004 Changelog
 
 ## v0.2 — Proposed 2026-08-19

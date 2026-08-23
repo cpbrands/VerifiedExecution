@@ -1,3 +1,20 @@
+---
+id: "ADR-003"
+title: "Receipt Carries Commit Evidence Without Creating Commit"
+version: "0.1"
+status: "Proposed"
+document_type: "Architectural Decision Record"
+category: "Architecture"
+author: "Verified Execution Editorial Board"
+created: 2026-08-19
+updated: 2026-08-20
+depends_on: []
+related_documents:
+  - RFC-003
+  - VE-004
+supersedes: null
+superseded_by: null
+---
 # ADR-003 — Receipt Carries Commit Evidence Without Creating Commit
 
 **Status:** Proposed  

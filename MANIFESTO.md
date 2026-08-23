@@ -1,3 +1,18 @@
+---
+id: "MANIFESTO"
+title: "Verified Execution Manifesto"
+version: "1.0"
+status: "Active"
+document_type: "Foundational Statement"
+category: "Governance"
+author: "Verified Execution Editorial Board"
+created: 2026-08-09
+updated: 2026-08-09
+depends_on: []
+related_documents: []
+supersedes: null
+superseded_by: null
+---
 # Verified Execution Manifesto
 
 > **Intelligence may propose. Legitimacy determines what may act.**
