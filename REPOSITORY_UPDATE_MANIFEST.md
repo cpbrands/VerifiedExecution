@@ -54,9 +54,9 @@ The root patches are recoverable from Git history and preserved in cleaned histo
 - Approved specification text except through separate governed revisions.
 - Placeholder scenarios, but classify them visibly through the index until they are completed or withdrawn.
 
-## Separate metadata migration
+## Completed metadata migration
 
-After applying this bundle, perform one metadata-only commit across remaining Markdown files using `METADATA_NORMALIZATION.md`. Do not mix those mechanical changes with specification semantics.
+DOC-001 metadata normalization and automated documentation validation were completed and merged through PR #2. No separate future metadata migration remains to be performed for this bundle.
 
 ## Verification checklist
 
