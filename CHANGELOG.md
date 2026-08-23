@@ -51,6 +51,12 @@ This changelog records repository-wide semantic, governance, status, and structu
 - Added Draft RFC-005 to define the scope and acceptance gates for Canonical Representation Profile 1, typed digest framing, Digest Reference, ObjectReference, Signature Record, verification-material references, and optional COSE profiles.
 - RFC-005 deliberately leaves exact resource bounds, mandatory algorithm suites, and certain object schemas open pending evidence.
 
+### Reconciliation branch work
+
+- Removed duplicated obsolete bodies from ADR-ENC-001, ADR-RULE-001/002, and ADR-VERIFY-002, preserving their accepted scoped bodies.
+- Added proposed ADR-VERIFY-003 to narrow VerificationContext to issuer-to-verifier binding.
+- Added proposed RFC-006 to reconcile the non-normative semantic-kernel model with the execution-history layer without changing approved specifications.
+
 ## Historical specification changes
 
 - VE-001 v0.2 introduced two-layer Action identity under RFC-004 and ADR-004.
