@@ -10,7 +10,6 @@ created: 2026-08-22
 updated: 2026-08-22
 depends_on:
   - ARCHITECTURE-INDEX
-  - ADR-VERIFY-003
 related_documents:
   - VE-000
   - KERNEL-VALIDATION
@@ -25,16 +24,18 @@ superseded_by: null
 
 Proposed. This RFC is a governance and integration proposal. It does not amend an approved specification or promote the reduced kernel model into the normative primitive set.
 
+Repository inclusion or merge does not constitute acceptance of this RFC or its proposed organizational concepts. The layer model becomes authoritative only through explicit acceptance followed by every governed specification revision required to incorporate it.
+
 ## Problem
 
 The current specification family defines Action, Event, Lifecycle, Execution Boundary, Adapter, and Receipt. Active non-normative validation also uses the compact vocabulary Action, Claim, Rule, Verify, and Evaluate. Treating the two lists as competing primitive sets creates authority drift and invites silent deletion or renaming.
 
 ## Proposed relationship
 
-The models describe different concerns and MAY be organized as two layers:
+The models describe different concerns and are proposed for possible organization as two layers:
 
-1. **Semantic kernel:** Action, Claim, Rule, Verify, and Evaluate describe canonical intent, asserted facts, deterministic rule evaluation, and verification inputs/results.
-2. **Execution-history layer:** Event, Lifecycle, Execution Boundary, Adapter, and Receipt describe legal progression, authoritative history, protected external execution, translation to targets, and inspectable execution outcome.
+1. **Proposed semantic kernel:** Action, Claim, Rule, Verify, and Evaluate would describe canonical intent, asserted facts, deterministic rule evaluation, and verification inputs/results.
+2. **Proposed execution-history layer:** Event, Lifecycle, Execution Boundary, Adapter, and Receipt would describe legal progression, authoritative history, protected external execution, translation to targets, and inspectable execution outcome.
 
 Action is the shared semantic artifact proposed for possible evaluation and, where legal, execution. Claims, Rules, Verify, and Evaluate do not by themselves authorize or execute an external effect. Events, Lifecycle, Execution Boundary, Adapter, and Receipt do not redefine the semantic content of Action or Claim.
 

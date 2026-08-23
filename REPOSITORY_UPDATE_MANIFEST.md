@@ -2,8 +2,8 @@
 id: REPOSITORY-UPDATE-2026-08-22
 title: Verified Execution Repository Update Manifest
 version: 1.0
-status: Proposed
-document_type: Change Manifest
+status: Historical
+document_type: Historical Change Manifest
 category: Repository Maintenance
 author: Verified Execution Editorial Board
 created: 2026-08-22
@@ -16,6 +16,8 @@ superseded_by: null
 ---
 
 # Repository Update Manifest
+
+> **Historical, editorial, and non-normative.** This manifest records repository maintenance results. It creates no requirements or acceptance gate and cannot override any specification, RFC, ADR, the Architecture Authority Index, or any changelog.
 
 ## Replace
 
@@ -58,15 +60,15 @@ The root patches are recoverable from Git history and preserved in cleaned histo
 
 DOC-001 metadata normalization and automated documentation validation were completed and merged through PR #2. No separate future metadata migration remains to be performed for this bundle.
 
-## Verification checklist
+## Historical validation results
 
-- [ ] Every new or replaced document contains exactly one YAML block.
-- [ ] No duplicate document body remains.
-- [ ] README contains `cpbrands/VerifiedExecution` and uses Execution Boundary.
-- [ ] No normative document depends on `KERNEL_VALIDATION.md`.
-- [ ] RFC-005 remains Draft.
-- [ ] COSE is described as optional.
-- [ ] Root patch files are absent after relocation.
-- [ ] Empty implementation placeholders are absent.
-- [ ] All Markdown links resolve.
-- [ ] Git diff separates editorial alignment from future semantic decisions.
+- [x] Every new or replaced document contains exactly one YAML block.
+- [x] No duplicate document body remains.
+- [x] README contains `cpbrands/VerifiedExecution` and uses Execution Boundary.
+- [x] No normative document depends on `KERNEL_VALIDATION.md`.
+- [x] RFC-005 remains Draft.
+- [x] COSE is described as optional.
+- [x] Root patch files are absent after relocation.
+- [x] Empty implementation placeholders are absent.
+- [x] All Markdown links resolve.
+- [x] Future semantic decisions remain expressly proposed and non-authoritative.

@@ -53,7 +53,8 @@ These models may ultimately describe different architectural layers. Their appar
 | Approved normative | `VE-001` v0.2, subject to its declared canonical-profile dependency |
 | Draft normative | `VE-000`; `VE-002`–`VE-006`; `CONFORMANCE.md`; `DOC-001` |
 | Accepted decisions | RFC-001; ADR-001; RFC-004; ADR-004; ADR-ENC-001; ADR-RULE-001/002; ADR-VERIFY-002 at profile-limited scope |
-| Proposed decisions | RFC-002; RFC-003; ADR-003; ADR-VERIFY-003; Draft RFC-005; Proposed RFC-006 |
+| Draft RFCs | RFC-005 |
+| Proposed RFCs and ADRs | RFC-002; RFC-003; ADR-003; RFC-006 |
 | Non-normative evidence | `KERNEL_VALIDATION.md`; `kernel-analysis/`; `reference-scenarios/` |
 | Historical integration inputs | `kernel-analysis/patches/` |
 

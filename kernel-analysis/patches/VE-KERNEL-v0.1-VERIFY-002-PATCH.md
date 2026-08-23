@@ -42,6 +42,6 @@ These are optional Claim-verification profiles. They are not the sole or canonic
 
 - VERIFY-002: accepted only at profile-limited scope.
 - VERIFY-001 mandatory algorithms: open.
-- VERIFY-003 resolution: narrowed to verification-context/profile work.
+- VERIFY-003: resolved at limited scope by ADR-VERIFY-002; VerificationContext establishes issuer-to-verifier binding, while discovery, rotation, and revocation remain profile work.
 - VERIFY-004 revocation: open.
 - Native digest framing and Signature Record: Draft RFC-005.
