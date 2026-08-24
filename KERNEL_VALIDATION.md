@@ -1,13 +1,13 @@
 ---
 id: "KERNEL-VALIDATION"
 title: "Verified Execution Kernel Validation"
-version: "0.19"
+version: "0.20"
 status: "Draft"
 document_type: "Validation Ledger"
 category: "Non-normative Validation"
 author: "Verified Execution Editorial Board"
 created: 2026-08-11
-updated: 2026-08-21
+updated: 2026-08-24
 depends_on: []
 related_documents: []
 maturity: "Active Validation"
@@ -18,9 +18,9 @@ superseded_by: null
 
 **Project:** Verified Execution\
 **Document:** Kernel Validation Record\
-**Version:** 0.19\
+**Version:** 0.20\
 **Status:** Draft / Active Validation\
-**Date:** 2026-08-19
+**Date:** 2026-08-24
 
 ------------------------------------------------------------------------
 
@@ -7537,5 +7537,68 @@ should the record remain a leaf until a reference scenario needs to
 reference signatures directly?
 
 **Status:** OPEN.
+
+------------------------------------------------------------------------
+
+## 67. Pressure Test: ObjectReference Identity and Recursion
+
+### Question
+
+Does `ObjectReference` need its own cryptographic object type and digest,
+or should it remain an embedded canonical structural value?
+
+### Result
+
+**PASS FOR EXCLUSION — `ObjectReference` remains a reusable embedded
+canonical structural value and does not receive its own cryptographic
+object type in the initial architecture.**
+
+The tested structure is:
+
+``` text
+ObjectReference := {
+    object_type,
+    representation_profile,
+    digest_reference
+}
+```
+
+Its `DigestReference` component remains:
+
+``` text
+DigestReference := {
+    digest_suite,
+    digest_bytes
+}
+```
+
+### Findings
+
+- Existing uses inside Claims, Receipts, Signature Records, and trust
+  history remain possible when `ObjectReference` is embedded.
+- Structural equality of canonical components is sufficient for lookup,
+  comparison, deduplication, indexing, and commitment by an enclosing
+  object.
+- A separate `OBJECT_REFERENCE` cryptographic object type would add
+  reference-to-reference chains, dereference policy, cycle handling, and
+  wrapper-versus-target identity questions without a validated need.
+- If a protocol must attest a reference value, a normal semantic object
+  containing that value can be signed or hashed instead.
+- Local cache hashes do not become VE protocol identities.
+
+### Decision consequence
+
+The ObjectReference identity question is resolved **No** for the initial
+architecture. `ObjectReference` is reusable embedded protocol machinery,
+not a first-class hashable VE object.
+
+This conclusion MAY be reconsidered only if a future reference scenario
+proves that an embedded value plus the digest or signature of an
+enclosing semantic object is insufficient.
+
+### Scope boundary
+
+This validation finding informs Draft RFC-005. It does not modify
+VE-001 or VE-007, and it does not advance RFC-005 beyond Draft.
 
 ------------------------------------------------------------------------

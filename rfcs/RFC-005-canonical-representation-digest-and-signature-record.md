@@ -7,7 +7,7 @@ document_type: RFC
 category: Protocol
 author: Verified Execution Editorial Board
 created: 2026-08-22
-updated: 2026-08-22
+updated: 2026-08-24
 depends_on:
   - ADR-ENC-001
   - ADR-VERIFY-002
@@ -104,7 +104,7 @@ Digest bytes without their suite are not a portable VE object reference.
 
 ## 7. ObjectReference
 
-Candidate minimum form:
+Reusable embedded form:
 
 ```text
 ObjectReference := {
@@ -114,7 +114,20 @@ ObjectReference := {
 }
 ```
 
-The RFC must determine whether this becomes a reusable protocol object or remains embedded structure.
+`ObjectReference` is reusable protocol structure embedded within a
+containing VE protocol object. It is not a first-class hashable VE object
+and MUST NOT have its own cryptographic object type or independent
+digest in the initial architecture.
+
+Structural equality of its canonical components is sufficient for lookup,
+deduplication, comparison, indexing, and inclusion in a signed or hashed
+enclosing object. An implementation MAY compute local cache hashes, but
+those hashes are not VE protocol identities.
+
+This exclusion MAY be reconsidered only if a future reference scenario
+demonstrates a requirement that cannot be satisfied by an embedded
+`ObjectReference` and the digest or signature of an enclosing semantic
+object.
 
 ## 8. Signature Binding Frame v1
 
@@ -180,7 +193,7 @@ RFC-005 does not:
 - exact object-type/profile/suite identifier widths and registries;
 - verification-material representation;
 - whether embedded verification material is permitted;
-- whether ObjectReference and SignatureRecord have their own object identities;
+- whether SignatureRecord has its own object identity;
 - exact COSE adapter-profile construction.
 
 These remain architectural/protocol decisions, not routine specification tasks, until resolved through this RFC.
