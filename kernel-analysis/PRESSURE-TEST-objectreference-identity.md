@@ -277,5 +277,3 @@ must itself be identified.
 
 No `OBJECT_REFERENCE` cryptographic object type is justified at this
 stage.
-
-

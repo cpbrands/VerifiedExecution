@@ -234,7 +234,7 @@ RFC-005 does not:
 - exact object-type/profile/suite identifier widths and registries;
 - verification-material representation;
 - whether embedded verification material is permitted;
-- whether ObjectReference and SignatureRecord have their own object identities;
+- whether SignatureRecord has its own object identity;
 - exact COSE adapter-profile construction.
 
 These remain architectural/protocol decisions, not routine specification tasks, until resolved through this RFC.

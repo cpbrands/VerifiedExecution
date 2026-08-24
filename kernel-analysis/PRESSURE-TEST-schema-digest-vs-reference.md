@@ -19,7 +19,7 @@ superseded_by: null
 
 # Pressure Test — `schema_digest` vs `schema_reference`
 
-**Date:** 2026-08-24  
+**Date:** 2026-08-24
 **Result:** FAIL for implicit context; PASS for explicit typed reference
 
 ## Question
@@ -126,5 +126,3 @@ RFC
 ```
 
 VE-007 must remain blocked until that semantic change is accepted.
-
-
