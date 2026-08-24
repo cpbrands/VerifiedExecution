@@ -1,13 +1,13 @@
 ---
 id: "KERNEL-VALIDATION"
 title: "Verified Execution Kernel Validation"
-version: "0.19"
+version: "0.21"
 status: "Draft"
 document_type: "Validation Ledger"
 category: "Non-normative Validation"
 author: "Verified Execution Editorial Board"
 created: 2026-08-11
-updated: 2026-08-21
+updated: 2026-08-24
 depends_on: []
 related_documents: []
 maturity: "Active Validation"
@@ -18,9 +18,9 @@ superseded_by: null
 
 **Project:** Verified Execution\
 **Document:** Kernel Validation Record\
-**Version:** 0.19\
+**Version:** 0.21\
 **Status:** Draft / Active Validation\
-**Date:** 2026-08-19
+**Date:** 2026-08-24
 
 ------------------------------------------------------------------------
 
@@ -7521,7 +7521,10 @@ ObjectReference = {
 to eliminate repeated framing metadata across SignatureRecord, Claims,
 Receipts, and trust history?
 
-**Status:** OPEN — HIGH LEVERAGE.
+**Status:** PARTIALLY RESOLVED IN DRAFT RFC-005 — non-authoritative
+until RFC-005 is accepted. The candidate portable form is embedded
+`ObjectReference`; exact registries and interoperability vectors remain
+open.
 
 ### HYP-054 — Embedded verification material
 
@@ -7537,5 +7540,58 @@ should the record remain a leaf until a reference scenario needs to
 reference signatures directly?
 
 **Status:** OPEN.
+
+------------------------------------------------------------------------
+
+## 67. Pressure Test: ObjectReference Identity and Recursion
+
+### Result
+
+**PASS FOR EXCLUSION.** `ObjectReference` is a reusable embedded
+canonical structural value, not a first-class hashable VE object.
+
+``` text
+ObjectReference := {
+    object_type,
+    representation_profile,
+    digest_reference
+}
+```
+
+Structural equality and commitment by an enclosing semantic object are
+sufficient for lookup, comparison, indexing, and attestation. A separate
+`OBJECT_REFERENCE` type would introduce reference chains, dereference
+rules, cycle handling, and wrapper-versus-target identity questions
+without a validated requirement.
+
+**Status:** VALIDATED CANDIDATE CONCLUSION — non-normative evidence for
+Draft RFC-005. Reconsider only if a future reference scenario shows that
+an embedded value plus an enclosing digest or signature is insufficient.
+
+------------------------------------------------------------------------
+
+## 68. Pressure Test: `schema_digest` vs. `schema_reference`
+
+### Result
+
+**FAIL FOR IMPLICIT CONTEXT; PASS FOR AN EXPLICIT TYPED REFERENCE.**
+
+``` text
+schema_digest
+   ↓
+schema_reference : ObjectReference
+```
+
+`schema_digest` alone cannot identify a typed VE object once detached,
+copied, indexed, signed, or moved between protocol contexts. A
+representation profile cannot safely be inferred from a current protocol
+version because historical objects can span profiles.
+
+VE-007 cannot supply the missing type or profile implicitly: that would
+change VE-001 meaning rather than encode it. If Draft RFC-005 is later
+accepted, this requires VE-001 v0.3 through normal change control.
+
+**Status:** VALIDATED CANDIDATE CONCLUSION — does not modify VE-001 or
+VE-007, and does not advance RFC-005 beyond Draft.
 
 ------------------------------------------------------------------------

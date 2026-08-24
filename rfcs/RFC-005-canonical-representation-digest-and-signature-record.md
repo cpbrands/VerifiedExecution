@@ -7,7 +7,7 @@ document_type: RFC
 category: Protocol
 author: Verified Execution Editorial Board
 created: 2026-08-22
-updated: 2026-08-22
+updated: 2026-08-24
 depends_on:
   - ADR-ENC-001
   - ADR-VERIFY-002
@@ -104,7 +104,7 @@ Digest bytes without their suite are not a portable VE object reference.
 
 ## 7. ObjectReference
 
-Candidate minimum form:
+Required portable candidate form
 
 ```text
 ObjectReference := {
@@ -114,9 +114,63 @@ ObjectReference := {
 }
 ```
 
-The RFC must determine whether this becomes a reusable protocol object or remains embedded structure.
+Within this Draft RFC, every portable reference to a VE cryptographic
+object MUST use this structure. A bare `DigestReference` identifies only
+a digest result; it is not sufficient to identify a typed VE object
+across representation profiles.
 
-## 8. Signature Binding Frame v1
+`ObjectReference` is reusable protocol structure embedded within a
+containing VE protocol object. It is not a first-class hashable VE object
+and MUST NOT have its own cryptographic object type or independent
+digest in the initial architecture.
+
+Structural equality of its canonical components is sufficient for lookup,
+deduplication, comparison, indexing, and inclusion in a signed or hashed
+enclosing object. An implementation MAY compute local cache hashes, but
+those hashes are not VE protocol identities.
+
+This exclusion MAY be reconsidered only if a future reference scenario
+demonstrates a requirement that cannot be satisfied by an embedded
+`ObjectReference` and the digest or signature of an enclosing semantic
+object.
+
+### Draft disposition and remaining work
+
+The Draft RFC proposes that `DigestReference` identifies a digest result,
+while `ObjectReference` identifies a portable typed VE object. The
+proposal is supported by validation evidence, but remains
+non-authoritative until RFC-005 is accepted.
+
+REF-001 remains partially resolved: exact object-type,
+representation-profile, and suite identifiers/registries, as well as
+cross-language canonicalization and verification vectors, remain open
+RFC-005 work.
+
+## 8. VE-001 impact
+
+If RFC-005 is ultimately accepted, the portable schema reference in a
+future VE-001 revision MUST change as follows:
+
+``` text
+schema_digest
+   ↓
+schema_reference : ObjectReference
+```
+
+For an Action schema, `schema_reference.object_type` MUST identify the
+schema-descriptor object class, and `schema_reference` MUST explicitly
+carry its representation profile and Digest Reference.
+
+This is a semantic type change to VE-001. It requires normal change
+control and a VE-001 v0.3 revision only after RFC-005 is accepted; this
+Draft RFC does not modify VE-001.
+
+VE-007 remains Draft and blocked on this accepted semantic contract.
+VE-007 MUST NOT encode `schema_digest` by inventing implicit object-type
+or representation-profile semantics from a field name, enclosing
+context, or current protocol version.
+
+## 9. Signature Binding Frame v1
 
 The signature input SHALL bind:
 
@@ -133,7 +187,7 @@ digest_bytes
 
 The signature suite is independent of the digest suite. A signature authenticates the binding frame, not an ambiguous bare digest.
 
-## 9. Minimum Signature Record
+## 10. Minimum Signature Record
 
 Candidate semantic components:
 
@@ -150,17 +204,17 @@ The record establishes neither signer identity nor authority. Claims and the app
 
 Discovery identifiers such as `kid`, URI, DID URL, or certificate locator are non-authoritative retrieval hints unless independently bound by the applicable profile.
 
-## 10. Optional COSE profiles
+## 11. Optional COSE profiles
 
 COSE_Sign1 and COSE_Sign MAY be registered as optional verification or transport profiles. COSE MUST NOT become the sole VE Signature Record representation.
 
 An optional profile MUST specify whether COSE authenticates the VE Signature Binding Frame or wraps an already complete Signature Record. Transport AAD or headers MUST NOT silently change the meaning of the inner VE signature.
 
-## 11. Streaming and resource safety
+## 12. Streaming and resource safety
 
 Canonicality checking, duplicate-key detection, resource enforcement, and digest computation SHALL be possible in one forward pass with working memory bounded by the profile limits. Partial parsing MUST NOT authorize partial effects.
 
-## 12. Non-goals
+## 13. Non-goals
 
 RFC-005 does not:
 
@@ -172,7 +226,7 @@ RFC-005 does not:
 - require COSE, JWS, CMS, or another external envelope universally;
 - promote Signature Record into a semantic kernel primitive.
 
-## 13. Open decisions
+## 14. Open decisions
 
 - exact Profile-1 bounds;
 - initial mandatory digest suite;
@@ -185,7 +239,7 @@ RFC-005 does not:
 
 These remain architectural/protocol decisions, not routine specification tasks, until resolved through this RFC.
 
-## 14. Acceptance gates
+## 15. Acceptance gates
 
 RFC-005 MUST NOT advance to Accepted until:
 

@@ -1,13 +1,13 @@
 ---
 id: OPEN-DECISIONS
 title: Verified Execution Open Decision Register
-version: 1.0
+version: 1.1
 status: Active
 document_type: Decision Register
 category: Governance
 author: Verified Execution Editorial Board
 created: 2026-08-22
-updated: 2026-08-22
+updated: 2026-08-24
 depends_on:
   - SPECIFICATION-GOVERNANCE
 related_documents:
@@ -32,12 +32,15 @@ superseded_by: null
 | REP-001 | Exact Profile-1 universal resource bounds | Open | RFC-005 Draft | Benchmarks, constrained-device review, and DoS testing. |
 | DIGEST-001 | Initial mandatory digest suite | Open | RFC-005 Draft | Standards and cryptographic-agility review. |
 | SIG-002 | Initial mandatory signature suite | Open | RFC-005 Draft | Decide whether a mandatory suite is required for v0.1. |
-| REF-001 | ObjectReference identity and reuse | Open | RFC-005 Draft | Cross-object reduction and interoperability tests. |
+| REF-001 | ObjectReference identity and reuse | Partially Resolved — Draft RFC-005 | RFC-005 Draft; pressure tests | Draft RFC-005 proposes embedded `ObjectReference` for portable typed VE objects; exact registries and cross-language vectors remain open. |
 | VMAT-001 | Verification-material representation | Open | RFC-005 Draft | Content-addressing, embedding, discovery, and rotation tests. |
 
 ## Register rules
 
 - Resolved items link to an Accepted ADR or Approved specification.
+- A scoped disposition in a Draft RFC MUST identify its Draft authority
+  and remains non-authoritative until accepted or incorporated into an
+  Approved specification.
 - Narrowed items record excluded scope but are not fully resolved.
 - Implementability work belongs in `SPECIFICATION_TASKS.md`.
 - Non-normative validation cannot change a resolved item without RFC/ADR disposition.
