@@ -7,7 +7,7 @@ document_type: Historical Change Manifest
 category: Repository Maintenance
 author: Verified Execution Editorial Board
 created: 2026-08-22
-updated: 2026-08-22
+updated: 2026-08-24
 depends_on:
   - ARCHITECTURE-INDEX
   - CHANGELOG
@@ -19,7 +19,7 @@ superseded_by: null
 
 > **Historical, editorial, and non-normative.** This manifest records repository maintenance results. It creates no requirements or acceptance gate and cannot override any specification, RFC, ADR, the Architecture Authority Index, or any changelog.
 
-## Replace
+## Replaced
 
 - `README.md`
 - `ARCHITECTURE_INDEX.md` — removes duplicated body
@@ -29,7 +29,7 @@ superseded_by: null
 - `rfcs/RFC-001-evidence-role.md`
 - `rfcs/RFC-002-core-specification-consistency.md`
 
-## Add
+## Added
 
 - `CHANGELOG.md`
 - `METADATA_NORMALIZATION.md`
@@ -39,7 +39,7 @@ superseded_by: null
 - `kernel-analysis/patches/VE-KERNEL-v0.1-ENC-RULE-RESOLUTION-PATCH.md`
 - `kernel-analysis/patches/VE-KERNEL-v0.1-VERIFY-002-PATCH.md`
 
-## Delete after relocation
+## Deleted after relocation
 
 - `/VE-KERNEL-v0.1-ENC-RULE-RESOLUTION-PATCH.md`
 - `/VE-KERNEL-v0.1-VERIFY-002-PATCH.md`

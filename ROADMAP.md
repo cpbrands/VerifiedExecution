@@ -7,7 +7,7 @@ document_type: Roadmap
 category: Strategy
 author: Verified Execution Editorial Board
 created: null
-updated: 2026-08-22
+updated: 2026-08-24
 depends_on:
   - ARCHITECTURE-INDEX
   - SPECIFICATION-GOVERNANCE
@@ -20,7 +20,7 @@ superseded_by: null
 
 Progress is organized by validated capability, not by dates or presumed future primitives. Policy, identity, evidence, authority, and compliance are capability domains; their appearance here does not promote them into the semantic kernel.
 
-## Stage 0 — Authority coherence
+## Stage 0 — Authority coherence (Complete)
 
 **Outcome:** another engineering team can determine what is authoritative in under five minutes.
 

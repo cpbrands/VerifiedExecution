@@ -7,7 +7,7 @@ document_type: Changelog
 category: Governance
 author: Verified Execution Editorial Board
 created: 2026-08-22
-updated: 2026-08-22
+updated: 2026-08-24
 depends_on:
   - SPECIFICATION-GOVERNANCE
 supersedes: null
@@ -17,6 +17,13 @@ superseded_by: null
 # Verified Execution Repository Changelog
 
 This changelog records repository-wide semantic, governance, status, and structural changes. Specification-specific changelogs remain authoritative for changes to their specifications.
+
+## 2026-08-24 — Editorial integrity
+
+- Marked the completed authority-coherence stage as complete.
+- Archived the completed DOC-001 metadata-normalization register.
+- Updated completed migration and placeholder-cleanup references to past tense.
+- No architecture, specification, RFC/ADR decision, or normative requirement changed.
 
 ## 2026-08-22 — Authority and repository alignment
 

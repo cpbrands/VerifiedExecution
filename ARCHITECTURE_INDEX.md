@@ -7,7 +7,7 @@ document_type: Governance Index
 category: Architecture
 author: Verified Execution Editorial Board
 created: 2026-08-22
-updated: 2026-08-22
+updated: 2026-08-24
 depends_on:
   - FOUNDING-PRINCIPLES
   - SPECIFICATION-GOVERNANCE
@@ -67,5 +67,5 @@ An accepted RFC or ADR may guide future work, but an approved specification rema
 - `OPEN_DECISIONS.md` tracks architectural questions and dispositions.
 - `SPECIFICATION_TASKS.md` tracks implementability work after decisions.
 - `reference-scenarios/README.md` identifies scenario maturity and validation coverage.
-- `METADATA_NORMALIZATION.md` tracks DOC-001 migration.
+- `METADATA_NORMALIZATION.md` records the completed DOC-001 normalization.
 - `CHANGELOG.md` records repository-wide changes.

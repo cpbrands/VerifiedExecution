@@ -2,12 +2,12 @@
 id: METADATA-NORMALIZATION
 title: DOC-001 Metadata Normalization Register
 version: 1.0
-status: Active
+status: Historical
 document_type: Migration Register
 category: Documentation
 author: Verified Execution Editorial Board
 created: 2026-08-22
-updated: 2026-08-22
+updated: 2026-08-24
 depends_on:
   - DOC-001
 supersedes: null
@@ -62,6 +62,9 @@ Composite values such as `Draft / Active Validation` belong in a separate `matur
 6. Commit metadata normalization separately from semantic revisions.
 
 ## Completion gate
+
+DOC-001 normalization was completed and validated on 2026-08-22. This
+register is retained as the historical record of that migration.
 
 Normalization is complete only when an automated repository check confirms:
 
