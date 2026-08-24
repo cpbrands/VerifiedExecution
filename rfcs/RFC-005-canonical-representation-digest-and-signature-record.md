@@ -15,6 +15,7 @@ depends_on:
 related_documents:
   - KERNEL-VALIDATION
   - SPECIFICATION-TASKS
+  - RFC-006
 supersedes: null
 superseded_by: null
 ---
