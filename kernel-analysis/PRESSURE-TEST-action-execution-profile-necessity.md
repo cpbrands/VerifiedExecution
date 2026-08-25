@@ -246,7 +246,7 @@ an authority for the outcome it reports.
 For unresolved feedback, neither a false completion nor a false failure
 Receipt is required. The existing no-false-resolution behavior remains
 available; exact Receipt serialization and evidence bindings are ordinary
-profile specification work.
+field-level specification work.
 
 **Result: Receipt needs no new generic execution-profile contract.**
 
@@ -284,21 +284,25 @@ implementations is not `cell-safe-insert-v1`. That robotic profile would
 duplicate a narrower unresolved convention before the convention itself is
 specified.
 
-The next artifact should be a non-normative candidate **Action-Referenced
-Observation Claim Binding Profile**. Its limited purpose is to specify:
+The next artifact is a **Canonical Claim-to-Action Reference and
+Verified-Claim-to-Rule-Input Mapping specification**. It is field-level
+interoperability detail covering:
 
-- how a Claim references `action_id` and `action_digest`;
-- the minimum issuer, provenance, and observation-time bindings needed for
-  Rule evaluation;
-- how verified Claims are supplied to completion/failure Rules; and
-- how a Receipt may reference the evaluated evidence without becoming its
-  authority.
+- exact binding of an observation/evidence Claim to Action content and/or
+  Action occurrence;
+- use of `action_id` and `action_digest` where occurrence-specific binding
+  is required;
+- issuer and provenance representation;
+- observation/assertion-time semantics when required;
+- deterministic projection of verified Claim values into Rule/Evaluate
+  inputs; and
+- Receipt references to the established Claims/Events used to justify a
+  terminal outcome.
 
-It MUST NOT define universal completion criteria, failure criteria,
-observation vocabularies, physical thresholds, or a new generic execution
-primitive. Domain-specific schemas/profile specifications, including a
-future `cell-safe-insert-v1`, would build on it only if that work later
-shows the convention is useful.
+This work does **not** introduce an Observation Claim subtype, an Action
+Execution Profile, a new primitive, a new Lifecycle state, or a new
+authority model. It specifies the interoperable use of existing Action,
+Claim, Rule, Verify/Evaluate, Event, and Receipt semantics directly.
 
 ## RFC-005 dependency
 
@@ -316,3 +320,4 @@ No architectural gap is demonstrated.
 | Version | Date | Change |
 |---|---|---|
 | 0.1 | 2026-08-25 | Initial pressure test of generic Action Execution Profile necessity. |
+| 0.2 | 2026-08-25 | Replace the removable binding-profile wrapper with the narrower field-level interoperability requirement. |
