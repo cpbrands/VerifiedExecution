@@ -78,8 +78,10 @@ This works for facts whose meaning is exactly the Event's fact:
 | “retry reached terminal failure” | Works if history establishes failure and the Claim refers to decisive Event(s). |
 | “sensor observed force X during this attempt” | Not fully resolved: an Event can be referenced, but current authority does not define which collection of Events is one attempt. |
 
-An `event_id` is a reliable historical anchor. It does not define membership
-in an attempt that spans multiple Events.
+An `event_id` is a reliable historical anchor. VE-002 references are
+optional traceability relationships; they do not currently define attempt
+membership. An Event reference therefore does not by itself define
+membership in an attempt that spans multiple Events.
 
 ## 3. Pre-Event observation attack
 
@@ -143,9 +145,9 @@ target response E4
 ```
 
 Neither Approved VE-001 nor current Draft Event/Lifecycle documents forbid
-overlapping attempts generally. VE-001 leaves attempt semantics an
-execution/lifecycle concern and asks whether attempts should remain Event
-structures or require future formalization.
+overlapping attempts generally. VE-003 leaves attempt formalization open,
+and VE-001 asks whether attempts should remain Event structures or require
+future formalization.
 
 If Cx is only bound to A, ordering cannot decide whether it belongs with E1
 or E2. If Cx references E1, that identifies a causal anchor, but current
@@ -167,8 +169,9 @@ Receipt = derived summary of history
 ```
 
 This test does not show that VE needs an `execution_attempt` object. It
-shows that Event/history needs a profile-level association and boundary rule
-before attempts can be reconstructed consistently across implementations.
+shows that multi-Event attempt grouping requires a normative
+grouping/association rule before attempts can be reconstructed consistently
+across implementations.
 
 ## 7. Claim-binding attack
 
@@ -200,8 +203,12 @@ an interoperable attempt-local claim.
 
 ## Exact unresolved dependency
 
-The unresolved dependency is a **profile-level Event/history association and
-attempt-boundary rule** specifying:
+Multi-Event attempt grouping requires a **normative grouping/association
+rule**. Current VE authority does not yet determine whether that rule belongs
+to Event/Lifecycle history semantics or is explicitly delegated to a
+normative execution profile.
+
+The rule must specify:
 
 - which Event or Event pattern opens an operational attempt;
 - how pre-Event observations later associate with authoritative history;
@@ -210,28 +217,44 @@ attempt-boundary rule** specifying:
 - how overlapping work, if allowed, is distinguished through explicit
   Event/history references rather than inferred order.
 
-This is not a new primitive proposal. It is the minimum specification work
-needed to determine whether Event/history reference is universally enough
-for attempt-specific binding.
+VE-002 references are optional traceability relationships and do not
+currently define attempt membership. VE-003 leaves attempt formalization
+open. Therefore current Event/Lifecycle authority does not yet provide
+deterministic multi-Event attempt grouping. Single-Event observations remain
+fully representable through Event references; multi-Event attempt-spanning
+Claims remain blocked. Ordering alone is insufficient under
+overlap/concurrency.
+
+This is not a new primitive proposal. No `attempt_id`, `attempt_reference`,
+or `ExecutionAttempt` primitive is demonstrated. It is the minimum
+specification work needed to determine whether Event/history reference is
+universally enough for attempt-specific binding.
 
 ## Consequence for Canonical Claim Reference Semantics
 
-Canonical Claim Reference Semantics is unblocked for Action content, Action
-occurrence, and individual Event references. Its attempt/history reference
-portion remains blocked on the Event/history association rule above. It must
-not define a universal attempt identity while that rule is unresolved.
+Canonical Claim Reference Semantics:
+
+```text
+Action content references          UNBLOCKED
+Action occurrence references       UNBLOCKED
+individual Event references        UNBLOCKED
+grouped attempt/history references BLOCKED
+```
+
+It must not define a universal attempt identity while the grouping rule is
+unresolved.
 
 ## Architectural result
 
 No new primitive, lifecycle state, or architectural gap is demonstrated.
-No RFC is required for this pressure test. A future normative change must
-follow normal governance if it changes an Approved specification.
+No RFC is required for this correction itself. A future normative change
+must follow normal governance if it changes an Approved specification.
 
 ## Revision history
 
 | Date | Change |
 |---|---|
-| 2026-08-25 | Initial non-normative pressure test. |
+| 2026-08-25 | Initial non-normative pressure test; corrected after independent audit. |
 
 ## Verdict
 
