@@ -107,7 +107,7 @@ Event identifier, or Claim value is.
 The current candidate Claim-body semantic model contains:
 
 | Local field label | Presence | Representation status |
-|---|---:|---|---|
+|---|---:|---|
 | `subject_reference` | Required | Semantic union known; exact profile encoding unresolved. |
 | `issuer_ref` | Required | Semantic content known; portable primitive representation unresolved. |
 | `predicate` | Required | Semantic content known; portable identifier representation and namespace unresolved. |
