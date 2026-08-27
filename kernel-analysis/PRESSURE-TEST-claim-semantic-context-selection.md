@@ -14,7 +14,6 @@ related_documents:
   - VE-001
   - VE-002
   - VE-CLAIM-REFERENCE-SEMANTICS
-  - CLAIM-BODY-SEMANTIC-FIELD-CONTRACT
   - VE-CBOR-1-CLAIM-BODY-SCHEMA
   - RFC-005
 supersedes: null
