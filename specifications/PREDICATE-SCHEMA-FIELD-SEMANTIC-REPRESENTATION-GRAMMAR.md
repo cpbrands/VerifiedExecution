@@ -62,6 +62,30 @@ grammars would duplicate scalar, record, collection, range, and failure
 behavior. Allowing each Predicate Schema to invent its own representation would
 prevent portable canonicalization.
 
+This conclusion applies to the finite semantic representation subset supported
+by the portable Predicate Schema canonical profile, not to every semantically
+possible Predicate Schema. Predicate Schema semantic validity is distinct from
+portable-profile validity. A semantically meaningful Predicate Schema whose
+issuer normalization, unit, time, or other semantics lie outside this closed
+subset MAY remain valid at the abstract semantic layer, but it is not
+portable-profile-valid.
+
+For this Draft, the portable-profile admission rule is closed-world:
+
+```text
+portable-profile-valid
+    iff
+every semantically relevant rule is represented by this grammar
+and permitted by the current portable profile
+```
+
+Every semantic rule that affects interpretation, validation, normalization,
+equality, units, time, or canonical value meaning MUST be represented by the
+current closed grammar and current profile-defined normalization rules. Any
+additional semantic rule makes the Predicate Schema non-profile-valid. It MUST
+NOT be ignored, discarded, approximated, preserved as opaque metadata, or
+partially serialized during canonicalization.
+
 `issuer_domain_ref`, `value_semantics_ref`, and `time_semantics_ref` are
 existing field-specific source-composition mechanisms already defined by the
 Predicate Schema Semantic Contract. They are outside this representation
@@ -69,9 +93,14 @@ grammar and introduce no generic semantic-reference mechanism. They are valid
 only in their named field contexts, resolve to retained immutable semantic
 content, and fail closed when unavailable.
 
+They are whole-field source-composition mechanisms only. They do not extend the
+portable semantic vocabulary: after resolution, the resulting semantic content
+MUST still be within the portable subset. A reference resolving to content
+outside that subset makes the Predicate Schema non-profile-valid.
+
 This grammar defines no `semantic_ref`, `field_semantics_ref`, `extension_ref`,
-`contract_ref`, `custom_semantics_ref`, generic extension map, registry, or new
-VE object.
+`contract_ref`, `custom_semantics_ref`, `semantic_descriptor`, generic extension
+map, registry, or new VE object.
 
 ## 2. Representation versus semantics
 
@@ -83,6 +112,16 @@ Field-semantic representation grammar
     -> the closed structure used to express that meaning deterministically
        before VE-CBOR-1 encoding
 ```
+
+The grammar therefore defines portable-profile validity, not the full range of
+abstract Predicate Schema semantic validity. The latter may be broader than the
+finite vocabulary this Draft can represent portably.
+
+There is no portable semantic metadata channel outside this grammar. An
+annotation, metadata map, opaque descriptor, comment, semantic label, or
+external interpretation hint MUST NOT affect the meaning of a profile-valid
+Predicate Schema. If it does affect meaning, the schema is outside the portable
+subset.
 
 For example, `integer` is a representation form. It does not establish a
 VE-owned ontology of quantities, currencies, accounts, identities, or time. The
@@ -165,10 +204,22 @@ A closed scalar vocabulary is represented by a scalar form plus an
 allowed_values: set of canonical scalar values
 ```
 
-The member set is in deterministic canonical-member order, and duplicate
-canonical members are invalid. Display labels are non-semantic metadata and
-MUST NOT affect validation, equality, canonicalization, or Predicate Schema
-identity. This constraint replaces a separate enumeration form.
+When absent, `allowed_values` imposes no allowed-values restriction. When
+present, it MUST contain at least one member. An empty member set would define
+an empty scalar domain and is invalid under the current bounded portable
+profile; it MUST NOT normalize to omission. The member set is in deterministic
+canonical-member order, and duplicate canonical members are invalid. Display
+labels are non-semantic metadata and MUST NOT affect validation, equality,
+canonicalization, or Predicate Schema identity. This constraint replaces a
+separate enumeration form.
+
+Allowed values MUST undergo only normalization explicitly defined by the current
+portable profile. They MUST validate under their FieldForm, normalize under
+those rules, canonicalize, sort deterministically, and reject duplicates after
+that normalization. Each member MUST also satisfy the applicable base scalar
+domain, including Integer bounds and scale where applicable. A member outside
+that base domain makes the Predicate Schema non-profile-valid. No
+source-specific or externally interpreted normalization is permitted.
 
 ## 5. Records and field identity
 
@@ -217,12 +268,31 @@ SequenceForm {
 }
 ```
 
+Omission of `min_items` means a minimum cardinality of zero. An explicit
+`min_items: 0` is semantically equivalent to omission and MUST normalize to the
+omitted form before canonical encoding. Omission of `max_items` means an
+unbounded maximum; no finite sentinel denotes that state, and every present
+`max_items` value remains explicit. Both cardinalities, when present, MUST be
+non-negative mathematical integers. If both are present, `min_items <=
+max_items` is required; otherwise the Predicate Schema is non-profile-valid.
+
+Cardinality is normalized before VE-CBOR-1 encoding. Therefore, an otherwise
+identical source SequenceForm with no cardinality members and one with only
+`min_items: 0` produce identical normalized cardinality content. Ordering and
+uniqueness remain independent of cardinality.
+
 When `ordering_significant` is `true`, source/normalized element order is
 semantic. When it is `false`, source order has no semantic meaning and the
 runtime array MUST use deterministic canonical-member ordering: bytewise
 lexicographic order of each normalized member's canonical VE-CBOR-1
 representation. When `uniqueness` is `true`, duplicate canonical members MUST
 fail closed. When it is `false`, multiplicity is preserved.
+
+`ordering_significant: false` together with `uniqueness: false` denotes
+**multiset** semantics. Canonicalization MUST normalize every member, derive
+its canonical bytes, sort members by the governed canonical byte-order rule,
+and preserve every repeated equal member. If `uniqueness` is `true`, repeated
+normalized canonical members MUST fail closed.
 
 The sequence constraints are the sole source of collection ordering and
 multiplicity behavior. Field semantics may set bounds but MUST NOT introduce a
@@ -245,6 +315,22 @@ Bound {
 }
 ```
 
+A profile-valid IntegerForm MUST describe a non-empty possible integer domain
+before `allowed_values` is applied. For a present lower bound, define
+`effective_min` as its `value` when `inclusive` is true and as `value + 1` when
+`inclusive` is false. For a present upper bound, define `effective_max` as its
+`value` when `inclusive` is true and as `value - 1` when `inclusive` is false.
+When both effective bounds exist, `effective_min <= effective_max` is required.
+Otherwise the IntegerForm is non-profile-valid.
+
+This rule makes `[1, 1]` valid, makes every equal-endpoint interval with an
+exclusive endpoint invalid, and rejects structurally ordered but integer-empty
+intervals such as `(1, 2)`. It permits `(1, 2]` and `[1, 2)`, each of which
+contains one integer. `min > max` is invalid. Effective-bound calculations use
+mathematical integers; an implementation that cannot represent `value + 1` or
+`value - 1` safely MUST reject the input rather than wrap, truncate, or use
+floating-point arithmetic.
+
 When an exact scale is required, the Claim value remains an integer coefficient
 and the applicable `value_semantics` defines the scale and relation:
 
@@ -260,6 +346,29 @@ apply to the raw integer coefficient. Absence of a lower or upper bound means
 unbounded in that direction. No sentinel bound, implicit zero, or omitted
 inclusivity rule is permitted.
 
+For portable-profile normalization, absent scale and `scale: 0`
+represent the same semantic case. The canonical normalized form MUST omit scale
+when its value is zero; a non-zero scale MUST remain explicit. This mechanical
+rule does not supply unit meaning.
+
+For current portable value semantics, validation MUST use only constraints
+expressible by FieldForm, normalization MUST use only current profile-defined
+normalization, and equality MUST be canonical-representation equality after
+that validation and normalization. Approximate equality, tolerance-based
+equality, case-insensitive semantic equality, domain-specific equivalence,
+normalization not defined by this profile, and custom comparison functions make
+the Predicate Schema non-profile-valid.
+
+No finite governed unit vocabulary is defined by the current portable profile.
+Accordingly, every unit-bearing semantic form is outside the current portable
+subset. A future governed profile may add a finite portable unit vocabulary, but
+this Draft does not anticipate or admit one.
+
+In the current portable subset, absence of unit semantics means
+**dimensionless**. It MUST NOT mean that a unit exists but is unspecified,
+externally implied, supplied by an alias or name, or deferred to documentation.
+Any such semantic claim makes the Predicate Schema non-profile-valid.
+
 ## 8. Null-like values
 
 There is no universal VE null semantic. `null_like` is predicate-defined
@@ -272,6 +381,11 @@ CBOR `null` MUST NOT substitute for absence. It MAY be a permitted canonical
 value only when the applicable Predicate Schema `value_semantics` explicitly
 defines its predicate-specific meaning. The grammar supplies no general null
 form or default null behavior.
+
+The broader semantic model may permit a predicate-defined null-like value, but
+the current portable FieldForm subset does not represent one. A Predicate Schema
+that gives a null-like asserted value semantic meaning is therefore
+non-profile-valid under the current portable profile.
 
 ## 9. Issuer-domain representation
 
@@ -287,23 +401,35 @@ comparison is:
 ```text
 semantic validation
         ↓
-applicable semantic normalization
+profile-governed normalization
         ↓
 canonical representation
         ↓
 deterministic canonical-representation equality
 ```
 
-The grammar does not invent semantic equality or replace the Predicate Schema
-semantics that determine normalization and equality rules. Once those rules
-produce normalized content, the mechanical equality comparison is deterministic
-canonical-representation equality.
+For the current portable subset, the identifier MUST be represented through the
+closed grammar; validation MUST use only constraints explicitly expressible by
+that FieldForm; normalization MUST be profile-governed; and equality is
+canonical-representation equality after validation and that normalization. The
+grammar supplies no separately programmable equality language.
 
-The grammar may enforce valid UTF-8 and NFC where text is used. It MUST NOT
-define trimming, case-folding pipelines, delimiter rewriting, locale
-transformation, arbitrary normalization sequences, executable code, CEL, or
-regex programs. Such domain-specific normalization remains in the applicable
-issuer-domain semantics, inline or through the existing `issuer_domain_ref`.
+UTF-8/NFC handling is portable because ADR-ENC-001 already governs it: text MUST
+be valid UTF-8 in NFC and non-NFC input is rejected. This Draft MUST NOT define
+trimming, case-folding, delimiter rewriting, locale transformation, arbitrary
+normalization sequences, executable code, CEL, or regex programs. In
+particular, arbitrary case folding is not portable-profile-valid unless a future
+profile explicitly pins its exact algorithm, Unicode/version dependency, and
+normalization semantics. An issuer-domain semantic form requiring unsupported
+normalization is outside the current portable subset.
+
+The following issuer-domain semantics are not portable-profile-valid unless a
+future governed profile explicitly represents them: checksum validation, email
+syntax, URI syntax, account-number syntax, DID-specific rules,
+locale-dependent rules, case-insensitive comparison, delimiter normalization,
+custom identity matching, and external identity-resolution rules. A Text issuer
+identifier with any such extra semantic validation is not equivalent to plain
+profile-valid Text merely because both serialize as Text.
 
 Issuer-domain representation MUST NOT encode trust, authorization,
 verification keys, signer binding, delegation, revocation, publisher authority,
@@ -326,9 +452,17 @@ content, invalid content, or a cyclic dependency makes semantic interpretation
 and canonicalization unavailable. No partial interpretation, fallback, alias,
 network lookup, mutable registry, or guessing is permitted.
 
+Resolution does not make arbitrary semantic content portable. After expansion,
+every semantically relevant rule in the content MUST pass the same exhaustive
+portable-subset admission check as inline content. Otherwise the Predicate
+Schema is non-profile-valid and MUST NOT proceed to canonical encoding under the
+current portable profile. Reference identity is never proof that referenced
+semantic content is portable-profile-valid.
+
 These mechanisms are outside this grammar. This grammar creates no generic
 semantic-reference construct, including `semantic_ref`, `field_semantics_ref`,
-`extension_ref`, `contract_ref`, or `custom_semantics_ref`.
+`extension_ref`, `contract_ref`, `custom_semantics_ref`, or
+`semantic_descriptor`.
 
 During Predicate Schema canonicalization, the Canonical Representation Profile
 resolves and recursively expands referenced exact canonical fragments. The
@@ -378,6 +512,13 @@ If a Predicate Schema omits `time_semantics`, both Claim time fields are
 forbidden under the Semantic Contract. A Claim supplying either field is
 semantically invalid; the field is not ignored.
 
+Present time semantics remain semantically possible under the broader Predicate
+Schema Semantic Contract, but they are outside the current portable subset:
+their time-domain meaning is not yet expressed by a finite governed portable
+vocabulary. The current portable profile therefore admits only absent
+`time_semantics`, under which both `assertion_time` and `observation_time` are
+forbidden. It creates no TimeDomain or time-domain reference.
+
 ## 13. Grammar nesting and canonical input
 
 Grammar nesting is permitted only as a finite, acyclic inline grammar tree.
@@ -394,6 +535,7 @@ canonicalization pipeline:
 resolve references
     -> recursively expand exact canonical fragments
     -> normalize fully inline semantic content
+    -> bounded portable-subset validation
     -> VE-CBOR-1 canonical bytes
 ```
 
@@ -401,6 +543,14 @@ No generic semantic-reference object may remain in normalized canonical content.
 Canonicalization collapses only exact governed normalization. It MUST NOT infer
 logical, mathematical, decompositional, or differently expressed-schema
 equivalence.
+
+For the bounded portable subset, a profile-valid FieldForm MUST describe at
+least one possible canonical value. Validation performs the finite local
+consistency checks defined by this grammar and the applicable profile; it does
+not attempt arbitrary nested-schema satisfiability analysis. At minimum, it
+rejects contradictory or integer-empty bounds, an empty `allowed_values` set,
+an allowed-value member outside its base scalar domain, and sequence cardinality
+with `min_items > max_items`.
 
 ## 14. Versioning, unknown constructs, and offline audit
 
@@ -433,10 +583,15 @@ on:
 - record field identity, ordering, presence, and closed unknown-field handling;
 - sequence ordering, uniqueness, bounds, and multiplicity behavior;
 - integer bounds and exact scale relation;
-- time-requirement states and existing time-semantics interpretation;
+- the current portable exclusion of present time semantics;
 - existing field-specific reference resolution, failure behavior, and
   acyclicity; and
 - rejection of unknown constructs and non-conforming input.
+
+This agreement applies only to the supported portable subset. It does not make
+arbitrary issuer normalization, unit systems, time domains, or externally
+interpreted semantic labels portable merely because they can be stored in source
+semantic material.
 
 Exact field-level VE-CBOR-1 map shapes and labels remain a revision concern of
 the existing Predicate Schema Canonical Representation Profile. They are not
@@ -450,17 +605,34 @@ semantics.
 
 | Example | Grammar result |
 |---|---|
-| A. `issuer_ref` is a normalized account identifier text | `TextForm`; UTF-8/NFC is enforced mechanically, while account-specific validation, normalization, and equality remain in the applicable issuer-domain semantics. |
+| A. `issuer_ref` is plain NFC text with no additional issuer-domain rule | `TextForm`; UTF-8/NFC validity is enforced mechanically and equality is canonical-representation equality. |
 | B. `value` is a Boolean approval | `BooleanForm`; the Predicate Schema supplies the proposition-specific meaning of `true` and `false`. |
-| C. `value` is an exact decimal currency-like quantity | `IntegerForm` with an exact scale and optional raw-coefficient bounds. Unit and quantity semantics remain in `value_semantics`; no float or free-form unit name is used. |
+| C. `value` is an exact dimensionless scaled quantity | `IntegerForm` with an exact scale and optional raw-coefficient bounds. No unit semantics are present. |
 | D. `value` is a structured record with two required fields | `RecordForm` with two uniquely named `required` descriptors. Unknown or duplicate runtime fields fail closed. |
 | E. `value` is an order-insensitive collection of canonical identifiers | `SequenceForm` with `ordering_significant: false` and `uniqueness: true`; members use canonical ordering and duplicate canonical members fail closed. |
-| F. `observation_time` is an integer timestamp under schema-defined epoch/scale | `observation_time: required` and `IntegerForm` with an exact scale where required. Epoch, precision, and related meaning remain in `time_semantics`. |
+| F. `observation_time` is an integer timestamp under schema-defined epoch/scale | Semantically possible, but outside the current portable subset until a finite governed time vocabulary is specified. |
 
-All examples are representable deterministically. Where an example uses
-domain-specific normalization, unit, or time meaning, independent
-implementations resolve the same retained field-specific semantic content before
-canonicalization.
+The local cardinality and integer-domain checks have these outcomes:
+
+| Case | Grammar result |
+|---|---|
+| Sequence `min` absent, `max` absent | Valid; `0..unbounded`. |
+| Sequence `min: 0`, `max` absent | Valid; normalizes to both members absent. |
+| Sequence `min: 2`, `max` absent | Valid; `2..unbounded`. |
+| Sequence `min` absent, `max: 5` | Valid; `0..5`. |
+| Sequence `min: 2`, `max: 5` | Valid. |
+| Sequence `min: 5`, `max: 5` | Valid; exact cardinality five. |
+| Sequence `min: 6`, `max: 5`, or either negative | Invalid. |
+| Integer `[1,1]`, `[1,2]`, `(1,2]`, or `[1,2)` | Valid. |
+| Integer `(1,1]`, `[1,1)`, `(1,1)`, `(1,2)`, or `min > max` | Invalid. |
+| `allowed_values` omitted | Valid; no allowed-values restriction. |
+| `allowed_values: [1]` within a valid Integer domain | Valid. |
+| `allowed_values: []`, duplicate normalized members, or member outside Integer bounds | Invalid. |
+
+Examples A--E are portable only where their normalization and unit semantics
+are completely expressed by the governed finite profile vocabulary. Reference
+resolution alone cannot make an unsupported domain-specific normalization, unit,
+or time meaning portable.
 
 ## 17. Architectural Decision Test
 
@@ -470,7 +642,7 @@ canonicalization.
 | Primitive burden | Pass. The grammar is representation machinery, not a primitive. |
 | Removability | A shared closed grammar cannot be removed without divergent field encodings. A generic reference mechanism, separate enumeration/scale/collection forms, and universal runtime wrappers can be removed without loss. |
 | Twenty-year durability | Pass, conditional on retaining the grammar/profile and immutable field-semantic material. |
-| Independent implementability | Pass. Domain-specific material resolves through existing field-specific composition rather than hidden code. |
+| Independent implementability | Pass for the currently supported portable subset. Content outside it remains semantically possible but is not portable-profile-valid. |
 | Total conceptual complexity | Pass. One finite grammar plus existing field-specific composition is smaller than separate grammars, a transformation language, or a universal VE type system. |
 
 ## 18. Governance and normative home
@@ -488,21 +660,20 @@ canonicalization.
 
 ## 19. Unresolved dependencies and next action
 
-This Draft resolves the field-semantic grammar blocker at the conceptual
-structure level. Remaining work is to bind the reduced grammar to exact
-VE-CBOR-1 map shapes and labels and to publish cross-language canonicalization
-vectors. Portable predicate identity also remains dependent on separately
-governed digest-suite and framing decisions.
+This Draft defines the closed grammar for the currently supported portable
+subset; it does not establish portability for every abstract Predicate Schema
+semantic form. The paired Canonical Representation Profile MUST enforce this
+bounded applicability boundary before encoding. Cross-language vectors remain
+needed for every admitted form and every fail-closed exclusion.
 
-The correct next action is to revise the existing Draft
-**PREDICATE-SCHEMA-CANONICAL-REPRESENTATION-PROFILE.md** to bind this grammar to
-exact VE-CBOR-1 map shapes and labels while preserving recursive normalization
-and the separate digest-suite decision. A separately versioned successor is not
-warranted because that profile remains Draft. This action must not alter Claim
-or Predicate Schema semantics.
+Within the bounded subset, portable predicate identity remains dependent on
+separately governed digest-suite and framing decisions. A separately versioned
+successor is not warranted because the existing canonical profile remains Draft.
+No further action may alter Claim or Predicate Schema semantics merely to widen
+representation scope.
 
 ## Revision history
 
 | Version | Date | Change |
 |---|---|---|
-| 0.1 | 2026-08-28 | Initial Draft defining a reduced finite field-semantic representation grammar. |
+| 0.1 | 2026-08-28 | Draft defining a reduced finite field-semantic grammar, bounded portable scope, and exhaustive closed-world admission rule. |
