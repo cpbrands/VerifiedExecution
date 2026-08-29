@@ -1,9 +1,9 @@
 ---
 id: PREDICATE-SCHEMA-FIELD-SEMANTIC-REPRESENTATION-GRAMMAR
 title: Predicate Schema Field-Semantic Representation Grammar
-version: "0.1"
-status: Draft
-document_type: Candidate Specification
+version: "1.0"
+status: Approved
+document_type: Specification
 category: Representation
 author: Verified Execution Editorial Board
 created: 2026-08-28
@@ -11,9 +11,9 @@ updated: 2026-08-28
 depends_on:
   - ADR-ENC-001
   - PREDICATE-SCHEMA-SEMANTIC-CONTRACT
+related_documents:
   - PREDICATE-SCHEMA-CANONICAL-REPRESENTATION-PROFILE
   - CLAIM-PREDICATE-SCHEMA-REFERENCE-SEMANTICS
-related_documents:
   - VE-CBOR-1-CLAIM-BODY-SCHEMA
   - VE-CLAIM-REFERENCE-SEMANTICS
   - RFC-005
@@ -26,12 +26,12 @@ superseded_by: null
 
 ## Status and authority boundary
 
-This is a Draft candidate representation artifact. It defines a small, closed
-mechanical grammar for expressing field semantics that Predicate Schema
-semantics already require. It applies those boundaries and ADR-ENC-001
-canonical-encoding mechanics; it does not redefine Claim semantics, Predicate
-Schema semantics, verification, Trust Context, Rule/Evaluate, Action, Event,
-or trust.
+This Approved v1.0 representation artifact defines a small, closed mechanical
+grammar for expressing field semantics that Predicate Schema semantics already
+require. It applies `ADR-ENC-001` v0.1 canonical-encoding mechanics and the
+Approved `PREDICATE-SCHEMA-SEMANTIC-CONTRACT` v1.0 source-composition boundary;
+it does not redefine Claim semantics, verification, Trust Context, Rule/Evaluate,
+Action, Event, or trust.
 
 This grammar is representation machinery. It does not create a VE primitive, a
 Claim-body field, a universal value or identity system, a universal time system,
@@ -48,6 +48,22 @@ Claim {
   }
 }
 ```
+
+## v1.0 machine-behavior freeze and dependency closure
+
+Machine-affecting behavior of this Approved v1.0 grammar is immutable. An
+editorial correction preserves v1.0 meaning only when no conforming
+implementation can change an admission outcome, reference-resolution result,
+normalized semantic content, canonical structure, canonical ordering, or
+canonical VE-CBOR-1 bytes. Any machine-affecting change requires the normal
+Approved-specification change process and a new semantic version.
+
+This grammar's machine-affecting dependencies are
+`PREDICATE-SCHEMA-SEMANTIC-CONTRACT` v1.0 for field-specific source composition
+and `ADR-ENC-001` v0.1 for VE-CBOR-1 mechanics. The Approved
+`PREDICATE-SCHEMA-CANONICAL-REPRESENTATION-PROFILE` v1.0 applies this grammar;
+it is a consumer, not a mutable dependency of the grammar. No mutable branch,
+repository URL, or Git revision is normative.
 
 ## 1. Architectural decision
 
@@ -70,25 +86,25 @@ issuer normalization, unit, time, or other semantics lie outside this closed
 subset MAY remain valid at the abstract semantic layer, but it is not
 portable-profile-valid.
 
-For this Draft, the portable-profile admission rule is closed-world:
+For this v1.0 grammar, the portable-profile admission rule is closed-world:
 
 ```text
 portable-profile-valid
     iff
 every semantically relevant rule is represented by this grammar
-and permitted by the current portable profile
+and permitted by the Approved Predicate Schema Canonical Representation Profile v1.0
 ```
 
 Every semantic rule that affects interpretation, validation, normalization,
-equality, units, time, or canonical value meaning MUST be represented by the
-current closed grammar and current profile-defined normalization rules. Any
+equality, units, time, or canonical value meaning MUST be represented by this
+v1.0 closed grammar and the v1.0 Profile-defined normalization rules. Any
 additional semantic rule makes the Predicate Schema non-profile-valid. It MUST
 NOT be ignored, discarded, approximated, preserved as opaque metadata, or
 partially serialized during canonicalization.
 
 `issuer_domain_ref`, `value_semantics_ref`, and `time_semantics_ref` are
-existing field-specific source-composition mechanisms already defined by the
-Predicate Schema Semantic Contract. They are outside this representation
+existing field-specific source-composition mechanisms defined by the Approved
+Predicate Schema Semantic Contract v1.0. They are outside this representation
 grammar and introduce no generic semantic-reference mechanism. They are valid
 only in their named field contexts, resolve to retained immutable semantic
 content, and fail closed when unavailable.
@@ -206,14 +222,14 @@ allowed_values: set of canonical scalar values
 
 When absent, `allowed_values` imposes no allowed-values restriction. When
 present, it MUST contain at least one member. An empty member set would define
-an empty scalar domain and is invalid under the current bounded portable
+an empty scalar domain and is invalid under the v1.0 bounded portable
 profile; it MUST NOT normalize to omission. The member set is in deterministic
 canonical-member order, and duplicate canonical members are invalid. Display
 labels are non-semantic metadata and MUST NOT affect validation, equality,
 canonicalization, or Predicate Schema identity. This constraint replaces a
 separate enumeration form.
 
-Allowed values MUST undergo only normalization explicitly defined by the current
+Allowed values MUST undergo only normalization explicitly defined by the v1.0
 portable profile. They MUST validate under their FieldForm, normalize under
 those rules, canonicalize, sort deterministically, and reject duplicates after
 that normalization. Each member MUST also satisfy the applicable base scalar
@@ -238,7 +254,7 @@ RecordField {
 }
 ```
 
-Record field identity is the exact UTF-8/NFC text name. Current authority
+Record field identity is the exact UTF-8/NFC text name. `ADR-ENC-001` v0.1
 requires text map keys for VE-CBOR-1 and establishes no global integer-label
 registry; this grammar does not invent one. The field descriptor set is sorted
 by the bytewise lexicographic order of each field name's deterministic
@@ -351,20 +367,20 @@ represent the same semantic case. The canonical normalized form MUST omit scale
 when its value is zero; a non-zero scale MUST remain explicit. This mechanical
 rule does not supply unit meaning.
 
-For current portable value semantics, validation MUST use only constraints
-expressible by FieldForm, normalization MUST use only current profile-defined
+For v1.0 portable value semantics, validation MUST use only constraints
+expressible by FieldForm, normalization MUST use only v1.0 profile-defined
 normalization, and equality MUST be canonical-representation equality after
 that validation and normalization. Approximate equality, tolerance-based
 equality, case-insensitive semantic equality, domain-specific equivalence,
 normalization not defined by this profile, and custom comparison functions make
 the Predicate Schema non-profile-valid.
 
-No finite governed unit vocabulary is defined by the current portable profile.
-Accordingly, every unit-bearing semantic form is outside the current portable
+No finite governed unit vocabulary is defined by the v1.0 portable profile.
+Accordingly, every unit-bearing semantic form is outside the v1.0 portable
 subset. A future governed profile may add a finite portable unit vocabulary, but
 this Draft does not anticipate or admit one.
 
-In the current portable subset, absence of unit semantics means
+In the v1.0 portable subset, absence of unit semantics means
 **dimensionless**. It MUST NOT mean that a unit exists but is unspecified,
 externally implied, supplied by an alias or name, or deferred to documentation.
 Any such semantic claim makes the Predicate Schema non-profile-valid.
@@ -383,9 +399,9 @@ defines its predicate-specific meaning. The grammar supplies no general null
 form or default null behavior.
 
 The broader semantic model may permit a predicate-defined null-like value, but
-the current portable FieldForm subset does not represent one. A Predicate Schema
+the v1.0 portable FieldForm subset does not represent one. A Predicate Schema
 that gives a null-like asserted value semantic meaning is therefore
-non-profile-valid under the current portable profile.
+non-profile-valid under the v1.0 portable profile.
 
 ## 9. Issuer-domain representation
 
@@ -408,7 +424,7 @@ canonical representation
 deterministic canonical-representation equality
 ```
 
-For the current portable subset, the identifier MUST be represented through the
+For the v1.0 portable subset, the identifier MUST be represented through the
 closed grammar; validation MUST use only constraints explicitly expressible by
 that FieldForm; normalization MUST be profile-governed; and equality is
 canonical-representation equality after validation and that normalization. The
@@ -421,7 +437,7 @@ normalization sequences, executable code, CEL, or regex programs. In
 particular, arbitrary case folding is not portable-profile-valid unless a future
 profile explicitly pins its exact algorithm, Unicode/version dependency, and
 normalization semantics. An issuer-domain semantic form requiring unsupported
-normalization is outside the current portable subset.
+normalization is outside the v1.0 portable subset.
 
 The following issuer-domain semantics are not portable-profile-valid unless a
 future governed profile explicitly represents them: checksum validation, email
@@ -456,7 +472,7 @@ Resolution does not make arbitrary semantic content portable. After expansion,
 every semantically relevant rule in the content MUST pass the same exhaustive
 portable-subset admission check as inline content. Otherwise the Predicate
 Schema is non-profile-valid and MUST NOT proceed to canonical encoding under the
-current portable profile. Reference identity is never proof that referenced
+v1.0 portable profile. Reference identity is never proof that referenced
 semantic content is portable-profile-valid.
 
 These mechanisms are outside this grammar. This grammar creates no generic
@@ -513,9 +529,9 @@ forbidden under the Semantic Contract. A Claim supplying either field is
 semantically invalid; the field is not ignored.
 
 Present time semantics remain semantically possible under the broader Predicate
-Schema Semantic Contract, but they are outside the current portable subset:
+Schema Semantic Contract, but they are outside the v1.0 portable subset:
 their time-domain meaning is not yet expressed by a finite governed portable
-vocabulary. The current portable profile therefore admits only absent
+vocabulary. The v1.0 portable profile therefore admits only absent
 `time_semantics`, under which both `assertion_time` and `observation_time` are
 forbidden. It creates no TimeDomain or time-domain reference.
 
@@ -575,7 +591,8 @@ unavailable rather than permitting recovery by guessing.
 ## 15. Cross-language implementation requirements
 
 Two independent teams must be able to implement the same parser, validator,
-normalizer, and canonicalization input model from this Draft. They must agree
+normalizer, and canonicalization input model from this Approved v1.0 grammar.
+They must agree
 on:
 
 - the finite FieldForm set and CBOR value categories;
@@ -583,7 +600,7 @@ on:
 - record field identity, ordering, presence, and closed unknown-field handling;
 - sequence ordering, uniqueness, bounds, and multiplicity behavior;
 - integer bounds and exact scale relation;
-- the current portable exclusion of present time semantics;
+- the v1.0 portable exclusion of present time semantics;
 - existing field-specific reference resolution, failure behavior, and
   acyclicity; and
 - rejection of unknown constructs and non-conforming input.
@@ -593,9 +610,9 @@ arbitrary issuer normalization, unit systems, time domains, or externally
 interpreted semantic labels portable merely because they can be stored in source
 semantic material.
 
-Exact field-level VE-CBOR-1 map shapes and labels remain a revision concern of
-the existing Predicate Schema Canonical Representation Profile. They are not
-defined by this grammar.
+Exact field-level VE-CBOR-1 map shapes and labels belong to the Approved
+Predicate Schema Canonical Representation Profile v1.0. They are not defined
+by this grammar.
 
 ## 16. Pressure-test examples
 
@@ -610,7 +627,7 @@ semantics.
 | C. `value` is an exact dimensionless scaled quantity | `IntegerForm` with an exact scale and optional raw-coefficient bounds. No unit semantics are present. |
 | D. `value` is a structured record with two required fields | `RecordForm` with two uniquely named `required` descriptors. Unknown or duplicate runtime fields fail closed. |
 | E. `value` is an order-insensitive collection of canonical identifiers | `SequenceForm` with `ordering_significant: false` and `uniqueness: true`; members use canonical ordering and duplicate canonical members fail closed. |
-| F. `observation_time` is an integer timestamp under schema-defined epoch/scale | Semantically possible, but outside the current portable subset until a finite governed time vocabulary is specified. |
+| F. `observation_time` is an integer timestamp under schema-defined epoch/scale | Semantically possible, but outside the v1.0 portable subset until a finite governed time vocabulary is specified. |
 
 The local cardinality and integer-domain checks have these outcomes:
 
@@ -653,27 +670,26 @@ or time meaning portable.
 | New Claim field? | No. |
 | New runtime abstraction? | No. Forms describe schema material; they do not wrap Claim values at runtime. |
 | New semantic abstraction? | No. Predicate Schema semantics remain the authority for meaning. |
-| New representation artifact? | Yes. This is narrowly scoped Draft representation machinery, not an architectural abstraction. |
-| RFC required? | No. This Draft applies existing semantic and encoding decisions without changing Approved semantics. |
-| Approved-specification revision required? | No. Normal governance applies before this Draft becomes authoritative. |
-| Correct normative home? | A standalone Draft representation grammar reused by Predicate Schema field semantics. |
+| New representation artifact? | Yes. This is narrowly scoped Approved representation machinery, not an architectural abstraction. |
+| RFC required? | No. This initial approval freezes existing Draft behavior without changing an Approved specification. |
+| Approved-specification revision required? | No. No previously Approved specification is revised. |
+| Correct normative home? | This Approved standalone representation grammar v1.0, reused by Predicate Schema field semantics. |
 
 ## 19. Unresolved dependencies and next action
 
-This Draft defines the closed grammar for the currently supported portable
+This Approved v1.0 grammar defines the closed grammar for the supported portable
 subset; it does not establish portability for every abstract Predicate Schema
 semantic form. The paired Canonical Representation Profile MUST enforce this
 bounded applicability boundary before encoding. Cross-language vectors remain
-needed for every admitted form and every fail-closed exclusion.
+required for every admitted form and every fail-closed exclusion.
 
 Within the bounded subset, portable predicate identity remains dependent on
-separately governed digest-suite and framing decisions. A separately versioned
-successor is not warranted because the existing canonical profile remains Draft.
-No further action may alter Claim or Predicate Schema semantics merely to widen
-representation scope.
+separately governed digest-suite and framing decisions. No further action may
+alter Claim or Predicate Schema semantics merely to widen representation scope.
 
 ## Revision history
 
 | Version | Date | Change |
 |---|---|---|
+| 1.0 | 2026-08-28 | Approved machine-behavior freeze for the closed field-semantic grammar; pins Semantic Contract v1.0 and ADR-ENC-001 v0.1, with normative canonicalization vectors. |
 | 0.1 | 2026-08-28 | Draft defining a reduced finite field-semantic grammar, bounded portable scope, and exhaustive closed-world admission rule. |

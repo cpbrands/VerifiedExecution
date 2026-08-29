@@ -7,7 +7,7 @@ document_type: Changelog
 category: Governance
 author: Verified Execution Editorial Board
 created: 2026-08-22
-updated: 2026-08-24
+updated: 2026-08-28
 depends_on:
   - SPECIFICATION-GOVERNANCE
 supersedes: null
@@ -17,6 +17,19 @@ superseded_by: null
 # Verified Execution Repository Changelog
 
 This changelog records repository-wide semantic, governance, status, and structural changes. Specification-specific changelogs remain authoritative for changes to their specifications.
+
+## 2026-08-28 — Predicate Schema canonicalization v1.0 freeze
+
+- Promoted the Predicate Schema Canonical Representation Profile, Field-Semantic
+  Representation Grammar, and Semantic Contract from Draft v0.1 to Approved
+  v1.0 as one machine-behavior freeze.
+- Pinned the closure to those v1.0 specifications and accepted `ADR-ENC-001`
+  v0.1; no new VE primitive or Claim field was introduced.
+- Added normative Predicate Schema canonicalization vectors for accepted and
+  rejected bounded-subset inputs, including reference expansion.
+- Did not approve unrelated Draft Claim, Event, RFC, verification, trust, or
+  runtime-resolution specifications. DIGEST-001 remains separate and blocked
+  until this closure and its vectors are merged.
 
 ## 2026-08-24 — Editorial integrity
 

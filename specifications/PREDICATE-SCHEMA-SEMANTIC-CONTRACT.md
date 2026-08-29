@@ -1,19 +1,19 @@
 ---
 id: PREDICATE-SCHEMA-SEMANTIC-CONTRACT
 title: Predicate Schema Semantic Contract
-version: "0.1"
-status: Draft
-document_type: Candidate Specification
+version: "1.0"
+status: Approved
+document_type: Specification
 category: Claim Semantics
 author: Verified Execution Editorial Board
 created: 2026-08-28
 updated: 2026-08-28
-depends_on:
+depends_on: []
+related_documents:
   - CLAIM-BODY-SEMANTIC-FIELD-CONTRACT
   - CLAIM-PREDICATE-SCHEMA-REFERENCE-SEMANTICS
   - VE-CLAIM-REFERENCE-SEMANTICS
   - ADR-VERIFY-002
-related_documents:
   - VE-CBOR-1-CLAIM-BODY-SCHEMA
   - VE-CEL-1-RULE-EVALUATE-INPUT-CONTRACT
   - RFC-005
@@ -25,7 +25,9 @@ superseded_by: null
 
 ## Status and authority boundary
 
-This is a Draft candidate specification. It defines candidate minimum semantic content of an immutable Predicate Schema. It does not amend an Approved specification, accept RFC-005, create a VE primitive, or add a Claim-body field.
+This Approved v1.0 specification defines the minimum semantic content of an
+immutable Predicate Schema. It does not amend an Approved specification, accept
+RFC-005, create a VE primitive, or add a Claim-body field.
 
 The accepted Claim envelope remains unchanged:
 
@@ -48,6 +50,28 @@ Claim.body.predicate
     = immutable Predicate Schema semantic-content identity
 ```
 
+## v1.0 machine-behavior freeze and dependency closure
+
+Machine-affecting behavior of this Approved v1.0 contract is immutable. An
+editorial correction preserves v1.0 meaning only when no conforming
+implementation can change an admission outcome, reference-resolution result,
+normalized semantic content, canonical structure, canonical ordering, or
+canonical VE-CBOR-1 bytes. Any machine-affecting change requires the normal
+Approved-specification change process and a new semantic version.
+
+For the Predicate Schema canonicalization closure, this contract owns only the
+semantic source model, field-specific reference resolution, exact-normalization
+rule, and fail-closed behavior consumed by the Approved
+`PREDICATE-SCHEMA-FIELD-SEMANTIC-REPRESENTATION-GRAMMAR` v1.0 and
+`PREDICATE-SCHEMA-CANONICAL-REPRESENTATION-PROFILE` v1.0. It does not encode
+CBOR; those consumers apply `ADR-ENC-001` v0.1.
+
+The related Claim, Event, and verification documents define their own semantic
+boundaries. They neither supply a FieldForm, alter v1.0 reference expansion,
+nor add a canonical map member, ordering rule, or VE-CBOR-1 byte rule to the
+canonicalization closure. They are therefore informative boundary references,
+not machine-affecting dependencies of this v1.0 contract.
+
 ## 1. Purpose
 
 A Predicate Schema exists only to make these Claim-body fields semantically interpretable:
@@ -60,7 +84,10 @@ assertion_time?
 observation_time?
 ```
 
-This specification defines the minimum semantics that independent implementations must agree on before a future representation profile produces canonical Predicate Schema bytes and portable content identity.
+This specification defines the minimum semantics that independent implementations
+must agree on for the Approved v1.0 representation profile to produce canonical
+Predicate Schema bytes and for a separately governed digest suite to produce
+portable content identity.
 
 ## 2. Terminology
 
@@ -265,14 +292,18 @@ ADR-VERIFY-002 remains unchanged. Predicate Schema interpretation does not verif
 Predicate Schema Semantic Contract
     -> semantic content
 
-Future Predicate Schema representation profile
-    -> deterministic canonical encoding
+Predicate Schema Canonical Representation Profile v1.0
+    -> deterministic canonical encoding for the bounded portable subset
 
 Digest suite/profile
     -> portable instantiation of predicate content identity
 ```
 
-This specification defines no CBOR labels, canonical bytes, digest algorithm, digest suite, wire form, or CEL mapping. Until a future representation profile defines deterministic canonical Predicate Schema bytes, portable content identity remains an implementation and conformance dependency, not an architectural blocker.
+This specification defines no CBOR labels, canonical bytes, digest algorithm,
+digest suite, wire form, or CEL mapping. The Approved v1.0 representation
+profile defines deterministic bytes only for its bounded portable subset;
+portable content identity remains blocked on separately governed digest framing,
+not on a new Claim semantic concept.
 
 ## 12. Architectural Decision Test
 
@@ -294,16 +325,20 @@ Predicate Schema remains a necessary non-primitive normative abstraction. It is 
 | New primitive? | No. |
 | New Claim field? | No. |
 | New normative abstractions? | No. Predicate Schema remains the existing non-primitive normative abstraction; reused field semantics are not separate architectural abstractions. |
-| RFC required? | No. This Draft does not change approved semantics or the accepted Claim envelope. |
-| Approved-specification revision required? | No. Normal governance applies before this Draft becomes authoritative. |
-| Correct normative home? | This standalone Draft Claim-semantics specification. |
+| RFC required? | No. This initial approval freezes existing Draft behavior without changing an Approved specification or the accepted Claim envelope. |
+| Approved-specification revision required? | No. No previously Approved specification is revised. |
+| Correct normative home? | This Approved standalone Predicate Schema semantic contract v1.0. |
 
 ## 14. Next artifact
 
-The next artifact is **Predicate Schema Canonical Representation Profile**. It should define deterministic Predicate Schema bytes, field encoding, and the content-identity construction required for portable conformance. It must remain separate from CEL mapping, verification mechanics, trust policy, and a global registry.
+The next artifact is DIGEST-001, which may define digest-suite and
+content-identity framing only after the complete v1.0 canonicalization closure
+and its normative vectors are merged. It must remain separate from CEL mapping,
+verification mechanics, trust policy, and a global registry.
 
 ## Revision history
 
 | Version | Date | Change |
 |---|---|---|
+| 1.0 | 2026-08-28 | Approved machine-behavior freeze for Predicate Schema source composition, reference resolution, normalization, and fail-closed semantics used by canonicalization v1.0. |
 | 0.1 | 2026-08-28 | Initial Draft defining minimum Predicate Schema semantic content and field-specific immutable composition. |
