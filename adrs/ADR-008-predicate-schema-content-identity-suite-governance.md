@@ -2,7 +2,7 @@
 id: ADR-008
 title: Predicate Schema Content Identity Suite Governance
 version: "0.1"
-status: Proposed
+status: Accepted
 document_type: Architectural Decision Record
 category: Architecture
 author: Verified Execution Editorial Board
@@ -26,12 +26,13 @@ superseded_by: null
 
 ## Status and authority boundary
 
-**Status:** Proposed
+**Status:** Accepted
 **Related RFC:** RFC-008 — Predicate Schema Content Identity Suite Governance
 **Decision:** A. ACCEPT PSCID SUITE-GOVERNANCE MODEL.
 
-This Proposed ADR records a narrow decision for Predicate Schema Content
-Identity (PSCID) only. It does not accept RFC-008, approve a specification,
+This Accepted ADR is authoritative at its declared architectural scope and
+records a narrow decision for Predicate Schema Content Identity (PSCID) only.
+It does not accept RFC-008, approve a specification,
 allocate a representation-profile or suite code, alter `DIGEST-001`, or change
 any existing PSCID-1 bytes or semantics.
 
@@ -243,7 +244,7 @@ Verification, Trust Context, Rule/Evaluate, or issuer identity semantics.
 
 ## 12. Consequences and governance sequence
 
-If accepted, this ADR becomes the authoritative architecture decision for a
+This Accepted ADR is the authoritative architecture decision for a
 Predicate-Schema-local suite model. It does not itself revise `DIGEST-001`,
 allocate codes, approve the current v1.1 closure, update `OPEN_DECISIONS`, or
 modify an Approved specification.
@@ -279,3 +280,4 @@ become Accepted and before a future specification change proceeds.
 | Version | Date | Change |
 |---|---|---|
 | 0.1 | 2026-08-30 | Initial Proposed PSCID-only suite-governance decision; no suite or profile allocation. |
+| 0.1 | 2026-08-30 | Status transitioned from Proposed to Accepted; decision and scope unchanged. |
