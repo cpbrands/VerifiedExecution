@@ -2,7 +2,7 @@
 id: RFC-007
 title: External Subject Reference Semantics
 version: 0.1
-status: Draft
+status: Accepted
 document_type: RFC
 category: Claim Semantics
 author: Verified Execution Editorial Board
@@ -24,15 +24,15 @@ superseded_by: null
 
 # RFC-007 — External Subject Reference Semantics
 
-## 1. Status and decision requested
+## 1. Status and accepted decision
 
-This RFC is Draft. It proposes a narrowly scoped extension to Claim subject
-semantics; it changes no Approved specification, allocates no representation
-profile code, and creates no ADR.
+This RFC is Accepted. It records the accepted narrowly scoped extension to
+Claim subject semantics; it changes no Approved specification and allocates no
+representation-profile code.
 
-The requested decision is whether a future governed Claim model should add one
+The accepted decision is that a future governed Claim model should add one
 closed, field-level form for a Claim about an externally defined subject. The
-proposal does not create an Entity primitive, an identity provider, a namespace
+decision does not create an Entity primitive, an identity provider, a namespace
 authority, a registry, a resolver, or Root Authority.
 
 ## 2. Problem
@@ -137,15 +137,15 @@ The selected model has the lowest total conceptual complexity: one closed Claim
 subject form and predicate-selected field semantics, without a generic identity
 or authority abstraction.
 
-## 5. Proposed closed subject form
+## 5. Accepted closed subject form
 
-The provisional term **ExternalSubjectReference** is the least misleading
-candidate considered here. It means a reference to a subject defined outside
-VE; it does not imply network retrieval, a universal entity, or a universal
-identity claim. `EntityReference`, `IdentityReference`, and `GenericReference`
-are rejected for those implications.
+**ExternalSubjectReference** is the accepted closed field-level form. It means
+a reference to a subject defined outside VE; it does not imply network
+retrieval, a universal entity, or a universal identity claim.
+`EntityReference`, `IdentityReference`, and `GenericReference` are rejected
+for those implications.
 
-The proposed future closed union is:
+The accepted future closed union is:
 
 ~~~text
 Claim.subject_reference :=
@@ -165,10 +165,10 @@ The existing Action and Event forms retain their VE-defined identity semantics.
 Subject-domain semantics apply only to `ExternalSubjectReference`; they MUST
 NOT redefine Action content, Action occurrence, or Event identity.
 
-## 6. Proposed Predicate Schema addition
+## 6. Accepted Predicate Schema addition
 
-This RFC proposes testing the following minimum field-specific addition in a
-future Predicate Schema version:
+This RFC authorizes the following minimum field-specific addition in a future
+governed Predicate Schema version:
 
 ~~~text
 PredicateSchema {
@@ -339,9 +339,9 @@ existing PSCID-1 identities.
 
 ## 12. Governance and acceptance gates
 
-Adoption requires all of the following, none of which this Draft performs:
+Adoption requires all of the following, none of which this RFC itself performs:
 
-1. acceptance of this RFC and a corresponding ADR;
+1. the acceptance recorded by this RFC and ADR-007;
 2. versioned revisions to the affected Approved Predicate Schema Semantic
    Contract and Canonical Representation Profile, with changelog entries;
 3. a new canonicalization profile/version, representation-profile code, and
@@ -362,11 +362,13 @@ semantics selected by the Predicate Schema. It avoids a VE Entity primitive,
 universal identity infrastructure, authority duplication, and an open generic
 reference ontology.
 
-This is a Draft decision request. The next step is review, not a silent change
-to Claim semantics, canonicalization, or PSCID-1.
+This Accepted RFC authorizes the next governed specification-revision phase.
+It does not itself change Claim semantics in an Approved specification,
+canonicalization, or PSCID-1.
 
 ## Revision history
 
 | Version | Date | Change |
 |---|---|---|
 | 0.1 | 2026-08-29 | Initial Draft proposing a closed external Claim subject form. |
+| 0.1 | 2026-08-29 | Status transitioned from Draft to Accepted; decision and scope unchanged. |
