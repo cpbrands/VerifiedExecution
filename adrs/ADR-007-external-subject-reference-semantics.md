@@ -2,7 +2,7 @@
 id: ADR-007
 title: External Subject Reference Semantics
 version: "0.1"
-status: Proposed
+status: Accepted
 document_type: Architectural Decision Record
 category: Architecture
 author: Verified Execution Editorial Board
@@ -24,12 +24,12 @@ superseded_by: null
 
 ## Status and authority boundary
 
-**Status:** Proposed
+**Status:** Accepted
 **Related RFC:** RFC-007 — External Subject Reference Semantics
-**Decision requested:** Whether to accept RFC-007's external-subject-reference
-architecture.
+**Decision:** A. ACCEPT RFC-007 ARCHITECTURE.
 
-This Proposed ADR is not authoritative and changes no Approved specification,
+This Accepted ADR is authoritative at its declared architectural scope and
+changes no Approved specification,
 canonicalization profile, representation-profile code, or PSCID suite. In
 particular, Predicate Schema Canonicalization v1.0,
 `representation_profile = h'01'`, and PSCID-1 suite `h'01'` remain immutable.
@@ -71,12 +71,12 @@ avoiding any universal Entity or identity system?
 | D. Authority-scoped subject references | Conflates subject equality with issuer trust and authority. | Violates the intended Root Authority separation. | Requires authority-context behavior unrelated to subject identity. | Makes legitimate reuse harder. | Overbuilt. |
 | E. Raw opaque bytes with raw-byte equality | Cannot express governed normalization or equality. | Does not itself change authority, but leaves identity semantics underdefined. | Different implementations can disagree about equivalent identifiers. | Unsafe across predicates. | Superficially small but insufficient. |
 
-## 4. Proposed decision
+## 4. Decision
 
 **A. ACCEPT RFC-007 ARCHITECTURE.**
 
-If this ADR is accepted, VE SHALL add exactly one future closed Claim
-field/reference form:
+This ADR authorizes future governed specification work to add exactly one
+future closed Claim field/reference form:
 
 ```text
 ExternalSubjectReference {
@@ -305,10 +305,10 @@ an identity system, a new authority model, or a generic semantic abstraction.
 
 ## 15. Governance and acceptance gates
 
-This ADR is Proposed. It becomes authoritative only if accepted through normal
-governance. Adoption requires:
+This ADR is Accepted and governs the architecture at its declared scope.
+Specification adoption remains separate and requires:
 
-1. acceptance of RFC-007 and this ADR;
+1. acceptance of RFC-007;
 2. affected Approved-specification revisions with version increments and
    changelog entries;
 3. a new canonicalization/profile generation, representation-profile code, and
@@ -319,7 +319,7 @@ No Approved specification may be changed informally.
 
 ## 16. Decision summary
 
-The proposed decision is **A. ACCEPT RFC-007 ARCHITECTURE**: one closed,
+The accepted decision is **A. ACCEPT RFC-007 ARCHITECTURE**: one closed,
 opaque external subject form, interpreted only by Predicate Schema
 `subject_domain` semantics, is the minimum architecture that solves the
 demonstrated external-subject gap while preserving VE's existing identity and
@@ -330,3 +330,4 @@ authority boundaries.
 | Version | Date | Change |
 |---|---|---|
 | 0.1 | 2026-08-29 | Initial Proposed ADR for RFC-007 external-subject-reference architecture. |
+| 0.1 | 2026-08-29 | Status transitioned from Proposed to Accepted; decision and scope unchanged. |
