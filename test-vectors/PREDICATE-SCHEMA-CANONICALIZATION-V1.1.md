@@ -13,6 +13,7 @@ depends_on:
   - PREDICATE-SCHEMA-FIELD-SEMANTIC-REPRESENTATION-GRAMMAR
   - PREDICATE-SCHEMA-SEMANTIC-CONTRACT
   - ADR-ENC-001
+  - DIGEST-001-PREDICATE-SCHEMA-CONTENT-IDENTITY
 related_documents:
   - PREDICATE-SCHEMA-CANONICALIZATION-V1
   - VE-CLAIM-REFERENCE-SEMANTICS
@@ -300,14 +301,94 @@ output. Each verifies five accepted byte strings and eight rejection stages.
 The paths agree exactly on C_A through C_E, including C_B == C_A and C_C ==
 v1.0 V1-A's bytes.
 
+## Provisional vNext identity vectors
+
+This section adds Draft candidate evidence only. `h'02'` for both the
+representation-profile and PSCID-suite slots is a provisional candidate value;
+it is not an allocated profile, an assigned suite, or a portable-conformance
+target. The candidate construction is:
+
+~~~ini
+frame = VE-CBOR-1([
+  bstr h'5645505343494431',
+  bstr h'02',
+  bstr h'02',
+  bstr C
+])
+
+digest   = SHA-256(frame)
+identity = h'02' || digest
+~~~
+
+The two validators independently derive `C`, construct and independently
+decode the four-element frame, calculate SHA-256, and compare the exact frame,
+digest, and 33-octet identity values below. Neither consumes the other
+validator's output.
+
+| Anchor | Canonical input | `C` octets | Frame octets | SHA-256 digest | Candidate identity |
+|---|---|---:|---:|---|---|
+| A | V1.1-A | 151 | 167 | `038df64019001d19588a6d0d7910148b4f416baf34a4283258f7c0243538107f` | `02038df64019001d19588a6d0d7910148b4f416baf34a4283258f7c0243538107f` |
+| C | V1.1-C | 94 | 110 | `1f2ba2e17d8589cfc976e7284f869b47349902b21d15222bed967aae1779f03d` | `021f2ba2e17d8589cfc976e7284f869b47349902b21d15222bed967aae1779f03d` |
+| D | V1.1-D | 263 | 280 | `0d4c08b338d10559a20ebe123fe0b54d34d5dc581cde3e30319619ffa6a2d2cc` | `020d4c08b338d10559a20ebe123fe0b54d34d5dc581cde3e30319619ffa6a2d2cc` |
+
+Anchor A pins frame `P_A` exactly as:
+
+~~~text
+84485645505343494431410241025897a36d6973737565725f646f6d61696ea268657175616c6974796963616e6f6e6963616c6a6964656e746966696572a164666f726d64746578746e7375626a6563745f646f6d61696ea268657175616c6974796963616e6f6e6963616c6a6964656e746966696572a164666f726d64746578746f76616c75655f73656d616e74696373a16576616c7565a164666f726d67626f6f6c65616e
+~~~
+
+Anchor C pins frame `P_C` exactly as:
+
+~~~text
+8448564550534349443141024102585ea26d6973737565725f646f6d61696ea268657175616c6974796963616e6f6e6963616c6a6964656e746966696572a164666f726d64746578746f76616c75655f73656d616e74696373a16576616c7565a164666f726d67626f6f6c65616e
+~~~
+
+Anchor D pins a 263-octet `C_D`; its exact frame begins
+`8448564550534349443141024102590107` and is code-bound in each independent
+validator. The `h'59 0107'` byte string is the required definite-length CBOR
+transition for 263 unchanged `C_D` octets.
+
+Anchor C proves the cross-suite boundary:
+
+~~~text
+C_V1-A == C_V1.1-C
+PSCID-1(C_V1-A) != candidate_identity_C
+~~~
+
+For the equal canonical input in Anchor C, both validators also independently
+derive the retained PSCID-1 identity:
+
+~~~text
+PSCID-1(C_V1-A) = 01634b3118ec88e36cf5eab44b86092e88f309fe918a99db460222fbd76946b80a
+~~~
+
+The validators use a fixed test-only suite-aware verifier for the retained
+`h'01'` PSCID-1 construction and the provisional `h'02'` candidate
+construction. This does not allocate either candidate code or introduce a
+runtime suite registry. They prove each candidate confusion failure exactly:
+
+| Case | Attack and verification path | Required result |
+|---|---|---|
+| N1 — suite relabel | Relabel `h'02' || candidate_digest_C` as `h'01' || candidate_digest_C`, then dispatch on carried `h'01'`. | The known retained PSCID-1 path derives the historical `h'01'` identity above and returns `identity-mismatch`. |
+| N2 — profile relabel | Construct `h'02' || SHA-256(frame(h'02', h'01', C))`, then dispatch on carried `h'02'`. | The candidate suite requires profile `h'02'` and returns `identity-mismatch`. |
+| N3 — downgrade reinterpretation | Pass candidate Anchor C and `C` to explicit PSCID-1 (`h'01'`) verification. | The PSCID-1 construction derives the retained historical identity and returns `identity-mismatch`. |
+| N4 — unknown suite | Relabel candidate Anchor C with carried suite `h'03'`, then dispatch. | No test suite definition exists for `h'03'`; verification fails closed with `unknown-suite`. |
+| N5 — frame-field substitution | Change only the candidate frame profile from `h'02'` to `h'01'`; retain the original candidate Anchor C identity. | The supplied frame hashes differently from the unchanged identity digest and returns `identity-mismatch`. |
+
+Thus N1 is a rejection by a **known** historical PSCID-1 verification path;
+N4 is the separate unknown-suite failure. N5 does not recompute a new identity
+for the substituted frame.
+
 ## Identity and adoption boundary
 
-These Draft vectors establish candidate canonical bytes only. They do not
-allocate a v1.1 representation-profile code, PSCID suite, PSCID-next value, or
-predicate identity. Historical v1.0 vectors and PSCID-1 remain unchanged.
+These Draft vectors establish candidate canonical and identity evidence only.
+They do not allocate a v1.1 representation-profile code, PSCID suite,
+PSCID-next value, or predicate identity. Historical v1.0 vectors and PSCID-1
+remain unchanged.
 
 ## Revision history
 
 | Version | Date | Change |
 |---|---|---|
+| 1.1 | 2026-08-30 | Added provisional candidate `h'02'` frame, digest, identity, parsing, and confusion anchors; no code allocated. |
 | 1.1 | 2026-08-30 | Draft vectors for optional subject_domain, source-reference convergence, the fourth subject-constraint member, and exact v1.0 replay. |

@@ -1,19 +1,21 @@
 ---
 id: DIGEST-001-PREDICATE-SCHEMA-CONTENT-IDENTITY
 title: DIGEST-001 Predicate Schema Content Identity
-version: "0.1"
+version: "0.2"
 status: Draft
 document_type: Candidate Specification
 category: Representation
 author: Verified Execution Editorial Board
 created: 2026-08-28
-updated: 2026-08-29
+updated: 2026-08-30
 depends_on:
   - ADR-ENC-001
   - PREDICATE-SCHEMA-CANONICAL-REPRESENTATION-PROFILE
   - PREDICATE-SCHEMA-FIELD-SEMANTIC-REPRESENTATION-GRAMMAR
   - PREDICATE-SCHEMA-SEMANTIC-CONTRACT
   - CLAIM-PREDICATE-SCHEMA-REFERENCE-SEMANTICS
+  - RFC-008
+  - ADR-008
 related_documents:
   - OPEN-DECISIONS
   - RFC-005
@@ -49,6 +51,12 @@ profile-valid Predicate Schema
         -> SHA-256 digest
         -> Predicate Schema content identity
 ~~~
+
+It preserves PSCID-1 exactly and adds only a provisional vNext-candidate
+suite/profile construction for the separately frozen external-subject v1.1
+candidate closure. That candidate is evidence for a later governed approval;
+it is not an Approved assignment, a portable-conformance target, or a change
+to any existing PSCID-1 identity.
 
 The identity is for immutable **Predicate Schema semantic content**. It is not
 a document identity, publisher identity, alias, version label, retrieval URL,
@@ -274,6 +282,99 @@ substitution. Implementations MUST fail the affected identity verification and
 surface the collision as an integrity/security failure. This Draft adds no
 collision-recovery runtime object or procedure.
 
+### 6.1 Provisional vNext candidate code audit
+
+The two PSCID-local tables currently have one assigned entry each:
+
+| Table | Assigned value | Immutable meaning |
+|---|---|---|
+| Representation profile | `h'01'` | Predicate Schema Canonicalization v1.0, as bound by PSCID-1 above. |
+| PSCID suite | `h'01'` | PSCID-1, as defined in Sections 3–6. |
+
+The next unused value in each table is `h'02'`. Repository code audit at the
+time of this Draft found no assigned or competing merged meaning for either
+local `h'02'` value and no repository reservation for it. Therefore this Draft
+uses:
+
+~~~text
+NEW_PROFILE = h'02'  // provisional candidate value only
+NEW_SUITE   = h'02'  // provisional candidate value only
+~~~
+
+These are not permanent allocations. They acquire permanent meaning only
+through final governed approval and merge of the coordinated closure, suite
+construction, code-assignment audit, and conformance evidence. Until then,
+they MUST NOT be represented as assigned, Accepted, Approved, or portable
+conformance codes. A later code conflict invalidates this candidate and
+requires a new audit rather than reassignment or reuse of an assigned value.
+
+### 6.2 Provisional vNext representation-profile binding
+
+For this Draft candidate only, `NEW_PROFILE = h'02'` binds exactly this
+candidate-frozen byte-producing closure:
+
+- Predicate Schema Semantic Contract **v1.1 Draft**, candidate revision
+  `459a7b5308b450e8a07ff88f2ec6d9a0e0e08f04`;
+- Predicate Schema Canonical Representation Profile **v1.1 Draft**, candidate
+  revision `4c8045be83bb33e60aa13bbeef56cd3fd70d3206`;
+- Predicate Schema Field-Semantic Representation Grammar **v1.0 Approved**,
+  revision `c58ef61373a304df228b42b8cc459a80e8d47716`; and
+- ADR-ENC-001 / VE-CBOR-1 **v0.1 Accepted**, repository revision
+  `00b002b27b50cf052beff00b1a9ad0b882bbf069`.
+
+The closure consists solely of the machine-affecting rules that admit,
+resolve, expand, normalize, validate, order, and encode the candidate
+Predicate Schema bytes `C`. Any byte-affecting change to one of these
+candidate revisions invalidates `NEW_PROFILE`, `NEW_SUITE`, and all candidate
+anchors; it requires regeneration and independent re-audit.
+
+The following are intentionally outside the byte-producing closure:
+
+| Material | Classification |
+|---|---|
+| Claim Reference Semantics v0.2 | External semantic dependency: it defines the referenced subject-form meanings, not Predicate Schema bytes. |
+| RFC-007 and ADR-007 | External architectural authority for external subject references. |
+| RFC-008 and ADR-008 | Governance authority for this local immutable-suite candidate. |
+| Conformance vectors and validators | Evidence of this candidate's implementation, not profile content. |
+
+No excluded document becomes part of `C` merely because the candidate closure
+uses its terminology or evidence.
+
+### 6.3 Provisional vNext suite construction
+
+The candidate retains the fixed PSCID family token `VEPSCID1` and SHA-256. Let
+`C` be exact canonical Predicate Schema bytes produced under the
+candidate-frozen `NEW_PROFILE = h'02'` closure in Section 6.2. Its construction
+is exactly:
+
+~~~ini
+frame = VE-CBOR-1([
+  bstr h'5645505343494431',
+  bstr h'02',
+  bstr h'02',
+  bstr C
+])
+
+digest   = SHA-256(frame)
+identity = h'02' || digest
+~~~
+
+The frame is one definite-length VE-CBOR-1 array with exactly four elements.
+The magic, suite, profile, and unchanged `C` are CBOR byte strings in that
+order. The digest is exactly 32 raw SHA-256 output octets and the candidate
+identity is exactly 33 octets: external suite byte `h'02'` followed by that
+digest. A parser MUST reject a non-33-octet identity, an unknown suite byte, a
+non-four-element frame, a non-byte-string element, an altered magic, a suite
+or profile mismatch, or trailing frame material.
+
+The suite byte occurs both in the carried identity and in the hashed frame.
+Thus a candidate digest cannot be relabeled as PSCID-1 without recomputation,
+and a candidate identity whose canonical bytes happen to equal a v1.0 `C`
+remains distinct from the PSCID-1 identity. Candidate equality is exact
+33-octet equality within this construction only; no cross-suite semantic
+equality, latest-profile interpretation, downgrade substitution, or migration
+alias is introduced.
+
 ## 7. Offline operation, migration, and downgrade handling
 
 An implementation can recompute and verify a PSCID-1 identity offline using
@@ -407,6 +508,69 @@ Schema bytes, the exact four-element framed preimage bytes, and the resulting
 
 Vectors are also required before this Draft can be considered for approval.
 
+### 10.3 Provisional vNext candidate identity anchors
+
+The following anchors are Draft evidence for the Section 6.2 candidate only.
+They use `NEW_SUITE = h'02'` and `NEW_PROFILE = h'02'`; neither byte is a
+permanent assignment. Each `C` is independently produced by the Node.js and
+Python candidate canonicalization paths before that path constructs the frame.
+
+| Anchor | `C` octets | Frame octets | SHA-256 digest | 33-octet candidate identity |
+|---|---:|---:|---|---|
+| A (`V1.1-A`) | 151 | 167 | `038df64019001d19588a6d0d7910148b4f416baf34a4283258f7c0243538107f` | `02038df64019001d19588a6d0d7910148b4f416baf34a4283258f7c0243538107f` |
+| C (`V1.1-C`) | 94 | 110 | `1f2ba2e17d8589cfc976e7284f869b47349902b21d15222bed967aae1779f03d` | `021f2ba2e17d8589cfc976e7284f869b47349902b21d15222bed967aae1779f03d` |
+| D (`V1.1-D`) | 263 | 280 | `0d4c08b338d10559a20ebe123fe0b54d34d5dc581cde3e30319619ffa6a2d2cc` | `020d4c08b338d10559a20ebe123fe0b54d34d5dc581cde3e30319619ffa6a2d2cc` |
+
+Anchor A exact values:
+
+~~~text
+C_A = a36d6973737565725f646f6d61696ea268657175616c6974796963616e6f6e6963616c6a6964656e746966696572a164666f726d64746578746e7375626a6563745f646f6d61696ea268657175616c6974796963616e6f6e6963616c6a6964656e746966696572a164666f726d64746578746f76616c75655f73656d616e74696373a16576616c7565a164666f726d67626f6f6c65616e
+P_A = 84485645505343494431410241025897a36d6973737565725f646f6d61696ea268657175616c6974796963616e6f6e6963616c6a6964656e746966696572a164666f726d64746578746e7375626a6563745f646f6d61696ea268657175616c6974796963616e6f6e6963616c6a6964656e746966696572a164666f726d64746578746f76616c75655f73656d616e74696373a16576616c7565a164666f726d67626f6f6c65616e
+D_A = 038df64019001d19588a6d0d7910148b4f416baf34a4283258f7c0243538107f
+I_A = 02038df64019001d19588a6d0d7910148b4f416baf34a4283258f7c0243538107f
+~~~
+
+Anchor C is the explicit cross-suite regression. Its `C_C` is exactly the
+Approved v1.0 V1-A canonical bytes and therefore exactly the PSCID-1 anchor's
+`C`; its candidate frame, digest, and identity nevertheless differ because the
+suite/profile bytes are `h'02'`:
+
+~~~text
+C_C = a26d6973737565725f646f6d61696ea268657175616c6974796963616e6f6e6963616c6a6964656e746966696572a164666f726d64746578746f76616c75655f73656d616e74696373a16576616c7565a164666f726d67626f6f6c65616e
+P_C = 8448564550534349443141024102585ea26d6973737565725f646f6d61696ea268657175616c6974796963616e6f6e6963616c6a6964656e746966696572a164666f726d64746578746f76616c75655f73656d616e74696373a16576616c7565a164666f726d67626f6f6c65616e
+D_C = 1f2ba2e17d8589cfc976e7284f869b47349902b21d15222bed967aae1779f03d
+I_C = 021f2ba2e17d8589cfc976e7284f869b47349902b21d15222bed967aae1779f03d
+~~~
+
+~~~text
+C_v1.0 == C_C
+PSCID-1(C_v1.0) != I_C
+~~~
+
+Anchor D exercises the CBOR byte-string length transition above 255 octets:
+
+~~~text
+C_D = a46d6973737565725f646f6d61696ea268657175616c6974796963616e6f6e6963616c6a6964656e746966696572a164666f726d64746578746e7375626a6563745f646f6d61696ea268657175616c6974796963616e6f6e6963616c6a6964656e746966696572a164666f726d64746578746f76616c75655f73656d616e74696373a16576616c7565a164666f726d67626f6f6c65616e737375626a6563745f636f6e73747261696e7473846e4576656e745265666572656e636576416374696f6e436f6e74656e745265666572656e6365781845787465726e616c5375626a6563745265666572656e63657819416374696f6e4f6363757272656e63655265666572656e6365
+P_D = 8448564550534349443141024102590107a46d6973737565725f646f6d61696ea268657175616c6974796963616e6f6e6963616c6a6964656e746966696572a164666f726d64746578746e7375626a6563745f646f6d61696ea268657175616c6974796963616e6f6e6963616c6a6964656e746966696572a164666f726d64746578746f76616c75655f73656d616e74696373a16576616c7565a164666f726d67626f6f6c65616e737375626a6563745f636f6e73747261696e7473846e4576656e745265666572656e636576416374696f6e436f6e74656e745265666572656e6365781845787465726e616c5375626a6563745265666572656e63657819416374696f6e4f6363757272656e63655265666572656e6365
+D_D = 0d4c08b338d10559a20ebe123fe0b54d34d5dc581cde3e30319619ffa6a2d2cc
+I_D = 020d4c08b338d10559a20ebe123fe0b54d34d5dc581cde3e30319619ffa6a2d2cc
+~~~
+
+Anchor D's frame begins its unchanged `C_D` byte string with `h'59 0107'`:
+the definite-length 263-octet CBOR byte-string encoding. It proves that the
+frame decoder and both implementations handle the required length transition
+without treating it as a different frame shape.
+
+The candidate validators also test these required confusion cases:
+
+| Case | Candidate result |
+|---|---|
+| N1 — suite relabel | Relabeling a candidate identity as `h'01'` without recomputing its frame is invalid. |
+| N2 — profile relabel | A candidate suite frame containing profile `h'01'` does not match the candidate identity. |
+| N3 — downgrade reinterpretation | Candidate Anchor C is invalid when verified with the PSCID-1 closure despite equal `C`. |
+| N4 — unknown suite | An unassigned carried suite code fails closed. |
+| N5 — frame-field substitution | Altering a framed suite, profile, magic, or other frame element without recomputing the identity is invalid. |
+
 ## 11. Architectural Decision Test
 
 | Test | Result |
@@ -431,15 +595,18 @@ Vectors are also required before this Draft can be considered for approval.
 | Approved-specification revision required? | No. |
 | Correct normative home | This standalone Draft Predicate Schema content-identity specification. |
 
-Remaining dependencies are cross-language PSCID-1 vectors, independent
-cryptographic review, and normal Draft review before any approval or register
-disposition. The single next artifact is a **PSCID-1 cross-language identity
-test-vector package** containing canonical bytes, framed preimages, identities,
-and required failure cases.
+PSCID-1 remains a Draft construction pending its own normal Draft review. The
+Section 6 candidate adds vNext frame, digest, identity, and confusion evidence
+without approving either candidate value. RFC-008 and ADR-008 now govern the
+candidate-suite process; they do not turn this Draft or its `h'02'` values into
+an assignment. Before any permanent allocation, the candidate requires the
+independent review, exact code audit, and final coordinated governance decision
+specified by those Accepted documents.
 
 ## Revision history
 
 | Version | Date | Change |
 |---|---|---|
+| 0.2 | 2026-08-30 | Added the provisional `h'02'` profile/suite candidate for the external-subject v1.1 closure and its non-authoritative identity anchors; PSCID-1 unchanged. |
 | 0.1 | 2026-08-29 | Bound representation-profile `h'01'` to the approved Predicate Schema Canonicalization v1.0 closure. |
 | 0.1 | 2026-08-28 | Initial Draft defining the candidate PSCID-1 framed SHA-256 construction for Predicate Schema content identity. |
