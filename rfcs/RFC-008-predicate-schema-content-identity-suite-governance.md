@@ -2,7 +2,7 @@
 id: RFC-008
 title: Predicate Schema Content Identity Suite Governance
 version: "0.1"
-status: Draft
+status: Accepted
 document_type: RFC
 category: Representation
 author: Verified Execution Editorial Board
@@ -26,14 +26,14 @@ superseded_by: null
 
 # RFC-008 — Predicate Schema Content Identity Suite Governance
 
-## 1. Status, decision requested, and narrow scope
+## 1. Status, accepted decision, and narrow scope
 
-This RFC is Draft. It proposes the governance model for **Predicate Schema
-Content Identity (PSCID)** suites only. It does not approve a suite, allocate a
+This RFC is Accepted. It records the accepted governance model for **Predicate
+Schema Content Identity (PSCID)** suites only. It does not approve a suite, allocate a
 representation-profile code or suite code, alter any existing PSCID-1 bytes,
 or amend an Approved specification.
 
-The decision requested is:
+The accepted decision is:
 
 > A PSCID suite is one immutable, Predicate-Schema-specific content-identity
 > construction. It pins domain-separated framing, one representation profile,
@@ -393,8 +393,6 @@ This RFC deliberately leaves these matters for the subsequent governed work:
 - whether the current v1.1 candidate closure is promoted and frozen;
 - which currently unallocated local values, if any, become `NEW_PROFILE` and
   `NEW_SUITE` after the required approval evidence;
-- the associated ADR that records the accepted PSCID-only security and
-  identity architecture; and
 - the final cross-language identity vectors and independent security-review
   record for any future authoritative suite.
 
@@ -403,7 +401,7 @@ No unresolved question requires accepting or modifying RFC-005.
 
 ## 16. Conclusion and next governance step
 
-**A. NARROW PSCID GOVERNANCE RFC READY FOR INDEPENDENT AUDIT.**
+**A. PSCID SUITE-GOVERNANCE MODEL ACCEPTED.**
 
 The minimum durable decision is a local, immutable PSCID suite that binds one
 representation profile, a domain-separated frame, a hash algorithm, and an
@@ -411,8 +409,10 @@ identity layout. It preserves PSCID-1 exactly, supports future cryptographic
 change through new suites, fails closed on unknown or unavailable material, and
 does not generalize into VE-wide digest or signature infrastructure.
 
-If this RFC is accepted, the next required governance artifact is a narrow ADR
-recording the same PSCID-only architecture. A later coordinated specification
+This Accepted RFC, together with Accepted ADR-008, makes the PSCID
+suite-governance architecture authoritative at its declared scope. It does not
+itself revise `DIGEST-001`, approve the current v1.1 closure, or allocate a
+representation-profile or PSCID-suite code. A later coordinated specification
 revision may allocate a permanent `NEW_PROFILE`/`NEW_SUITE` pair only after the
 security and interoperability gates in Section 9 are satisfied.
 
@@ -421,3 +421,4 @@ security and interoperability gates in Section 9 are satisfied.
 | Version | Date | Change |
 |---|---|---|
 | 0.1 | 2026-08-30 | Initial Draft proposing local immutable Predicate Schema content-identity suite governance; no code allocation. |
+| 0.1 | 2026-08-30 | Status transitioned from Draft to Accepted; decision and scope unchanged. |
