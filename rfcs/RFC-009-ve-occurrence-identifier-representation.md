@@ -2,7 +2,7 @@
 id: RFC-009
 title: VE Occurrence Identifier Representation
 version: "0.1"
-status: Draft
+status: Accepted
 document_type: RFC
 category: Representation
 author: Verified Execution Editorial Board
@@ -22,14 +22,14 @@ superseded_by: null
 
 # RFC-009 — VE Occurrence Identifier Representation
 
-## 1. Status and narrow scope
+## 1. Status, accepted decision, and narrow scope
 
-This Draft proposes one shared **OccurrenceId** representation convention for
-VE specifications that explicitly opt in. It is not a generic VE identity
-system, a new VE primitive, or an automatic change to every field named
-`*_id`.
+This RFC is Accepted. It records the accepted shared **OccurrenceId**
+representation convention for VE specifications that explicitly opt in. It is
+not a generic VE identity system, a new VE primitive, or an automatic change
+to every field named `*_id`.
 
-The proposed representation is:
+The accepted decision is:
 
 ~~~text
 OccurrenceId := exactly 32 opaque octets
@@ -216,13 +216,14 @@ occurrence semantics. No change to `VE-CLAIM-REFERENCE-SEMANTICS` is required.
 
 ## 15. Governance and next steps
 
-This is a Draft RFC. ADR-009 is Proposed. VE-002 v0.2 is a Draft opt-in
-candidate. No Approved specification is changed, and no changelog or
-`OPEN_DECISIONS.md` entry is made at this candidate stage.
+This is an Accepted RFC. ADR-009 remains Proposed. VE-002 v0.2 remains a
+Draft opt-in candidate. No Approved specification is changed, and no changelog
+or `OPEN_DECISIONS.md` entry is made by this isolated RFC status transition.
 
-If accepted, an owning-specification revision and vectors must carry the
-applicable version and changelog governance. This RFC does not allocate an
-identity registry, generator code, or cross-kind namespace.
+This accepted RFC does not itself revise VE-002. An eventual
+owning-specification approval and vectors must carry the applicable version
+and changelog governance. This RFC does not allocate an identity registry,
+generator code, or cross-kind namespace.
 
 ## 16. Open Questions
 
@@ -231,8 +232,15 @@ change, not an unresolved question that blocks this proposal.
 
 ## 17. Decision
 
-**A. PROPOSE SHARED VE OCCURRENCE-ID REPRESENTATION.**
+**A. ADOPT SHARED VE OCCURRENCE-ID REPRESENTATION.**
 
 An exact 32-octet opaque VE-CBOR-1 byte string is sufficient for explicitly
 adopting occurrence kinds. VE-002 may use it for Event identity now as a Draft
 candidate; VE-001 Action identity remains unchanged.
+
+## Revision history
+
+| Version | Date | Change |
+|---|---|---|
+| 0.1 | 2026-08-30 | Initial Draft proposing the shared opt-in OccurrenceId convention; VE-002 is the sole Draft adopter. |
+| 0.1 | 2026-08-30 | Status transitioned from Draft to Accepted; technical decision and scope unchanged. |
