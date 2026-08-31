@@ -1,23 +1,26 @@
 ---
 id: "VE-002"
 title: "Event Specification"
-version: "0.1"
+version: "0.2"
 status: "Draft"
 document_type: "Core Primitive Specification"
 category: "Specification"
 author: "Verified Execution Editorial Board"
 created: 2026-08-10
-updated: 2026-08-10
+updated: 2026-08-30
 depends_on:
   - VE-000
   - VE-001
-related_documents: []
+  - ADR-ENC-001
+related_documents:
+  - RFC-009
+  - ADR-009
 supersedes: null
 superseded_by: null
 ---
 # VE-002 — Event Specification
 
-**Version:** 0.1  
+**Version:** 0.2
 **Status:** Draft  
 **Category:** Core Primitive Specification  
 **Identifier:** VE-002  
@@ -163,6 +166,59 @@ Identity never changes.
 Events are never recycled.
 
 Events are never merged.
+
+## 4.1 Event occurrence identifier representation candidate
+
+This v0.2 Draft candidate adopts the shared **OccurrenceId** representation
+proposed by Draft RFC-009 and Proposed ADR-009 for `event_id` only. It does
+not amend any Approved specification.
+
+An Event `event_id` MUST be an opaque sequence of exactly 32 octets.
+
+Its only portable VE-CBOR-1 representation is one definite-length byte string
+whose payload is those 32 octets:
+
+~~~text
+h'58 20' || event_id payload
+~~~
+
+The encoded value is therefore exactly 34 octets. `event_id` equality is exact
+byte-for-byte equality of all 32 payload octets. No text normalization,
+namespace interpretation, content interpretation, or cross-kind equality rule
+applies.
+
+Any alternative scalar form is invalid for `event_id`, including a text string,
+integer, non-32-octet byte string, indefinite-length byte string, tagged byte
+string, non-shortest length encoding, or a value followed by trailing bytes.
+The prohibition on tags and indefinite-length items follows the existing
+VE-CBOR-1 canonical representation rules; this specification introduces no
+additional tag mechanism.
+
+## 4.2 Event-specific assignment rules
+
+`event_id` identifies one historical Event occurrence, not Event content. No
+two distinct Event occurrences MAY be assigned the same `event_id`. An Event
+identifier is immutable after assignment and MUST NOT be reassigned or
+recycled.
+
+A discovered duplicate `event_id` for distinct Event occurrences is a
+producer conformance failure. It does not create an alias, merge the Events, or
+license an implementation to select one occurrence over another.
+
+Generation is implementation-defined. This specification does not require or
+infer randomness, a content hash, UUID semantics, time ordering, issuer
+identity, namespace structure, a registry, or a resolver from an `event_id`.
+
+## 4.3 Scope boundary
+
+This Draft candidate changes only Event identity representation in VE-002.
+`action_id` remains governed by VE-001, including VE-001's existing
+profile-defined generation rule. Receipt identifiers, external identifiers,
+and other identifiers do not adopt this representation merely because they use
+an `_id` name.
+
+The same 32 octets appearing in an Event identifier and another identifier
+kind do not establish equality across kinds.
 
 ---
 
@@ -726,6 +782,32 @@ Events describe facts.
 
 Not projections.
 
+EVT-C09
+
+Every `event_id` is exactly 32 opaque octets.
+
+EVT-C10
+
+When serialized, every `event_id` is exactly one canonical VE-CBOR-1
+definite-length byte string with initial octets `h'58 20'` and a 32-octet
+payload.
+
+EVT-C11
+
+`event_id` equality is exact equality of all 32 payload octets.
+
+EVT-C12
+
+Duplicate assignment of one `event_id` to distinct Event occurrences is a
+producer conformance failure; identifiers are not aliases and are never
+recycled.
+
+EVT-C13
+
+An implementation MUST reject a malformed, alternate, tagged,
+indefinite-length, non-canonical, or trailing-byte Event identifier
+representation.
+
 ---
 
 # 25. Open Questions
@@ -773,3 +855,12 @@ the integrity of the entire Verified Execution architecture depends upon preserv
 If Events cease to represent immutable historical facts,
 
 the platform loses its ability to establish legitimacy.
+
+---
+
+# Revision history
+
+| Version | Date | Change |
+|---|---|---|
+| 0.2 | 2026-08-30 | Draft candidate: add the narrow canonical 32-octet `event_id` representation and Event-specific non-reuse rules; no Event payload, lifecycle, provenance, or ordering representation is added. |
+| 0.1 | 2026-08-10 | Initial Draft. |
