@@ -18,6 +18,30 @@ superseded_by: null
 
 This changelog records repository-wide semantic, governance, status, and structural changes. Specification-specific changelogs remain authoritative for changes to their specifications.
 
+## 2026-08-30 — Predicate Schema v1.1 and PSCID v0.2 approval
+
+- **Specifications:** Predicate Schema Semantic Contract v1.1, Predicate
+  Schema Canonical Representation Profile v1.1, and DIGEST-001 v0.2.
+- **Version:** Draft v1.1 → Approved v1.1 for the Semantic Contract and
+  Canonical Representation Profile; Draft v0.2 → Approved v0.2 for
+  DIGEST-001.
+- **Classification:** Class B — compatible semantic extension.
+- **Summary:** Approved `subject_domain` semantics and
+  `ExternalSubjectReference` support within the closed Predicate Schema model,
+  the corresponding bounded v1.1 canonical representation profile, and the
+  Predicate-Schema-specific PSCID binding.
+- **Affected semantics:** `representation_profile = h'02'` and PSCID suite
+  `h'02'` are permanently assigned to the approved v1.1 Predicate Schema
+  canonicalization closure. Approved DIGEST-001 v0.2 fixes the associated
+  framing, SHA-256 construction, exact 33-octet identity layout, and anchors;
+  PSCID-1 and the v1.0 closure remain unchanged.
+- **Compatibility:** Valid v1.0 Predicate Schemas that use neither
+  `subject_domain` nor `ExternalSubjectReference` retain identical canonical
+  bytes. The change does not claim Claim-reference wire conformance, solve
+  CAD/unit semantics, resolve Draft RFC-005 generic digest infrastructure, or
+  introduce a VE Entity model.
+- **Authority:** Accepted RFC-007/ADR-007 and RFC-008/ADR-008.
+
 ## 2026-08-30 — VE-002 v0.2 approval
 
 - **Specification:** VE-002 Event Specification

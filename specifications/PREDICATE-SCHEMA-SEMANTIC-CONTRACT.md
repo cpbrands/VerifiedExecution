@@ -2,12 +2,12 @@
 id: PREDICATE-SCHEMA-SEMANTIC-CONTRACT
 title: Predicate Schema Semantic Contract
 version: "1.1"
-status: Draft
+status: Approved
 document_type: Specification
 category: Claim Semantics
 author: Verified Execution Editorial Board
 created: 2026-08-28
-updated: 2026-08-29
+updated: 2026-08-30
 depends_on: []
 related_documents:
   - CLAIM-BODY-SEMANTIC-FIELD-CONTRACT
@@ -25,13 +25,12 @@ superseded_by: null
 
 ## Status and authority boundary
 
-This Draft v1.1 candidate defines a proposed, narrowly scoped revision to the
-minimum semantic content of an immutable Predicate Schema. It implements only
-the `subject_domain` semantics authorized by Accepted RFC-007 and ADR-007. It
-does not approve this candidate, accept RFC-005, create a VE primitive, or add
-a Claim-body field.
+This Approved v1.1 revision defines a narrowly scoped revision to the minimum
+semantic content of an immutable Predicate Schema. It implements only the
+`subject_domain` semantics authorized by Accepted RFC-007 and ADR-007. It does
+not accept RFC-005, create a VE primitive, or add a Claim-body field.
 
-Approved v1.0 remains immutable. This Draft does not alter the semantics or
+Approved v1.0 remains immutable. This revision does not alter the semantics or
 canonicalization outcome of a v1.0-valid Predicate Schema that does not use
 `subject_domain` or `ExternalSubjectReference`.
 
@@ -56,7 +55,7 @@ Claim.body.predicate
     = immutable Predicate Schema semantic-content identity
 ```
 
-## v1.0 machine-behavior freeze and v1.1 candidate boundary
+## v1.0 machine-behavior freeze and v1.1 approved boundary
 
 Machine-affecting behavior of Approved v1.0 is immutable. An editorial
 correction preserves v1.0 meaning only when no conforming implementation can
@@ -78,10 +77,10 @@ nor add a canonical map member, ordering rule, or VE-CBOR-1 byte rule to the
 canonicalization closure. They are therefore informative boundary references,
 not machine-affecting dependencies of this v1.0 contract.
 
-This Draft v1.1 candidate adds no canonicalization rule, representation-profile
-code, PSCID suite, or digest construction. A future coordinated vNext closure
-must define those separately before a v1.1 release can claim portable
-representation conformance.
+This Approved v1.1 revision supplies the semantic portion of the coordinated
+v1.1 closure. The separately Approved Canonical Representation Profile v1.1
+and DIGEST-001 v0.2 define its portable representation and PSCID binding; this
+contract itself does not encode CBOR or construct a digest.
 
 ## 1. Purpose
 
@@ -97,9 +96,8 @@ observation_time?
 
 This specification defines the minimum semantics that independent
 implementations must agree on. Approved v1.0 uses those semantics for its
-bounded canonical representation; the v1.1 candidate additions require the
-separate governed vNext representation work before they can produce portable
-Predicate Schema bytes or portable content identity.
+bounded canonical representation; the v1.1 additions are represented by the
+coordinated Approved v1.1 profile and DIGEST-001 v0.2 identity construction.
 
 ## 2. Terminology
 
@@ -235,9 +233,10 @@ SubjectDomain {
 }
 ```
 
-The model describes meaning only. Exact canonical encoding is owned by a
-future Canonical Representation Profile. `subject_domain` defines identifier
-form, required normalization, and equality. It MUST NOT define authority,
+The model describes meaning only. Exact canonical encoding for the bounded
+portable subset is owned by the separately Approved Predicate Schema Canonical
+Representation Profile v1.1. `subject_domain` defines identifier form,
+required normalization, and equality. It MUST NOT define authority,
 issuer semantics, trust, identity-provider behavior, resolution, registry
 membership, namespace authority, resource semantics, provenance, delegation,
 authentication, a generic identity model, or Root Authority.
@@ -302,12 +301,12 @@ is required.
 
 ### 6.2 Backward compatibility
 
-Every v1.0-valid Predicate Schema remains semantically valid under this Draft
-v1.1 when it does not use `subject_domain` or
+Every v1.0-valid Predicate Schema remains semantically valid under this v1.1
+revision when it does not use `subject_domain` or
 `ExternalSubjectReference`. Issuer-domain, value, time, and the three existing
 Action/Event subject-form semantics are unchanged. The v1.0 dimensionless-unit
 rule, all v1.0 unit/CAD boundaries, and all other v1.0 exclusions remain in
-effect. The v1.1 candidate adds no interpretation to those schemas and changes
+effect. The v1.1 revision adds no interpretation to those schemas and changes
 no v1.0 canonicalization outcome.
 
 When `time_semantics` is absent, both `assertion_time` and `observation_time` are forbidden for Claims under that Predicate Schema. A Claim containing either field is semantically invalid; the field is not ignored. When `time_semantics` is present, the Predicate Schema MUST provide exactly one authoritative source: inline time semantics XOR `time_semantics_ref`, an immutable time-semantics semantic-content identity. It MUST define whether each field is optional or required, its proposition-specific meaning, and any applicable immutable time-domain semantic content. The two fields remain distinct from each other, verification time, Event time, and Receipt time.
@@ -369,7 +368,10 @@ canonical Predicate Schema semantic content
 predicate semantic-content identity
 ```
 
-This is a semantic identity rule. Exact byte representation and digest computation remain future representation-profile work.
+This is a semantic identity rule. For the bounded portable subset, the
+Approved Predicate Schema Canonical Representation Profile v1.1 defines
+canonical byte representation and Approved DIGEST-001 v0.2 defines Predicate
+Schema content identity. This Semantic Contract defines neither construction.
 
 Two field-specific references `D1` and `D2` are interchangeable only when both resolve to identical canonical semantic content. Mere logical or mathematical equivalence is insufficient. Predicate identity follows governed canonical semantic specification content, not unrestricted equivalence inference; this specification introduces no theorem proving.
 
@@ -465,9 +467,10 @@ Digest suite/profile
 This specification defines no CBOR labels, canonical bytes, digest algorithm,
 digest suite, wire form, or CEL mapping. The Approved v1.0 representation
 profile remains unchanged and continues to define deterministic bytes only for
-its bounded portable subset. This Draft v1.1 does not define portable
-`subject_domain` or fourth-subject-form encoding, a representation-profile
-code, or a PSCID suite; those require separate coordinated vNext work.
+its bounded portable subset. The Approved v1.1 Canonical Representation
+Profile and DIGEST-001 v0.2 separately define portable `subject_domain`, the
+fourth permitted `subject_constraints` member, profile `h'02'`, and PSCID suite
+`h'02'` for the coordinated v1.1 closure.
 
 ## 12. Architectural Decision Test
 
@@ -489,22 +492,23 @@ Predicate Schema remains a necessary non-primitive normative abstraction. It is 
 | New primitive? | No. |
 | New Claim field? | No. |
 | New normative abstractions? | No. Predicate Schema remains the existing non-primitive normative abstraction; reused field semantics are not separate architectural abstractions. |
-| RFC required? | No additional RFC. Accepted RFC-007 and ADR-007 authorize this Draft v1.1 candidate. |
-| Approved-specification revision required? | Yes for adoption. This Draft is the proposed v1.1 revision to Approved v1.0; it does not approve that revision. |
-| Correct normative home? | This standalone Draft Predicate Schema Semantic Contract v1.1. |
+| RFC required? | No additional RFC. Accepted RFC-007 and ADR-007 authorize this v1.1 revision. |
+| Approved-specification revision required? | Complete. This Approved v1.1 revision supersedes v1.0 only where expressly stated. |
+| Correct normative home? | This standalone Approved Predicate Schema Semantic Contract v1.1. |
 
-## 14. Next artifact
+## 14. Future evolution
 
-The next coordinated work is the vNext Predicate Schema Canonical
-Representation Profile revision, followed by the new representation-profile
-code, PSCID suite, and conformance vectors required before this Draft v1.1 can
-be adopted. It must remain separate from CEL mapping, verification mechanics,
-trust policy, and a global registry.
+The coordinated v1.1 representation profile, profile code, PSCID suite, and
+conformance vectors are Approved with this revision. Any future
+machine-affecting Predicate Schema change requires a new governed revision,
+representation-profile code, PSCID suite, and conformance evidence. It remains
+separate from CEL mapping, verification mechanics, trust policy, and a global
+registry.
 
 ## Revision history
 
 | Version | Date | Change |
 |---|---|---|
-| 1.1 | 2026-08-29 | Draft candidate derived from Accepted RFC-007 and ADR-007 and Claim Reference Semantics Draft v0.2: adds optional `subject_domain`, four-form subject constraints, external-subject validity, and contextual cross-predicate comparability. No v1.1 representation closure, profile code, PSCID suite, or vectors are allocated. |
+| 1.1 | 2026-08-30 | Approved coordinated v1.1 revision under Accepted RFC-007/ADR-007 and RFC-008/ADR-008: adds optional `subject_domain`, four-form subject constraints, external-subject validity, and contextual cross-predicate comparability; profile `h'02'`, PSCID suite `h'02'`, and the v1.1 canonicalization conformance vectors are approved separately in the same governed closure. Claim Reference Semantics v0.2 remains Draft. |
 | 1.0 | 2026-08-28 | Approved machine-behavior freeze for Predicate Schema source composition, reference resolution, normalization, and fail-closed semantics used by canonicalization v1.0. |
 | 0.1 | 2026-08-28 | Initial Draft defining minimum Predicate Schema semantic content and field-specific immutable composition. |

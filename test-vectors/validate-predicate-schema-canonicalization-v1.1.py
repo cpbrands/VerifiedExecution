@@ -29,8 +29,8 @@ EXPECTED = {
     "V1.1-E": C_WITH_DOMAIN + SUBJECT_CONSTRAINTS_KEY + E_VALUES,
 }
 
-# These h'02' values are provisional Draft-candidate test inputs only; no
-# permanent representation-profile or PSCID-suite assignment is made here.
+# These h'02' values are permanent assignments for the Approved v1.1 closure.
+# This test independently verifies the corresponding fixed construction.
 CANDIDATE_SUITE = 0x02
 CANDIDATE_PROFILE = 0x02
 MAGIC = b"VEPSCID1"

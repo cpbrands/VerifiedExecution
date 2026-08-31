@@ -2,7 +2,7 @@
 id: PREDICATE-SCHEMA-CANONICAL-REPRESENTATION-PROFILE
 title: Predicate Schema Canonical Representation Profile
 version: "1.1"
-status: Draft
+status: Approved
 document_type: Specification
 category: Representation
 author: Verified Execution Editorial Board
@@ -26,22 +26,22 @@ superseded_by: null
 
 ## Status and authority boundary
 
-This Draft v1.1 candidate applies the accepted VE-CBOR-1 mechanics in
-`ADR-ENC-001` v0.1 to a proposed normalized Predicate Schema semantic model.
+This Approved v1.1 revision applies the accepted VE-CBOR-1 mechanics in
+`ADR-ENC-001` v0.1 to the normalized Predicate Schema semantic model.
 It uses the unchanged Approved
 `PREDICATE-SCHEMA-FIELD-SEMANTIC-REPRESENTATION-GRAMMAR` v1.0 for closed
-field-form structures and Draft `PREDICATE-SCHEMA-SEMANTIC-CONTRACT` v1.1 for
-the proposed `subject_domain` source composition, reference resolution, and
+field-form structures and Approved `PREDICATE-SCHEMA-SEMANTIC-CONTRACT` v1.1
+for the `subject_domain` source composition, reference resolution, and
 semantic normalization authorized by Accepted RFC-007 and ADR-007. It does not
 amend Claim semantics, verification, Trust Context, Rule/Evaluate, or
 Action/Event ownership.
 
-Approved v1.0 remains authoritative. This Draft v1.1 does not change the
+Approved v1.0 remains authoritative. This Approved v1.1 revision does not change the
 normalized content or canonical VE-CBOR-1 bytes of a valid v1.0 Predicate
 Schema that does not use `subject_domain` or `ExternalSubjectReference`.
 
-This is a Draft VE-CBOR-1 Predicate Schema Profile v1.1 candidate. It creates neither a
-second canonicalization system nor a VE primitive, Claim-body field, universal
+This is an Approved VE-CBOR-1 Predicate Schema Profile v1.1. It creates neither
+a second canonicalization system nor a VE primitive, Claim-body field, universal
 identity ontology, universal time system, generic semantic-reference layer, or
 runtime wrapper.
 
@@ -61,7 +61,7 @@ This profile does not define Claim verification, trust, signer/key binding,
 delegation, revocation, Rule applicability, Rule evaluation, Action identity,
 Event identity, a CBOR-to-CEL mapping, or a digest suite.
 
-## v1.0 machine-behavior freeze and v1.1 candidate boundary
+## v1.0 machine-behavior freeze and v1.1 approved boundary
 
 Machine-affecting behavior of Approved v1.0 is immutable. An editorial
 correction preserves v1.0 meaning only when no conforming implementation can
@@ -95,18 +95,19 @@ No mutable branch name, repository URL, or Git revision is a normative part of
 this closure. `PREDICATE-SCHEMA-CANONICALIZATION-V1` supplies its normative
 conformance vectors; it does not alter this profile's rules.
 
-This Draft v1.1 candidate adds only optional `subject_domain` canonicalization
-and the fourth permitted `subject_constraints` member. It does not freeze a
-v1.1 closure, allocate a representation-profile code or PSCID suite, alter
-DIGEST-001, or change v1.0 vectors. Those steps require separate coordinated
-vNext profile binding and independent byte agreement.
+This Approved v1.1 revision adds optional `subject_domain` canonicalization and
+the fourth permitted `subject_constraints` member. Its machine-affecting
+closure is frozen with the Approved Semantic Contract v1.1, unchanged Grammar
+v1.0, and ADR-ENC-001 / VE-CBOR-1 v0.1. DIGEST-001 v0.2 permanently binds the
+closure to representation profile `h'02'` and PSCID suite `h'02'`; v1.0 vectors
+and bindings remain unchanged.
 
 ## 1. Architectural decision
 
 ### Verdict
 
-**B. DRAFT v1.1 CANONICAL BYTES DEFINED FOR THE BOUNDED PORTABLE SUBSET;
-ADOPTION STILL BLOCKED ON COORDINATED CLOSURE, VECTORS, AND PROFILE BINDING.**
+**A. CANONICAL BYTES FULLY DEFINED FOR THE BOUNDED PORTABLE SUBSET;
+THE COORDINATED V1.1 CLOSURE IS APPROVED.**
 
 For every profile-valid normalized Predicate Schema, two independent
 implementations can derive identical canonical bytes without an
@@ -122,7 +123,7 @@ labels. Predicate Schema semantic validity is distinct from portable-profile
 validity. This profile defines canonical Predicate Schema bytes only when the
 normalized semantic content lies entirely within the supported portable subset.
 
-This Draft v1.1 portable-profile candidate is closed-world. A Predicate Schema is
+This Approved v1.1 portable profile is closed-world. A Predicate Schema is
 portable-profile-valid only if every semantic rule affecting interpretation,
 validation, normalization, equality, units, time, or canonical value meaning is
 represented by the v1.0 closed field-semantic grammar and permitted by this
@@ -138,11 +139,10 @@ satisfiability analysis. At minimum, contradictory or integer-empty bounds,
 empty `allowed_values`, allowed-value members outside their base scalar domain,
 and sequence cardinality with `min_items > max_items` are invalid.
 
-Portable predicate identity for this Draft v1.1 candidate remains blocked by
-separately governed representation-profile binding, digest-suite, and
-identity-framing decisions. This profile does not select a representation code,
-digest algorithm, digest domain, object-type framing, or predicate-identity
-envelope.
+Portable predicate identity for this Approved v1.1 profile is defined by the
+separately Approved DIGEST-001 v0.2 construction. This profile does not itself
+select a digest algorithm, digest domain, object-type framing, or
+predicate-identity envelope.
 
 ## 2. Relationship to VE-CBOR-1
 
@@ -210,8 +210,8 @@ canonical bytes. It MUST NOT infer logical, mathematical, decompositional, or
 differently expressed-schema equivalence.
 
 The source-level issuer_domain_ref, value_semantics_ref, and
-time_semantics_ref forms are source-composition mechanisms only. The Draft
-v1.1 `subject_domain_ref` form is likewise source composition only. All such
+time_semantics_ref forms are source-composition mechanisms only. The v1.1
+`subject_domain_ref` form is likewise source composition only. All such
 references are resolved and recursively expanded before normalized canonical
 Predicate Schema content is emitted. No generic semantic reference,
 `SubjectDomainID`, fragment digest, `ContentIdentity`, `DigestRef`, or `HashRef`
@@ -255,7 +255,7 @@ declaration order. The relevant encoded text-key order is:
 | `value_semantics` | `0x6f` (length 15) | 4 |
 | `subject_constraints` | `0x73` (length 19) | 5 |
 
-In this bounded candidate, the emitted order is therefore
+In this bounded profile, the emitted order is therefore
 `issuer_domain`, optional `subject_domain`, `value_semantics`, and optional
 `subject_constraints`. `time_semantics` remains a Semantic Contract source
 field but is not an encoded member of the bounded v1.0/v1.1 portable subset:
@@ -268,7 +268,7 @@ sufficient and unchanged. `subject_domain.identifier` reuses its existing
 `FieldForm` and normalization machinery; no new grammar family is introduced.
 
 For every valid v1.0 Predicate Schema that does not use `subject_domain` or
-`ExternalSubjectReference`, this v1.1 candidate emits exactly the same
+`ExternalSubjectReference`, this v1.1 profile emits exactly the same
 normalized map and byte-for-byte identical canonical content `C` as v1.0. This
 is canonical-content compatibility only. It does not assert PSCID equality
 under any future v1.1 representation-profile or PSCID suite.
@@ -666,18 +666,18 @@ the allowed subset of the existing closed Claim subject-reference union. It
 MUST NOT encode Action/Event/external identifier values, identifier wire forms,
 subject-reference payloads, attempt grouping, a generic reference, or a new
 subject type. Any additional subject semantic constraint not represented by this
-closed subset is outside this Draft v1.1 portable-profile candidate and MUST
+closed subset is outside this Approved v1.1 portable profile and MUST
 fail validation.
 
 **Event dependency: non-blocking for Predicate Schema canonical bytes.**
 This profile encodes only the semantic name EventReference, not an Event
-instance or its identifier. Draft VE-002 and future Event representation work
-remain relevant to portable Claim/reference bytes, not to canonical Predicate
+instance or its identifier. Approved VE-002 v0.2 and future Claim-reference
+representation work remain relevant to portable Claim/reference bytes, not to canonical Predicate
 Schema bytes under this profile.
 
 ## 12. Time-semantics portable boundary
 
-The v1.0 and Draft v1.1 bounded portable subsets admit exactly one canonical time state:
+The v1.0 and Approved v1.1 bounded portable subsets admit exactly one canonical time state:
 `time_semantics` is omitted. It means both Claim time fields are forbidden, and
 a Claim containing either `assertion_time` or `observation_time` is semantically
 invalid under that Predicate Schema; the field is not ignored.
@@ -713,7 +713,7 @@ values, duplicate map keys, unsupported features, and noncanonical encodings
 are invalid and MUST fail closed. They MUST NOT be ignored, preserved as opaque
 extension data, mapped to a default, or passed to an executable policy engine.
 
-For Draft v1.1 subject-domain material, the same rule rejects an unknown
+For v1.1 subject-domain material, the same rule rejects an unknown
 subject-domain member, absent `identifier`, unsupported equality value, unknown
 identifier FieldForm, unsupported identifier normalization or validation, and
 every unknown subject-constraint member. Unsupported referenced subject-domain
@@ -755,13 +755,11 @@ order, bound representation, optionality rule, and recursive node form is fixed
 by this profile and ADR-ENC-001. This claim does not extend to Predicate Schemas
 outside the portable subset.
 
-This Draft v1.1 defines candidate canonical bytes, not an allocated portable
-predicate identity. Approved v1.0 canonicalization, `representation_profile =
-h'01'`, and PSCID-1 remain unchanged. This Draft allocates no v1.1
-representation-profile code or PSCID suite and MUST NOT silently reuse the v1.0
-binding. A future adoption requires separately governed profile binding,
-identity framing, and new conformance vectors. RFC-005 remains Draft and is
-not a normative dependency.
+This Approved v1.1 profile defines the canonical bytes bound to permanent
+`representation_profile = h'02'` and PSCID suite `h'02'` by Approved
+DIGEST-001 v0.2. Approved v1.0 canonicalization, `representation_profile =
+h'01'`, and PSCID-1 remain unchanged. RFC-005 remains Draft and is not a
+normative dependency.
 
 The relationship to RFC-005 is **B. CONCEPTUAL ALIGNMENT ONLY**. RFC-005 may
 eventually supply digest framing or a portable typed-reference structure, but
@@ -820,12 +818,12 @@ The vectors MUST also demonstrate the following v1.0 admission outcomes:
 | `value_semantics_ref` resolving to unsupported unit-bearing semantics | Non-profile-valid after expansion. |
 | Present substantive `time_semantics` | Non-profile-valid. |
 
-The vectors are required conformance evidence for Approved v1.0. They do not
-make this Draft v1.1, Claim-body portability, Event semantics, runtime
-resolution infrastructure, trust, verification, or authorization Approved. A
-new v1.1 vector package is required before adoption and must cover inline/ref
+The Approved `PREDICATE-SCHEMA-CANONICALIZATION-V1.1` vector package supplies
+the corresponding v1.1 conformance evidence, including inline/ref
 subject-domain equivalence, fourth-member subject-constraint ordering, and each
-new subject-domain rejection rule.
+new subject-domain rejection rule. It does not make Claim-body portability,
+runtime-resolution infrastructure, trust, verification, or authorization
+Approved.
 
 ## 17. Architectural Decision Test
 
@@ -834,8 +832,8 @@ new subject-domain rejection rule.
 | Founding Principles consistency | Pass. Canonical bytes make immutable semantics inspectable without altering authority. |
 | New primitive burden | Pass. This is representation machinery for Predicate Schema, not a primitive. |
 | Removability | VE-CBOR-1 mechanics, the unchanged fixed grammar, bounded subject-domain map, and normalization boundary are necessary; a second canonicalization system and generic reference layer are removable. |
-| Twenty-year durability | Pass, conditional on retaining semantic material, this profile, the grammar, and future identity framing. |
-| Independent implementability | Pass for the bounded portable subset, pending v1.1 vectors and profile binding. |
+| Twenty-year durability | Pass, conditional on retaining semantic material, this profile, the grammar, and immutable identity framing. |
+| Independent implementability | Pass for the bounded portable subset under the Approved v1.1 vector package and DIGEST-001 v0.2 binding. |
 | Total conceptual complexity | Pass. One fixed VE-CBOR-1 profile and the existing FieldForm grammar avoid a second encoding system, grammar family, or identity ontology. |
 
 ## 18. Governance and normative home
@@ -846,28 +844,27 @@ new subject-domain rejection rule.
 | New Claim field? | No. |
 | New runtime abstraction? | No. |
 | New semantic abstraction? | No. Predicate Schema semantics remain the authority for meaning. |
-| RFC required? | No additional RFC. Accepted RFC-007 and ADR-007 authorize this Draft v1.1 candidate. |
+| RFC required? | No additional RFC. Accepted RFC-007/ADR-007 and RFC-008/ADR-008 authorize this v1.1 revision and its local PSCID binding. |
 | ADR required? | No additional ADR. ADR-ENC-001 remains the applicable canonical-encoding authority. |
-| Approved-specification revision required? | Yes for adoption. This Draft v1.1 is a proposed revision to Approved v1.0. |
-| Correct normative home? | This Draft VE-CBOR-1 Predicate Schema representation profile v1.1 candidate. |
+| Approved-specification revision required? | Complete. This Approved v1.1 revision supersedes v1.0 only where expressly stated. |
+| Correct normative home? | This Approved VE-CBOR-1 Predicate Schema representation profile v1.1. |
 
-## 19. Remaining blocker and next action
+## 19. Future evolution
 
 The unchanged field-semantic representation grammar is sufficient for this
-bounded v1.1 candidate. Semantic forms outside the subset remain valid abstract
-Predicate Schema content but are not canonicalized by this profile. The
-remaining v1.1 adoption work is coordinated closure: independent byte agreement
-and vectors, a new representation-profile code, and a new PSCID suite/profile
-binding. It must not alter Approved v1.0 canonicalization, `h'01'`, or PSCID-1.
+bounded v1.1 profile. Semantic forms outside the subset remain valid abstract
+Predicate Schema content but are not canonicalized by this profile. Future
+machine-affecting changes require a new governed profile revision,
+representation-profile code, PSCID suite/profile binding, and conformance
+evidence; they must not alter Approved v1.0 canonicalization, `h'01'`, or
+PSCID-1.
 
-The next action is to prepare that coordinated v1.1 closure after this Draft
-profile and the Draft Semantic Contract are independently audited. No code,
-suite, vector change, RFC, or ADR is created by this candidate.
+No future change may reinterpret profile `h'02'` or PSCID suite `h'02'`.
 
 ## Revision history
 
 | Version | Date | Change |
 |---|---|---|
-| 1.1 | 2026-08-30 | Draft candidate derived from Accepted RFC-007 and ADR-007, Claim Reference Semantics Draft v0.2, and Semantic Contract Draft v1.1: adds optional `subject_domain`, source expansion, bounded `SubjectDomain` canonical form, and `ExternalSubjectReference` subject-constraint member. No v1.1 closure, profile code, PSCID suite, or vectors are allocated. |
+| 1.1 | 2026-08-30 | Approved coordinated revision under Accepted RFC-007/ADR-007 and RFC-008/ADR-008: adds optional `subject_domain`, source expansion, bounded `SubjectDomain` canonical form, and `ExternalSubjectReference` subject-constraint member; permanently binds the frozen v1.1 closure to profile `h'02'` and PSCID suite `h'02'` through Approved DIGEST-001 v0.2 and Approved v1.1 conformance vectors. Claim Reference Semantics v0.2 remains Draft. |
 | 1.0 | 2026-08-28 | Approved machine-behavior freeze for the bounded portable canonicalization profile; pins Grammar v1.0, Semantic Contract v1.0, and ADR-ENC-001 v0.1, with normative canonicalization vectors. |
 | 0.1 | 2026-08-28 | Revised Draft to define canonical bytes only for the bounded portable subset, with exhaustive closed-world admission before encoding. |

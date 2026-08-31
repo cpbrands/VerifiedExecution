@@ -1,8 +1,8 @@
 ---
 id: PREDICATE-SCHEMA-CANONICALIZATION-V1.1
-title: Predicate Schema Canonicalization v1.1 Draft Vectors
+title: Predicate Schema Canonicalization v1.1 Conformance Vectors
 version: "1.1"
-status: Draft
+status: Approved
 document_type: Conformance Vector
 category: Conformance
 author: Verified Execution Editorial Board
@@ -23,19 +23,19 @@ supersedes: null
 superseded_by: null
 ---
 
-# Predicate Schema Canonicalization v1.1 Draft Vectors
+# Predicate Schema Canonicalization v1.1 Conformance Vectors
 
 ## Status and scope
 
-This Draft package tests only the v1.1 candidate additions: optional
-subject_domain, source-level subject_domain_ref expansion, and
+This Approved package defines conformance evidence for the v1.1 additions:
+optional subject_domain, source-level subject_domain_ref expansion, and
 ExternalSubjectReference in subject_constraints. Approved v1.0 and its vector
 package remain authoritative and unchanged.
 
-The vectors test canonical Predicate Schema bytes C. C is not a PSCID, does not
-allocate a v1.1 representation_profile code or PSCID suite, and does not define
-Claim-body wire encoding. CAD/unit semantics remain outside this bounded
-portable subset.
+The vectors test canonical Predicate Schema bytes C. C is not a PSCID and does
+not define Claim-body wire encoding. Approved DIGEST-001 v0.2 permanently
+binds the v1.1 closure to representation-profile `h'02'` and PSCID suite
+`h'02'`; CAD/unit semantics remain outside this bounded portable subset.
 
 ## Common fixture material
 
@@ -301,12 +301,12 @@ output. Each verifies five accepted byte strings and eight rejection stages.
 The paths agree exactly on C_A through C_E, including C_B == C_A and C_C ==
 v1.0 V1-A's bytes.
 
-## Provisional vNext identity vectors
+## Normative v1.1 identity vectors
 
-This section adds Draft candidate evidence only. `h'02'` for both the
-representation-profile and PSCID-suite slots is a provisional candidate value;
-it is not an allocated profile, an assigned suite, or a portable-conformance
-target. The candidate construction is:
+This section supplies Approved v1.1 identity conformance evidence. `h'02'` is
+the permanently assigned representation-profile code and PSCID-suite code for
+the immutable v1.1 closure defined by Approved DIGEST-001 v0.2. The
+construction is:
 
 ~~~ini
 frame = VE-CBOR-1([
@@ -325,7 +325,7 @@ decode the four-element frame, calculate SHA-256, and compare the exact frame,
 digest, and 33-octet identity values below. Neither consumes the other
 validator's output.
 
-| Anchor | Canonical input | `C` octets | Frame octets | SHA-256 digest | Candidate identity |
+| Anchor | Canonical input | `C` octets | Frame octets | SHA-256 digest | `h'02'` identity |
 |---|---|---:|---:|---|---|
 | A | V1.1-A | 151 | 167 | `038df64019001d19588a6d0d7910148b4f416baf34a4283258f7c0243538107f` | `02038df64019001d19588a6d0d7910148b4f416baf34a4283258f7c0243538107f` |
 | C | V1.1-C | 94 | 110 | `1f2ba2e17d8589cfc976e7284f869b47349902b21d15222bed967aae1779f03d` | `021f2ba2e17d8589cfc976e7284f869b47349902b21d15222bed967aae1779f03d` |
@@ -352,7 +352,7 @@ Anchor C proves the cross-suite boundary:
 
 ~~~text
 C_V1-A == C_V1.1-C
-PSCID-1(C_V1-A) != candidate_identity_C
+PSCID-1(C_V1-A) != v1.1_identity_C
 ~~~
 
 For the equal canonical input in Anchor C, both validators also independently
@@ -362,18 +362,18 @@ derive the retained PSCID-1 identity:
 PSCID-1(C_V1-A) = 01634b3118ec88e36cf5eab44b86092e88f309fe918a99db460222fbd76946b80a
 ~~~
 
-The validators use a fixed test-only suite-aware verifier for the retained
-`h'01'` PSCID-1 construction and the provisional `h'02'` candidate
-construction. This does not allocate either candidate code or introduce a
-runtime suite registry. They prove each candidate confusion failure exactly:
+The validators use a fixed suite-aware verifier for the retained `h'01'`
+PSCID-1 construction and the permanently assigned `h'02'` v1.1 construction.
+They introduce no runtime suite registry. They prove each required confusion
+failure exactly:
 
 | Case | Attack and verification path | Required result |
 |---|---|---|
-| N1 — suite relabel | Relabel `h'02' || candidate_digest_C` as `h'01' || candidate_digest_C`, then dispatch on carried `h'01'`. | The known retained PSCID-1 path derives the historical `h'01'` identity above and returns `identity-mismatch`. |
-| N2 — profile relabel | Construct `h'02' || SHA-256(frame(h'02', h'01', C))`, then dispatch on carried `h'02'`. | The candidate suite requires profile `h'02'` and returns `identity-mismatch`. |
-| N3 — downgrade reinterpretation | Pass candidate Anchor C and `C` to explicit PSCID-1 (`h'01'`) verification. | The PSCID-1 construction derives the retained historical identity and returns `identity-mismatch`. |
-| N4 — unknown suite | Relabel candidate Anchor C with carried suite `h'03'`, then dispatch. | No test suite definition exists for `h'03'`; verification fails closed with `unknown-suite`. |
-| N5 — frame-field substitution | Change only the candidate frame profile from `h'02'` to `h'01'`; retain the original candidate Anchor C identity. | The supplied frame hashes differently from the unchanged identity digest and returns `identity-mismatch`. |
+| N1 — suite relabel | Relabel `h'02' || v1.1_digest_C` as `h'01' || v1.1_digest_C`, then dispatch on carried `h'01'`. | The known retained PSCID-1 path derives the historical `h'01'` identity above and returns `identity-mismatch`. |
+| N2 — profile relabel | Construct `h'02' || SHA-256(frame(h'02', h'01', C))`, then dispatch on carried `h'02'`. | The `h'02'` suite requires profile `h'02'` and returns `identity-mismatch`. |
+| N3 — downgrade reinterpretation | Pass v1.1 Anchor C and `C` to explicit PSCID-1 (`h'01'`) verification. | The PSCID-1 construction derives the retained historical identity and returns `identity-mismatch`. |
+| N4 — unknown suite | Relabel v1.1 Anchor C with carried suite `h'03'`, then dispatch. | No assigned suite definition exists for `h'03'`; verification fails closed with `unknown-suite`. |
+| N5 — frame-field substitution | Change only the `h'02'` frame profile from `h'02'` to `h'01'`; retain the original v1.1 Anchor C identity. | The supplied frame hashes differently from the unchanged identity digest and returns `identity-mismatch`. |
 
 Thus N1 is a rejection by a **known** historical PSCID-1 verification path;
 N4 is the separate unknown-suite failure. N5 does not recompute a new identity
@@ -381,14 +381,14 @@ for the substituted frame.
 
 ## Identity and adoption boundary
 
-These Draft vectors establish candidate canonical and identity evidence only.
-They do not allocate a v1.1 representation-profile code, PSCID suite,
-PSCID-next value, or predicate identity. Historical v1.0 vectors and PSCID-1
-remain unchanged.
+These Approved vectors establish canonical and identity conformance evidence
+for the permanently assigned v1.1 profile and suite. They do not define a
+generic PSCID-next value or predicate-identity abstraction. Historical v1.0
+vectors and PSCID-1 remain unchanged.
 
 ## Revision history
 
 | Version | Date | Change |
 |---|---|---|
-| 1.1 | 2026-08-30 | Added provisional candidate `h'02'` frame, digest, identity, parsing, and confusion anchors; no code allocated. |
-| 1.1 | 2026-08-30 | Draft vectors for optional subject_domain, source-reference convergence, the fourth subject-constraint member, and exact v1.0 replay. |
+| 1.1 | 2026-08-30 | Approved the v1.1 package and its permanent `h'02'` profile/suite frame, digest, identity, parsing, and confusion anchors under DIGEST-001 v0.2; PSCID-1 unchanged. |
+| 1.1 | 2026-08-30 | Initial Draft vectors for optional subject_domain, source-reference convergence, the fourth subject-constraint member, and exact v1.0 replay. |
