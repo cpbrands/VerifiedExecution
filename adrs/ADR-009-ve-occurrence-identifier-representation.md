@@ -2,7 +2,7 @@
 id: ADR-009
 title: VE Occurrence Identifier Representation
 version: "0.1"
-status: Proposed
+status: Accepted
 document_type: Architectural Decision Record
 category: Architecture
 author: Verified Execution Editorial Board
@@ -22,19 +22,19 @@ superseded_by: null
 
 # ADR-009 — VE Occurrence Identifier Representation
 
-## Status and decision scope
+## Status and authority boundary
 
-**Status:** Proposed
+**Status:** Accepted
 **Related RFC:** RFC-009 — VE Occurrence Identifier Representation
 **Decision:** A. ADOPT SHARED VE OCCURRENCE-ID CONVENTION.
 
-This Proposed ADR selects a narrow reusable scalar convention, not a VE-wide
-identity architecture. A specification adopts it only through its own governed
+This Accepted ADR is authoritative at its declared architectural scope. It
+records a narrow reusable scalar convention, not a VE-wide identity
+architecture. A specification adopts it only through its own governed
 revision. The only adoption candidate in this transaction is Draft VE-002
 `event_id`; VE-001 `action_id` remains unchanged.
 
-RFC-009 is the proposal artifact. If this ADR is Accepted, it records the
-architectural decision; it does not itself approve VE-002 or cause another
+RFC-009 is Accepted. This ADR does not itself approve VE-002 or cause another
 specification to adopt OccurrenceId.
 
 ## 1. Context
@@ -125,9 +125,9 @@ This decision does not introduce:
 
 ## 8. Consequences and governance
 
-This Proposed ADR authorizes no Approved-specification change. It records the
-architecture candidate for RFC-009 and Draft VE-002 v0.2. If later Accepted,
-each adopting specification must separately revise its own semantic rules and
+This Accepted ADR authorizes no Approved-specification change. It records the
+architecture decision for Accepted RFC-009 and Draft VE-002 v0.2. Each
+adopting specification must separately revise its own semantic rules and
 conformance materials under normal version and changelog governance.
 
 ## 9. Affected Specifications
@@ -147,8 +147,18 @@ No other specification silently adopts OccurrenceId through this ADR.
 
 ## 10. Conclusion
 
-**A. ADOPT SHARED VE OCCURRENCE-ID CONVENTION.**
+**A. ACCEPT SHARED VE OCCURRENCE-ID CONVENTION.**
 
 The selected convention is sufficient for narrow Event adoption while retaining
 the distinction between Action occurrence identity, Event occurrence identity,
 and all other identity families.
+
+This Accepted ADR does not itself approve VE-002 or expand OccurrenceId
+adoption beyond its sole Draft Event candidate.
+
+## Revision history
+
+| Version | Date | Change |
+|---|---|---|
+| 0.1 | 2026-08-30 | Initial Proposed ADR selecting a narrow shared OccurrenceId convention; VE-002 is the sole Draft adoption candidate. |
+| 0.1 | 2026-08-30 | Status transitioned from Proposed to Accepted; decision and scope unchanged. |
