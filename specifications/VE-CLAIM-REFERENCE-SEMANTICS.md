@@ -36,10 +36,11 @@ Draft specification Approved or perform the separate governed vNext
 specification revisions needed for portable representation conformance.
 
 This document reuses the Approved VE-001 distinction between Action content
-identity and Action occurrence identity. It relies on Draft VE-002 only for
-the semantic role of an immutable, globally unique `event_id`. It does not
-claim final portable Event-reference conformance until the relevant Event and
-encoding work is finalized.
+identity and Action occurrence identity. It relies on Approved VE-002 v0.2,
+under Accepted RFC-009 and ADR-009, for the semantic role of an immutable,
+globally unique `event_id`. The Event occurrence identity, scalar
+representation, equality, canonical representation, and malformed-rejection
+dependency for `EventReference` are therefore authoritative.
 
 RFC-005 remains Draft and is not a normative dependency of this document.
 
@@ -402,9 +403,10 @@ validated need establishes its semantic owner, identity rules, compatibility
 effects, and conformance behavior. Such a change MUST NOT be made by treating
 an unknown reference as generic.
 
-Final portable-conformance status for `EventReference` remains contingent on
-the Draft Event and encoding work. That dependency does not block this
-specification's semantic decision about the currently legal Claim subjects.
+The Event occurrence dependency of `EventReference` is satisfied by Approved
+VE-002 v0.2 under Accepted RFC-009 and ADR-009. Separate governed
+Claim-reference representation work remains required for final portable
+Claim-reference conformance.
 
 Portable representation conformance for `ExternalSubjectReference` likewise
 requires the separate governed vNext Predicate Schema and representation work.
