@@ -2,7 +2,7 @@
 id: "VE-002"
 title: "Event Specification"
 version: "0.2"
-status: "Draft"
+status: "Approved"
 document_type: "Core Primitive Specification"
 category: "Specification"
 author: "Verified Execution Editorial Board"
@@ -21,7 +21,7 @@ superseded_by: null
 # VE-002 — Event Specification
 
 **Version:** 0.2
-**Status:** Draft  
+**Status:** Approved\
 **Category:** Core Primitive Specification  
 **Identifier:** VE-002  
 **Depends on:** VE-000, VE-001
@@ -167,11 +167,11 @@ Events are never recycled.
 
 Events are never merged.
 
-## 4.1 Event occurrence identifier representation candidate
+## 4.1 Event occurrence identifier representation
 
-This v0.2 Draft candidate adopts the shared **OccurrenceId** representation
-proposed by Draft RFC-009 and Proposed ADR-009 for `event_id` only. It does
-not amend any Approved specification.
+This Approved v0.2 specification adopts the shared **OccurrenceId**
+representation established by Accepted RFC-009 and Accepted ADR-009 for
+`event_id` only. It does not amend any other Approved specification.
 
 An Event `event_id` MUST be an opaque sequence of exactly 32 octets.
 
@@ -211,7 +211,8 @@ identity, namespace structure, a registry, or a resolver from an `event_id`.
 
 ## 4.3 Scope boundary
 
-This Draft candidate changes only Event identity representation in VE-002.
+This Approved v0.2 specification changes only Event identity representation in
+VE-002.
 `action_id` remains governed by VE-001, including VE-001's existing
 profile-defined generation rule. Receipt identifiers, external identifiers,
 and other identifiers do not adopt this representation merely because they use
@@ -862,5 +863,6 @@ the platform loses its ability to establish legitimacy.
 
 | Version | Date | Change |
 |---|---|---|
+| 0.2 | 2026-08-30 | Approved the existing v0.2 Event occurrence-identifier contract under Accepted RFC-009 and ADR-009; approval-state transition only, with no change to the Draft-candidate semantic requirements. |
 | 0.2 | 2026-08-30 | Draft candidate: add the narrow canonical 32-octet `event_id` representation and Event-specific non-reuse rules; no Event payload, lifecycle, provenance, or ordering representation is added. |
 | 0.1 | 2026-08-10 | Initial Draft. |

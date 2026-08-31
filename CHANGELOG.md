@@ -7,7 +7,7 @@ document_type: Changelog
 category: Governance
 author: Verified Execution Editorial Board
 created: 2026-08-22
-updated: 2026-08-28
+updated: 2026-08-30
 depends_on:
   - SPECIFICATION-GOVERNANCE
 supersedes: null
@@ -17,6 +17,21 @@ superseded_by: null
 # Verified Execution Repository Changelog
 
 This changelog records repository-wide semantic, governance, status, and structural changes. Specification-specific changelogs remain authoritative for changes to their specifications.
+
+## 2026-08-30 — VE-002 v0.2 approval
+
+- **Specification:** VE-002 Event Specification
+- **Version:** Draft v0.2 → Approved v0.2
+- **Classification:** Approved specification transition
+- **Summary:** VE-002 Event Specification approved with portable `event_id`
+  conformance using the accepted VE OccurrenceId representation.
+- **Affected semantics:** Event occurrence identity is now portable: an
+  `event_id` is exactly 32 opaque octets with exact ordered-octet equality and
+  the canonical VE-CBOR-1 `h'58 20' || payload` representation. VE-002 remains
+  occurrence-based, not content-addressed.
+- **Compatibility:** No VE-001 change, Event digest or content identity,
+  registry or resolver, or generator requirement is introduced.
+- **Authority:** RFC-009 and ADR-009.
 
 ## 2026-08-28 — Predicate Schema canonicalization v1.0 freeze
 
