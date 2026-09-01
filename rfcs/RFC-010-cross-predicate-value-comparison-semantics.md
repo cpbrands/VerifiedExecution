@@ -2,7 +2,7 @@
 id: RFC-010
 title: Cross-Predicate Value Comparison Semantics
 version: "0.1"
-status: Draft
+status: Accepted
 document_type: RFC
 category: Semantics
 author: Verified Execution Editorial Board
@@ -25,14 +25,14 @@ superseded_by: null
 
 # RFC-010 — Cross-Predicate Value Comparison Semantics
 
-## 1. Status, proposed decision, and narrow scope
+## 1. Status, accepted decision, and narrow scope
 
-This RFC is Draft. It proposes a narrow extension to the existing Predicate
+This RFC is Accepted. It records a narrow extension to the existing Predicate
 Schema `value_semantics` model so that independent implementations can decide
 whether values governed by different predicates inhabit the same comparison
 domain and support a requested relation.
 
-The proposed architectural decision is:
+The accepted architectural decision is:
 
 > Cross-predicate comparison is permitted only when each value is valid under
 > its own Predicate Schema, both schemas permit the requested relation, and
@@ -403,12 +403,12 @@ meaning.
 
 ## 18. Governance and sequencing
 
-This RFC is Draft and non-authoritative. It adds no kernel primitive, changes
-no Approved specification, allocates no profile or suite code, and does not
-resolve an Open Decision.
+This RFC is Accepted and authoritative at its declared architectural scope. It
+adds no kernel primitive, changes no Approved specification, allocates no
+profile or suite code, and does not resolve an Open Decision.
 
-If the direction survives review, the next governance artifact is an ADR that
-records the architectural decision. Only after RFC and ADR acceptance may a
+The next governance gate is acceptance of ADR-010, which records the
+architectural decision. Only after both RFC and ADR acceptance may a
 coordinated Draft specification revision define final semantics and
 representation. Approved-spec adoption would then require version increments,
 closed conformance evidence, security review, changelog, and RFC-008/ADR-008
@@ -448,3 +448,4 @@ primitive and does not conflate comparability with authority.
 | Version | Date | Change |
 |---|---|---|
 | 0.1 | 2026-08-31 | Initial Draft proposing normalized structural cross-predicate comparison semantics within Predicate Schema `value_semantics`. |
+| 0.1 | 2026-08-31 | Status transitioned from Draft to Accepted; architectural direction, exclusions, and representation boundary unchanged. |
