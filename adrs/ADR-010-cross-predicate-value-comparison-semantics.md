@@ -2,7 +2,7 @@
 id: ADR-010
 title: Cross-Predicate Value Comparison Semantics
 version: "0.1"
-status: Proposed
+status: Accepted
 document_type: Architectural Decision Record
 category: Architecture
 author: Verified Execution Editorial Board
@@ -28,15 +28,15 @@ superseded_by: null
 
 ## Status and authority boundary
 
-**Status:** Proposed  
+**Status:** Accepted
 **Related RFC:** RFC-010 — Cross-Predicate Value Comparison Semantics  
 **Decision:** A. ADOPT STRUCTURAL CROSS-PREDICATE VALUE COMPARISON SEMANTICS
 INSIDE `value_semantics`.
 
-This Proposed ADR records an architectural direction for review. It is not yet
-authoritative. It changes no Approved specification, chooses no final field
-name or grammar, defines no canonical encoding, and allocates no Predicate
-Schema representation-profile or PSCID suite code.
+This Accepted ADR is authoritative at its declared architectural scope. It
+changes no Approved specification, chooses no final field name or grammar,
+defines no canonical encoding, and allocates no Predicate Schema
+representation-profile or PSCID suite code.
 
 RS-QTY-001 and its gap analysis are non-normative evidence. Their Q1–Q9 cases
 remain validation evidence, not normative specification text.
@@ -322,7 +322,7 @@ This ADR makes no change to those artifacts or responsibilities.
 
 ## 14. Representation and PSCID governance
 
-ADR approval would authorize the architectural direction only. It would not
+This Accepted ADR authorizes the architectural direction only. It does not
 approve:
 
 - final field names;
@@ -375,17 +375,17 @@ responsibility before representation fixes its form.
 
 ## 17. Governance and next steps
 
-This ADR is Proposed. RFC-010 remains Draft. No specification is revised and no
-changelog entry is required by this proposal-only artifact.
+This ADR is Accepted. RFC-010 is Accepted. No specification is revised and no
+changelog entry is required by this architecture-only acceptance.
 
-If RFC-010 and this ADR are accepted through separate status transitions, they
-authorize preparation of coordinated Predicate Schema v1.2 Draft candidates.
-They do not themselves approve those candidates. Final Approved-spec adoption
-would require version increments, revision histories, conformance vectors,
-security review, a changelog entry, and the RFC-008/ADR-008 allocation gate.
+Together, RFC-010 and this ADR authorize preparation of coordinated Predicate
+Schema v1.2 Draft candidates. They do not themselves approve those candidates.
+Final Approved-spec adoption would require version increments, revision
+histories, conformance vectors, security review, a changelog entry, and the
+RFC-008/ADR-008 allocation gate.
 
-No ADR status transition, specification edit, profile allocation, or PSCID
-suite allocation occurs in this Draft transaction.
+This acceptance performs no specification edit, profile allocation, or PSCID
+suite allocation.
 
 ## 18. Conclusion
 
@@ -403,3 +403,4 @@ representation choices.
 | Version | Date | Change |
 |---|---|---|
 | 0.1 | 2026-08-31 | Initial Proposed ADR selecting normalized structural cross-predicate comparison semantics within Predicate Schema `value_semantics`. |
+| 0.1 | 2026-08-31 | Status transitioned from Proposed to Accepted; decision, exclusions, and representation boundary unchanged. |
