@@ -1,13 +1,13 @@
 ---
 id: OPEN-DECISIONS
 title: Verified Execution Open Decision Register
-version: 1.2
+version: 1.3
 status: Active
 document_type: Decision Register
 category: Governance
 author: Verified Execution Editorial Board
 created: 2026-08-22
-updated: 2026-08-30
+updated: 2026-09-02
 depends_on:
   - SPECIFICATION-GOVERNANCE
 related_documents:
@@ -23,7 +23,8 @@ superseded_by: null
 |---|---|---|---|---|
 | ENC-001 | Canonical serialization family | Resolved | ADR-ENC-001 | VE-CBOR-1 selected; exact profile details are specification tasks. |
 | PRED-001 | Predicate Schema external-subject semantics | Resolved | Accepted RFC-007/ADR-007; Approved Predicate Schema Semantic Contract v1.1 and Canonical Representation Profile v1.1 | `subject_domain` and the fourth permitted `subject_constraints` member are authoritative for Predicate Schema semantics and bounded canonicalization. Claim Reference v0.2 remains Draft for separate representation-level conformance. |
-| PSCID-001 | Predicate-Schema-specific content identity | Resolved | Accepted RFC-008/ADR-008; Approved DIGEST-001 v0.2 | PSCID-1 remains unchanged; permanent profile and suite `h'02'` bind the approved v1.1 Predicate Schema canonicalization closure. Generic digest infrastructure remains open under RFC-005. |
+| PRED-002 | Predicate Schema cross-predicate value comparison | Resolved | Accepted RFC-010/ADR-010; Approved Predicate Schema Semantic Contract v1.2 and Canonical Representation Profile v1.2 | Optional normalized structural comparison semantics inside `value_semantics` govern equality capability and Integer-only ordering. Incompatible or unsupported semantics yield `NOT COMPARABLE`; no conversion or value-domain primitive is introduced. |
+| PSCID-001 | Predicate-Schema-specific content identity | Resolved | Accepted RFC-008/ADR-008; Approved DIGEST-001 v0.3 | PSCID-1 and permanent v1.1 profile/suite `h'02'` remain unchanged; permanent profile and suite `h'03'` bind the approved v1.2 Predicate Schema canonicalization closure. Generic digest infrastructure remains open under RFC-005. |
 | RULE-001 | Portable v0.1 Rule representation | Resolved | ADR-RULE-001/002 | VE-CEL-1 selected. |
 | RULE-002 | Deterministic Rule execution | Resolved | ADR-RULE-001/002 | Explicit immutable inputs; no hidden side effects. |
 | VERIFY-001 | Mandatory algorithms/profiles | Open | RFC-005 Draft | Requires interoperability and lifecycle evidence. |

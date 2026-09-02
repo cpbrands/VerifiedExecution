@@ -1,13 +1,13 @@
 ---
 id: PREDICATE-SCHEMA-SEMANTIC-CONTRACT
 title: Predicate Schema Semantic Contract
-version: "1.1"
+version: "1.2"
 status: Approved
 document_type: Specification
 category: Claim Semantics
 author: Verified Execution Editorial Board
 created: 2026-08-28
-updated: 2026-08-30
+updated: 2026-09-02
 depends_on: []
 related_documents:
   - CLAIM-BODY-SEMANTIC-FIELD-CONTRACT
@@ -17,6 +17,8 @@ related_documents:
   - VE-CBOR-1-CLAIM-BODY-SCHEMA
   - VE-CEL-1-RULE-EVALUATE-INPUT-CONTRACT
   - RFC-005
+  - RFC-010
+  - ADR-010
 supersedes: null
 superseded_by: null
 ---
@@ -25,14 +27,15 @@ superseded_by: null
 
 ## Status and authority boundary
 
-This Approved v1.1 revision defines a narrowly scoped revision to the minimum
-semantic content of an immutable Predicate Schema. It implements only the
-`subject_domain` semantics authorized by Accepted RFC-007 and ADR-007. It does
-not accept RFC-005, create a VE primitive, or add a Claim-body field.
+This Approved v1.2 revision adds only the cross-predicate value-comparison
+semantics authorized by Accepted RFC-010 and ADR-010. It does not accept
+RFC-005, create a VE primitive, add a Claim-body field, define a universal
+quantity ontology, or introduce generic conversion or arithmetic.
 
-Approved v1.0 remains immutable. This revision does not alter the semantics or
-canonicalization outcome of a v1.0-valid Predicate Schema that does not use
-`subject_domain` or `ExternalSubjectReference`.
+Approved v1.1 remains historically authoritative and immutable. This revision does not alter
+the semantics of a v1.1-valid Predicate Schema that omits the new optional
+comparison extension. The coordinated Approved v1.2 Canonical Representation
+Profile preserves that schema's normalized content and canonical bytes.
 
 The accepted Claim envelope remains unchanged:
 
@@ -77,10 +80,13 @@ nor add a canonical map member, ordering rule, or VE-CBOR-1 byte rule to the
 canonicalization closure. They are therefore informative boundary references,
 not machine-affecting dependencies of this v1.0 contract.
 
-This Approved v1.1 revision supplies the semantic portion of the coordinated
-v1.1 closure. The separately Approved Canonical Representation Profile v1.1
-and DIGEST-001 v0.2 define its portable representation and PSCID binding; this
-contract itself does not encode CBOR or construct a digest.
+Approved v1.1 supplies the semantic portion of the permanent v1.1 closure. The
+separately Approved Canonical Representation Profile v1.1 and DIGEST-001 v0.2
+define its portable representation and PSCID binding. This Approved v1.2
+revision defines new semantic content only; the coordinated Approved Canonical
+Representation Profile v1.2 defines canonical bytes and Approved DIGEST-001
+v0.3 defines content identity. This contract does not encode CBOR, construct a
+digest, or alter the v1.1 closure.
 
 ## 1. Purpose
 
@@ -126,6 +132,14 @@ present: inline `subject_domain` XOR source-level `subject_domain_ref`.
 `subject_domain_ref` is composition notation only; it does not establish a
 portable semantic-fragment identity, `SubjectDomainID`, generic
 `ContentIdentity`, `DigestRef`, or `HashRef`.
+
+**Comparison semantics**
+
+Optional normalized structural semantic content inside `value_semantics` that
+establishes cross-predicate equality and, when explicitly enabled, ordering.
+It is not a `ValueDomain`, Quantity, Money, Currency, Unit, separately
+addressable object, registry entry, reference target, or semantic-fragment
+identity.
 
 ## 3. Minimal Predicate Schema model
 
@@ -194,6 +208,141 @@ absent Claim-body field
 ```
 
 A schema MAY define structured values. It MUST define relevant structure, field meaning, ordering significance, multiplicity, duplicate-member behavior, field identity, missing-field semantics, and equality. Terms such as record, list, set, tuple, and map remain proposition-specific semantics, not universal VE types.
+
+### 5.1 Optional cross-predicate comparison semantics
+
+`value_semantics` MAY contain one optional inline `comparison` member. The
+field name is fixed for v1.2 after pressure-testing
+`comparison_semantics`, a second representation grammar, whole-field equality,
+and external identifiers. The smallest semantic shape is:
+
+```text
+ValueSemantics {
+  value: FieldForm
+  comparison?: {
+    domain: FieldForm
+    ordered: boolean
+  }
+}
+```
+
+`comparison` is inline normalized structural content within
+`value_semantics`. It MUST NOT be supplied through `comparison_ref`,
+`comparison_domain_id`, `unit_id`, `currency_id`, a generic semantic reference,
+or a registry or resolver. It is not independently addressable and has no
+identity separate from the Predicate Schema containing it.
+
+The `domain` FieldForm is inline structural semantic descriptor material in
+this position; it is not a runtime schema for the Claim value. Its entire
+normalized closed structure contributes to comparison-domain equality. VE
+assigns no universal external ontology to descriptor text. Portable meaning
+MUST NOT depend on undocumented publisher-private interpretation. A bare label
+such as `"CAD"` is insufficient whenever it could mean Canadian dollars in one
+schema and Customer Account Debit in another. The normalized descriptor MUST
+then contain enough semantic material to distinguish those meanings. The
+distinction comes from semantic structure, not publisher identity, trust, a
+namespace, registry, resolver, or authority.
+
+The `domain` member reuses the existing finite, acyclic FieldForm grammar only
+as closed structural semantic material. It MUST be valid under that grammar.
+It creates no second value-representation grammar, universal ontology, domain
+registry, namespace authority, or runtime value field.
+
+Presence of `comparison` explicitly supports semantic equality comparison.
+Equality-only comparison is available for Boolean, Integer, Text, Bytes,
+Record, and Sequence forms through normalized canonical semantic equality,
+provided both runtime values validate locally and comparison semantics match.
+Record and Sequence equality recursively includes their complete
+comparison-relevant structure.
+
+`ordered: true` additionally supports `<`, `<=`, `>`, and `>=` after all
+comparison preconditions succeed, but is valid only when the top-level
+comparison-relevant value form is IntegerForm. A schema using `ordered: true`
+with Boolean, Text, Bytes, Record, or Sequence is invalid. This contract
+defines no lexicographic, bytewise, canonical-CBOR, locale, or
+implementation-specific ordering. `ordered: false` is equality-only. Broader
+ordered forms require future governed evidence. Integer representation alone
+does not imply ordering, and this contract defines no generic operator or
+arithmetic language.
+
+### 5.2 Comparison-relevant value form and predicate-local admissibility
+
+The **normalized comparison-relevant value form** is existing normalized
+FieldForm semantic material after removing only fields explicitly classified
+here as predicate-local admissibility constraints. It is a fixed specification
+rule, not an object, transform language, reusable abstraction, identifier,
+reference, or second grammar.
+
+The exhaustive classification is:
+
+- comparison-relevant: form discriminator, Integer scale, scalar
+  `allowed_values`, Record field identity/name, Record required/optional
+  semantics, Record closedness, recursively classified Record child forms,
+  Sequence element form, Sequence `ordering_significant`, Sequence
+  `uniqueness`, recursively classified Sequence child forms, and all governed
+  canonical scalar-normalization rules; and
+- predicate-local admissibility only: Integer lower and upper bounds and
+  Sequence `min_items` and `max_items`.
+
+No other FieldForm member may be removed. In particular, `allowed_values`
+remains comparison-relevant because it may define semantic vocabulary rather
+than merely restrict local admission. Predicate-local members still MUST
+validate each Claim value before comparison. Ignoring only those members
+permits predicates with different bounds or sequence cardinality to share
+comparison semantics without weakening either predicate. Predicate proposition
+meaning remains outside the normalized comparison-relevant value form.
+
+Scale is retained because it changes the canonical comparison representation.
+Absent scale and `scale: 0` first undergo the existing governed normalization
+to omission. Any other scale mismatch produces different comparison semantics;
+it does not authorize implicit rescaling.
+
+For relation `R`, the normalized structural comparison semantics are exactly:
+
+```text
+NormalizedComparisonSemantics {
+  form: normalized_comparison_relevant_value_form(value)
+  domain: normalize(comparison.domain)
+  ordered: comparison.ordered
+}
+```
+
+The notation above names the fixed result for exposition only; it does not
+create a callable transform or separately named reusable abstraction. The
+`form` member is not an additional serialized source member. Equality is
+intrinsic canonical equality after local validation and governed normalization,
+so this model does not duplicate an `equality: canonical` declaration.
+Likewise, scale and representation are derived from `value`, so they are not
+duplicated inside `comparison`.
+
+### 5.3 Cross-predicate comparison invariant
+
+Cross-predicate comparison is permitted if and only if:
+
+1. each value is valid under its own Predicate Schema;
+2. each schema contains `comparison` and explicitly supports the invoked
+   capability; and
+3. the schemas' normalized structural comparison semantics required for that
+   relation are identical.
+
+Otherwise the values are **NOT COMPARABLE**. `NOT COMPARABLE` is distinct from
+a supported comparison whose result is false.
+
+Missing, malformed, unknown, unsupported, cyclic, or non-identical comparison
+material MUST fail closed. Implementations MUST NOT compare raw integers or
+canonical scalar bytes, infer ordering, match labels, silently rescale, perform
+conversion, consult a registry or resolver, partially normalize, or guess.
+
+Semantic comparability establishes neither Claim authenticity, issuer trust,
+predicate recognition, Rule applicability, resource authorization, nor
+execution legitimacy. Those remain separate VE gates. A comparison result
+MUST NOT make an otherwise inadmissible Claim eligible.
+
+VE performs no cross-domain conversion. An external system may derive and
+issue an ordinary verified Claim already expressed in the target comparison
+semantics. VE then verifies and evaluates that Claim normally. This contract
+defines no `ConversionClaim`, `FXClaim`, UnitConversion primitive,
+exchange-rate source, market authority, or conversion subsystem.
 
 ## 6. Subject and time semantics
 
@@ -413,7 +562,7 @@ A Predicate Schema is semantically valid only when:
 1. `issuer_domain` and `value_semantics` each have exactly one authoritative source, and any present `subject_domain` and `time_semantics` each have exactly one authoritative source;
 2. every required transitive semantic dependency is available and supported;
 3. its referenced semantic dependency graph is finite and acyclic where recursive content identities depend on one another;
-4. issuer, value, subject, and time declarations do not contradict one another; and
+4. issuer, value, comparison, subject, and time declarations do not contradict one another; and
 5. every semantic construct it uses is understood by the implementation.
 
 The graph of referenced semantic dependencies MUST be finite and acyclic where
@@ -432,6 +581,13 @@ mutable external context.
 
 An unsupported semantic feature MUST fail closed unless it is explicitly identified as non-semantic metadata. This specification creates no larger universal error taxonomy.
 
+When `comparison` is present, its map MUST be closed, its `domain` MUST be a
+valid finite FieldForm, and `ordered` MUST be a boolean. An unknown comparison
+member, absent required member, opaque identifier or reference, unsupported
+capability value, or comparison material outside `value_semantics` is invalid.
+If `ordered` is true, the normalized comparison-relevant value form MUST be
+IntegerForm; every other form is invalid at schema admission.
+
 ## 10. Extensibility and authority boundaries
 
 This specification rejects an open-ended semantic `extensions` map. A new semantic rule, domain, or constraint changes Predicate Schema semantic content and therefore produces a new predicate identity. Non-semantic tooling metadata MAY evolve without changing predicate identity when it remains outside the canonical semantic-content boundary.
@@ -441,6 +597,11 @@ Predicate Schema defines what a Claim body means. It MUST NOT define:
 - authorization logic, Rule expressions, policy, threshold decisions, issuer ranking, Claim selection, conflict resolution, or Rule evaluation;
 - signature suites, verifier or key mapping, trusted issuers, revocation, or verification profiles; or
 - Action semantics, Action digest, Action occurrence identity, Event semantics, or Event identity.
+
+Comparison semantics MUST NOT define trust, issuer recognition, Rule
+applicability, execution authorization, arithmetic, conversion, a universal
+Quantity/Money/Currency/Unit ontology, a ValueDomain object, or a semantic
+registry, namespace, resolver, or fragment identity.
 
 `issuer_domain` and `subject_domain` remain distinct field-specific semantics:
 the former interprets the Claim issuer and the latter interprets an external
@@ -470,18 +631,21 @@ profile remains unchanged and continues to define deterministic bytes only for
 its bounded portable subset. The Approved v1.1 Canonical Representation
 Profile and DIGEST-001 v0.2 separately define portable `subject_domain`, the
 fourth permitted `subject_constraints` member, profile `h'02'`, and PSCID suite
-`h'02'` for the coordinated v1.1 closure.
+`h'02'` for the coordinated v1.1 closure. The Approved v1.2 Canonical
+Representation Profile defines deterministic bytes for the optional
+`comparison` extension, and Approved DIGEST-001 v0.3 permanently binds that
+closure to representation profile `h'03'` and PSCID suite `h'03'`.
 
 ## 12. Architectural Decision Test
 
 | Test | Result |
 |---|---|
-| Founding Principles consistency | Pass. Claim meaning is explicit, inspectable, and independent of runtime infrastructure. |
-| New primitive burden | Pass. Predicate Schema is the only non-primitive normative abstraction; reusable field semantics do not become architectural abstractions. |
-| Removability | The five semantic elements cannot be removed without ambiguity; a generic contract layer or generic identity model can be removed without loss. |
-| Twenty-year durability | Pass. Immutable composition and closed semantics support offline historical interpretation. |
-| Independent implementability | Pass. Implementations can resolve the same acyclic immutable semantic dependency graph. |
-| Total conceptual complexity | Pass. Field-specific reuse avoids duplicated issuer/subject equality rules and a universal contract, type, or identity system. |
+| Founding Principles consistency | Pass. Claim meaning and comparison preconditions are explicit, inspectable, fail closed, and remain separate from authority. |
+| New primitive burden | Pass. Comparison content remains inside existing `value_semantics`; it creates no Quantity, Unit, ValueDomain, registry, or other primitive. |
+| Removability | Removing the extension loses deterministic Q1–Q9 evaluation; removing a second grammar, duplicate equality/scale fields, ontology, registry, or conversion layer loses no required capability. |
+| Twenty-year durability | Pass. Closed normalized structural equality does not depend on a publisher, registry, resolver, market source, or implementation language. |
+| Independent implementability | Pass: implementations can validate locally, apply the exhaustive comparison-relevant classification, compare normalized structures, and fail closed. |
+| Total conceptual complexity | Pass. One two-member inline map and a fixed FieldForm classification are smaller than Quantity + Money + Currency + Unit + conversion machinery. |
 
 Predicate Schema remains a necessary non-primitive normative abstraction. It is not mere documentation metadata because implementations need it to interpret Claim bodies consistently. It is not a kernel primitive because it owns no independent execution, lifecycle, authorization, or authority semantics.
 
@@ -492,23 +656,28 @@ Predicate Schema remains a necessary non-primitive normative abstraction. It is 
 | New primitive? | No. |
 | New Claim field? | No. |
 | New normative abstractions? | No. Predicate Schema remains the existing non-primitive normative abstraction; reused field semantics are not separate architectural abstractions. |
-| RFC required? | No additional RFC. Accepted RFC-007 and ADR-007 authorize this v1.1 revision. |
-| Approved-specification revision required? | Complete. This Approved v1.1 revision supersedes v1.0 only where expressly stated. |
-| Correct normative home? | This standalone Approved Predicate Schema Semantic Contract v1.1. |
+| RFC required? | Complete. Accepted RFC-010 and ADR-010 authorize the v1.2 comparison semantics. |
+| Approved-specification revision required? | Complete through this coordinated v1.2 approval. |
+| Correct normative home? | This standalone Approved Predicate Schema Semantic Contract v1.2. |
 
 ## 14. Future evolution
 
 The coordinated v1.1 representation profile, profile code, PSCID suite, and
-conformance vectors are Approved with this revision. Any future
-machine-affecting Predicate Schema change requires a new governed revision,
-representation-profile code, PSCID suite, and conformance evidence. It remains
-separate from CEL mapping, verification mechanics, trust policy, and a global
-registry.
+conformance vectors remain Approved and unchanged. The v1.2 extension requires
+a distinct representation profile because admission and canonical bytes gain
+optional comparison content. Under RFC-008/ADR-008, representation profile
+`h'03'` and PSCID suite `h'03'` are permanently assigned by the coordinated
+v1.2 adoption. Schemas omitting `comparison` preserve their canonical bytes,
+but identities remain suite-specific with no cross-suite aliasing. The work
+remains separate from CEL mapping,
+verification mechanics, trust policy, conversion, and a global registry.
 
 ## Revision history
 
 | Version | Date | Change |
 |---|---|---|
+| 1.2 | 2026-09-02 | Status transitioned from Draft to Approved in the coordinated v1.2 adoption; representation profile `h'03'`, PSCID suite `h'03'`, DIGEST-001 v0.3, and v1.2 conformance vectors are approved separately in the same atomic closure. Existing v1.1 semantics and bytes remain unchanged when `comparison` is omitted. |
+| 1.2 | 2026-09-01 | Draft candidate under Accepted RFC-010/ADR-010: adds optional inline structural `comparison` semantics inside `value_semantics`, exhaustive comparison-relevant FieldForm classification, equality/Integer-only ordered capability distinction, fail-closed cross-predicate invariant, and no profile or PSCID allocation. Approved v1.1 remains authoritative. |
 | 1.1 | 2026-08-30 | Approved coordinated v1.1 revision under Accepted RFC-007/ADR-007 and RFC-008/ADR-008: adds optional `subject_domain`, four-form subject constraints, external-subject validity, and contextual cross-predicate comparability; profile `h'02'`, PSCID suite `h'02'`, and the v1.1 canonicalization conformance vectors are approved separately in the same governed closure. Claim Reference Semantics v0.2 remains Draft. |
 | 1.0 | 2026-08-28 | Approved machine-behavior freeze for Predicate Schema source composition, reference resolution, normalization, and fail-closed semantics used by canonicalization v1.0. |
 | 0.1 | 2026-08-28 | Initial Draft defining minimum Predicate Schema semantic content and field-specific immutable composition. |

@@ -7,7 +7,7 @@ document_type: Changelog
 category: Governance
 author: Verified Execution Editorial Board
 created: 2026-08-22
-updated: 2026-08-30
+updated: 2026-09-02
 depends_on:
   - SPECIFICATION-GOVERNANCE
 supersedes: null
@@ -17,6 +17,30 @@ superseded_by: null
 # Verified Execution Repository Changelog
 
 This changelog records repository-wide semantic, governance, status, and structural changes. Specification-specific changelogs remain authoritative for changes to their specifications.
+
+## 2026-09-02 — Predicate Schema v1.2 comparison semantics and PSCID v0.3 approval
+
+- **Specifications:** Predicate Schema Semantic Contract v1.2, Predicate
+  Schema Canonical Representation Profile v1.2, and DIGEST-001 v0.3.
+- **Version:** Draft v1.2 → Approved v1.2 for the Semantic Contract and
+  Canonical Representation Profile; Draft v0.3 → Approved v0.3 for DIGEST-001.
+- **Classification:** Class B — compatible semantic extension.
+- **Summary:** Approved optional normalized structural comparison semantics
+  inside `PredicateSchema.value_semantics`, including equality capability and
+  Integer-only ordered comparison. Comparison is permitted only after local
+  validity, explicit capability, and identical normalized comparison semantics;
+  otherwise the result is `NOT COMPARABLE`, not false.
+- **Affected semantics:** `representation_profile = h'03'` and PSCID suite
+  `h'03'` are permanently assigned to the approved v1.2 Predicate Schema
+  canonicalization closure. Approved DIGEST-001 v0.3 fixes its framing,
+  SHA-256 construction, exact 33-octet identity layout, and anchors.
+- **Compatibility:** Valid v1.1 schemas without `comparison` retain identical
+  canonical bytes. PSCID-1 `h'01'` and the v1.1 `h'02'` profile/suite remain
+  unchanged. This change introduces no `Quantity`, `Money`, `Currency`, `Unit`,
+  or `ValueDomain` primitive, cross-domain conversion, generic arithmetic,
+  trust inference, historical-identity supersession, or resolution of Draft
+  RFC-005 generic digest infrastructure.
+- **Authority:** Accepted RFC-010/ADR-010 and RFC-008/ADR-008.
 
 ## 2026-08-30 — Predicate Schema v1.1 and PSCID v0.2 approval
 

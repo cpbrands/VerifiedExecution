@@ -1,13 +1,13 @@
 ---
 id: DIGEST-001-PREDICATE-SCHEMA-CONTENT-IDENTITY
 title: DIGEST-001 Predicate Schema Content Identity
-version: "0.2"
+version: "0.3"
 status: Approved
 document_type: Specification
 category: Representation
 author: Verified Execution Editorial Board
 created: 2026-08-28
-updated: 2026-08-30
+updated: 2026-09-02
 depends_on:
   - ADR-ENC-001
   - PREDICATE-SCHEMA-CANONICAL-REPRESENTATION-PROFILE
@@ -28,8 +28,10 @@ superseded_by: null
 
 ## Status and authority boundary
 
-This is an Approved Predicate-Schema-specific representation specification for
-deriving portable content identity from canonical Predicate Schema bytes. It
+This Approved v0.3 Predicate-Schema-specific representation specification
+derives portable content identity from canonical Predicate Schema bytes.
+Approved v0.2 remains authoritative for its historical construction. This v0.3
+revision permanently assigns the v1.2 successor construction and its codes. It
 resolves the scoped PSCID content-identity decision recorded as `PSCID-001` in
 the Open Decision Register; it does not resolve the broader generic
 `DIGEST-001` work owned by Draft RFC-005.
@@ -52,9 +54,9 @@ profile-valid Predicate Schema
         -> Predicate Schema content identity
 ~~~
 
-It preserves PSCID-1 exactly and defines the permanent `h'02'` suite/profile
-construction for the separately frozen external-subject v1.1 closure. Neither
-construction changes an existing PSCID-1 identity.
+It preserves PSCID-1 exactly and preserves the permanent `h'02'` suite/profile
+construction for the external-subject v1.1 closure. The v1.2 construction
+changes neither historical construction.
 
 The identity is for immutable **Predicate Schema semantic content**. It is not
 a document identity, publisher identity, alias, version label, retrieval URL,
@@ -76,7 +78,7 @@ canonical bytes appear alike.
 
 ### Verdict
 
-**A. PSCID-1 AND PSCID SUITE `h'02'` IDENTITY CONSTRUCTIONS CLOSED.**
+**A. PSCID v1.2 SUCCESSOR CONSTRUCTION AND `h'03'/h'03'` BINDING ARE CLOSED.**
 
 Raw `digest(canonical_bytes)` is insufficient because canonical bytes alone do
 not state which Predicate Schema representation profile or digest construction
@@ -361,6 +363,66 @@ remains distinct from the PSCID-1 identity. Equality is exact
 equality, latest-profile interpretation, downgrade substitution, or migration
 alias is introduced.
 
+### 6.4 Permanent v1.2 code assignments
+
+An audit of freshly fetched authoritative `origin/main` and all reachable refs
+on 2026-09-01 found `h'03'` to be the smallest value without an assigned or
+reserved meaning in each PSCID-local table. Existing occurrences treated it as
+unknown or explicitly unallocated. This coordinated approval permanently
+assigns:
+
+| Table | Permanent value | Status |
+|---|---|---|
+| Representation profile | `h'03'` | Permanently assigned to the v1.2 closure in Section 6.5. |
+| PSCID suite | `h'03'` | Permanently assigned to the construction in Section 6.6. |
+
+These local codes are immutable, append-only, historically retained, and MUST
+NOT be reassigned or reinterpreted. Other unknown codes continue to fail closed.
+
+### 6.5 Immutable v1.2 representation-profile closure
+
+`representation_profile = h'03'` denotes exactly
+this frozen byte-producing closure:
+
+- Predicate Schema Semantic Contract **v1.2 Approved**;
+- Predicate Schema Canonical Representation Profile **v1.2 Approved**;
+- Predicate Schema Field-Semantic Representation Grammar **v1.0 Approved**;
+  and
+- ADR-ENC-001 / VE-CBOR-1 **v0.1 Accepted**.
+
+The first two Approved artifacts are located in repository
+commit `06ecffcca4a5f1c83503ee2ede10456706955ae2`. That commit identifier is an
+audit locator, not part of the semantic profile or canonical bytes. Claim
+Reference Semantics, VE-002, RFC-010, ADR-010, DIGEST-001 itself, vectors,
+validators, and the security review are outside the byte-producing closure.
+
+The v1.2 closure adds only the optional closed `value_semantics.comparison`
+structure defined by those specifications. It introduces no `ValueDomain`
+primitive, registry, resolver, semantic-fragment identity, conversion system,
+or generic digest primitive.
+
+### 6.6 Permanent v1.2 PSCID construction
+
+Let `C` be canonical bytes from the Section 6.5 closure. The permanent
+construction is exactly:
+
+~~~ini
+frame = VE-CBOR-1([
+  bstr h'5645505343494431',
+  bstr h'03',
+  bstr h'03',
+  bstr C
+])
+
+digest   = SHA-256(frame)
+identity = h'03' || digest
+~~~
+
+The permanent PSCID framing, raw SHA-256 output, 33-octet layout, exact
+identity-byte equality, collision handling, trust boundary, and no-cross-suite
+equivalence rules are unchanged. This successor does not reinterpret either
+historical suite.
+
 ## 7. Offline operation, migration, and downgrade handling
 
 An implementation can recompute and verify a PSCID-1 identity offline using
@@ -558,6 +620,35 @@ The independent validators also test these required confusion cases:
 | N4 — unknown suite | An unassigned carried suite code fails closed. |
 | N5 — frame-field substitution | Altering a framed suite, profile, magic, or other frame element without recomputing the identity is invalid. |
 
+### 10.4 Approved v1.2 anchors and confusion cases
+
+The Approved v1.2 vectors independently derive these exact anchors in Node.js
+and Python under permanent suite/profile `h'03'/h'03'`:
+
+| Anchor | Coverage | `C` octets | Frame octets | SHA-256 digest | 33-octet identity |
+|---|---|---:|---:|---|---|
+| A | Ordered Integer comparison with structural CAD domain | 358 | 375 | `2ff55e9de79fae803c62de0bfcd14632a19cc007039f7bd2c16fb01bd54df010` | `032ff55e9de79fae803c62de0bfcd14632a19cc007039f7bd2c16fb01bd54df010` |
+| B | Equality-only Text comparison semantics | 211 | 227 | `6c1653e4a2d10b5bb1de6e070406888510cd805633fbcf2ebeb6a7e07d89fa0b` | `036c1653e4a2d10b5bb1de6e070406888510cd805633fbcf2ebeb6a7e07d89fa0b` |
+| C | Legacy Boolean schema, byte-identical to Approved v1.1 Anchor C | 94 | 110 | `cfd11fb27684b51ca191d1c1a39b11f62180c6c2e9d4fcac7bf2dabb542de3f2` | `03cfd11fb27684b51ca191d1c1a39b11f62180c6c2e9d4fcac7bf2dabb542de3f2` |
+| D | Nested Record/Sequence value and structural comparison domain | 562 | 579 | `aa9513dc1e22b93ba4166cd8846e7fc687afd3a81474ae8201395500c541ba17` | `03aa9513dc1e22b93ba4166cd8846e7fc687afd3a81474ae8201395500c541ba17` |
+
+For Anchor C, `C_v1.1 == C_v1.2`, while its permanent `h'02'` identity
+`021f2ba2e17d8589cfc976e7284f869b47349902b21d15222bed967aae1779f03d`
+differs from the v1.2 identity above solely because the frame binds a
+different suite/profile. Exact 33-octet equality remains the only PSCID
+equality rule; no cross-suite equivalence is inferred.
+
+The validators also require N1 v1.2 relabeling as `h'02'`, N2
+wrong profile, N3 forced `h'02'` verification, N5 substituted frame, N6
+historical `h'02'` identity under the v1.2 suite, N7 CAD-to-USD comparison
+domain mutation, N8 deleted comparison semantics, and N9 predicate-local bound
+mutation to fail as `identity-mismatch`. N4 uses unknown `h'04'` and fails as
+`unknown-suite`. A separate ordered-flag mutation also fails as
+`identity-mismatch`. N9 additionally proves that bounds may be excluded from
+comparison compatibility while remaining bound into the entire Predicate
+Schema identity. PSCID-1 Anchor C and the permanent `h'02'` A/C/D anchors are
+replayed exactly and remain unchanged.
+
 ## 11. Architectural Decision Test
 
 | Test | Result |
@@ -579,18 +670,21 @@ The independent validators also test these required confusion cases:
 | New generic normative abstraction? | No. This is a Predicate-Schema-specific representation construction. |
 | RFC required now? | No additional RFC. Accepted RFC-007/ADR-007 and RFC-008/ADR-008 authorize this coordinated revision. |
 | ADR required now? | No. ADR-ENC-001 remains the canonical-encoding authority. |
-| Approved-specification revision required? | Complete: DIGEST-001 v0.2 and the affected Predicate Schema v1.1 specifications are Approved together. |
-| Correct normative home | This standalone Approved Predicate Schema content-identity specification. |
+| Approved-specification revision required? | Complete in this v0.3 approval. Approved v0.2 remains authoritative for historical `h'02'` identities. |
+| Correct normative home | This standalone Predicate Schema content-identity specification. |
 
-PSCID-1 remains authoritative and unchanged. Section 6 permanently assigns the
-v1.1 frame, digest, identity, and confusion evidence to `h'02'`. The required
-independent review, exact code audit, conformance vectors, and coordinated
-governance approval specified by Accepted RFC-008 and ADR-008 are complete.
+PSCID-1 and permanent suite/profile `h'02'/h'02'` remain authoritative and
+unchanged. Sections 6.4–6.6 and 10.4 are authoritative v1.2 definitions. Future
+suites require a fresh code audit, independent security review, exact anchors,
+two implementations, negative tests, and coordinated governance under Accepted
+RFC-008 and ADR-008.
 
 ## Revision history
 
 | Version | Date | Change |
 |---|---|---|
+| 0.3 | 2026-09-02 | Status transitioned from Draft to Approved: permanently assigned profile `h'03'` and PSCID suite `h'03'` to the immutable v1.2 closure; anchors A–D, N1–N9, historical replay, and ordered-flag binding are authoritative; `h'01'` and `h'02'` remain unchanged. |
+| 0.3 | 2026-09-01 | Draft candidate added provisional, unassigned `h'03'/h'03'` evidence for the frozen v1.2 comparison-semantics closure, anchors A–D, historical replay, N1–N9, and the ordered-flag binding check; PSCID-1 and permanent `h'02'/h'02'` remain unchanged. |
 | 0.2 | 2026-08-30 | Draft candidate added the provisional `h'02'` profile/suite construction for the external-subject v1.1 closure and its identity anchors; PSCID-1 unchanged. |
 | 0.2 | 2026-08-30 | Status transitioned from Draft to Approved: permanently assigned profile `h'02'` and PSCID suite `h'02'` to the immutable v1.1 closure; anchors A/C/D and N1–N5 are authoritative conformance evidence; PSCID-1 unchanged. |
 | 0.1 | 2026-08-29 | Bound representation-profile `h'01'` to the approved Predicate Schema Canonicalization v1.0 closure. |
