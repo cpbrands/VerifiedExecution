@@ -1,13 +1,13 @@
 ---
 id: PREDICATE-SCHEMA-CANONICAL-REPRESENTATION-PROFILE
 title: Predicate Schema Canonical Representation Profile
-version: "1.1"
-status: Approved
+version: "1.2"
+status: Draft
 document_type: Specification
 category: Representation
 author: Verified Execution Editorial Board
 created: 2026-08-28
-updated: 2026-08-30
+updated: 2026-09-01
 depends_on:
   - ADR-ENC-001
   - PREDICATE-SCHEMA-SEMANTIC-CONTRACT
@@ -17,6 +17,8 @@ related_documents:
   - VE-CBOR-1-CLAIM-BODY-SCHEMA
   - VE-CLAIM-REFERENCE-SEMANTICS
   - RFC-005
+  - RFC-010
+  - ADR-010
   - SPECIFICATION-TASKS
 supersedes: null
 superseded_by: null
@@ -26,24 +28,23 @@ superseded_by: null
 
 ## Status and authority boundary
 
-This Approved v1.1 revision applies the accepted VE-CBOR-1 mechanics in
-`ADR-ENC-001` v0.1 to the normalized Predicate Schema semantic model.
-It uses the unchanged Approved
+This Draft v1.2 candidate applies the existing VE-CBOR-1 mechanics in
+`ADR-ENC-001` v0.1 to the optional comparison semantics authorized by Accepted
+RFC-010 and ADR-010. It uses the unchanged Approved
 `PREDICATE-SCHEMA-FIELD-SEMANTIC-REPRESENTATION-GRAMMAR` v1.0 for closed
-field-form structures and Approved `PREDICATE-SCHEMA-SEMANTIC-CONTRACT` v1.1
-for the `subject_domain` source composition, reference resolution, and
-semantic normalization authorized by Accepted RFC-007 and ADR-007. It does not
-amend Claim semantics, verification, Trust Context, Rule/Evaluate, or
-Action/Event ownership.
+field-form structures and the coordinated Draft
+`PREDICATE-SCHEMA-SEMANTIC-CONTRACT` v1.2 candidate for the fixed
+comparison-relevant classification and cross-predicate invariant. It does not amend Claim semantics,
+verification, Trust Context, Rule/Evaluate, or Action/Event ownership.
 
-Approved v1.0 remains authoritative. This Approved v1.1 revision does not change the
-normalized content or canonical VE-CBOR-1 bytes of a valid v1.0 Predicate
-Schema that does not use `subject_domain` or `ExternalSubjectReference`.
+Approved v1.1 remains authoritative and immutable. This Draft v1.2 candidate
+does not change normalized content or canonical VE-CBOR-1 bytes for any
+v1.1-valid Predicate Schema that omits `value_semantics.comparison`.
 
-This is an Approved VE-CBOR-1 Predicate Schema Profile v1.1. It creates neither
-a second canonicalization system nor a VE primitive, Claim-body field, universal
-identity ontology, universal time system, generic semantic-reference layer, or
-runtime wrapper.
+This is a Draft VE-CBOR-1 Predicate Schema Profile v1.2 candidate. It creates
+neither a second canonicalization system nor a VE primitive, Claim-body field,
+universal quantity or identity ontology, generic semantic-reference layer, or
+runtime wrapper. It allocates no representation-profile or PSCID suite code.
 
 The accepted Claim envelope remains unchanged:
 
@@ -95,19 +96,18 @@ No mutable branch name, repository URL, or Git revision is a normative part of
 this closure. `PREDICATE-SCHEMA-CANONICALIZATION-V1` supplies its normative
 conformance vectors; it does not alter this profile's rules.
 
-This Approved v1.1 revision adds optional `subject_domain` canonicalization and
-the fourth permitted `subject_constraints` member. Its machine-affecting
-closure is frozen with the Approved Semantic Contract v1.1, unchanged Grammar
-v1.0, and ADR-ENC-001 / VE-CBOR-1 v0.1. DIGEST-001 v0.2 permanently binds the
-closure to representation profile `h'02'` and PSCID suite `h'02'`; v1.0 vectors
-and bindings remain unchanged.
+Approved v1.1 adds optional `subject_domain` canonicalization and the fourth
+permitted `subject_constraints` member. Its permanent closure, profile `h'02'`,
+PSCID suite `h'02'`, vectors, and bytes remain unchanged. This Draft v1.2
+candidate adds only optional inline comparison content and does not alter or
+reinterpret either existing binding.
 
 ## 1. Architectural decision
 
 ### Verdict
 
-**A. CANONICAL BYTES FULLY DEFINED FOR THE BOUNDED PORTABLE SUBSET;
-THE COORDINATED V1.1 CLOSURE IS APPROVED.**
+**A. BOUNDED COMPARISON-SEMANTICS CANONICALIZATION IS SUFFICIENT WITHOUT A NEW
+GRAMMAR OR SEMANTIC OBJECT.**
 
 For every profile-valid normalized Predicate Schema, two independent
 implementations can derive identical canonical bytes without an
@@ -123,7 +123,7 @@ labels. Predicate Schema semantic validity is distinct from portable-profile
 validity. This profile defines canonical Predicate Schema bytes only when the
 normalized semantic content lies entirely within the supported portable subset.
 
-This Approved v1.1 portable profile is closed-world. A Predicate Schema is
+This Draft v1.2 portable profile candidate is closed-world. A Predicate Schema is
 portable-profile-valid only if every semantic rule affecting interpretation,
 validation, normalization, equality, units, time, or canonical value meaning is
 represented by the v1.0 closed field-semantic grammar and permitted by this
@@ -139,10 +139,9 @@ satisfiability analysis. At minimum, contradictory or integer-empty bounds,
 empty `allowed_values`, allowed-value members outside their base scalar domain,
 and sequence cardinality with `min_items > max_items` are invalid.
 
-Portable predicate identity for this Approved v1.1 profile is defined by the
-separately Approved DIGEST-001 v0.2 construction. This profile does not itself
-select a digest algorithm, digest domain, object-type framing, or
-predicate-identity envelope.
+Portable predicate identity for Approved v1.1 remains defined by Approved
+DIGEST-001 v0.2. This Draft does not select a digest algorithm, profile code,
+suite code, framing revision, or predicate-identity envelope for v1.2.
 
 ## 2. Relationship to VE-CBOR-1
 
@@ -267,11 +266,11 @@ The Approved `PREDICATE-SCHEMA-FIELD-SEMANTIC-REPRESENTATION-GRAMMAR` v1.0 is
 sufficient and unchanged. `subject_domain.identifier` reuses its existing
 `FieldForm` and normalization machinery; no new grammar family is introduced.
 
-For every valid v1.0 Predicate Schema that does not use `subject_domain` or
-`ExternalSubjectReference`, this v1.1 profile emits exactly the same
-normalized map and byte-for-byte identical canonical content `C` as v1.0. This
-is canonical-content compatibility only. It does not assert PSCID equality
-under any future v1.1 representation-profile or PSCID suite.
+For every valid v1.1 Predicate Schema that omits
+`value_semantics.comparison`, this Draft v1.2 profile emits exactly the same
+normalized map and byte-for-byte identical canonical content `C` as Approved
+v1.1. No new default or empty comparison map is emitted. This is
+canonical-content compatibility only; no v1.2 PSCID binding exists yet.
 
 ## 5. Canonical field-form node representation
 
@@ -607,11 +606,17 @@ source reference disappears before canonical content is emitted.
 ## 10. Value-semantics canonical representation
 
 
-value_semantics has exactly this closed map:
+In this Draft v1.2 candidate, value_semantics has exactly this closed map:
 
 ~~~text
 ValueSemantics := {
-  "value": FieldForm
+  "value": FieldForm,
+  "comparison"?: ComparisonSemantics
+}
+
+ComparisonSemantics := {
+  "domain": FieldForm,
+  "ordered": boolean
 }
 ~~~
 
@@ -620,26 +625,81 @@ domain, scalar vocabulary, numeric scale/range, record structure, and collection
 behavior. Value meaning remains Predicate Schema semantics; this map does not
 establish a VE-global value type system.
 
+The optional `comparison` member is inline structural semantic content, not a
+ValueDomain object, Quantity, Money, Currency, Unit, registry entry, external
+identifier, reference, or digest. The map is closed. Both members are required
+when `comparison` is present; no other member is permitted.
+
+`domain` reuses the existing normalized FieldForm encoding exactly as inline
+structural semantic descriptor material. It is not a runtime schema for the
+Claim value or a second runtime value field. Its entire normalized structure
+contributes to comparison-domain equality. Portable meaning cannot depend on
+undocumented publisher-private interpretation. A bare `"CAD"` label is
+insufficient where Canadian dollars and Customer Account Debit would otherwise
+collide; sufficiently distinguishing normalized structural material is
+required. Publisher identity, trust, namespaces, registries, resolvers, and
+external authorities do not repair an ambiguous descriptor.
+
+`ordered` is exactly a CBOR Boolean. Presence of `comparison` supplies equality
+capability through existing canonical equality for Boolean, Integer, Text,
+Bytes, Record, and Sequence forms. Composite equality recursively uses the
+complete normalized comparison-relevant structure. `ordered: true`
+additionally supplies ordered-comparison capability and is valid only for a
+top-level Integer value form. Boolean, Text, Bytes, Record, and Sequence forms
+with `ordered: true` fail profile admission. Canonical byte ordering is not
+semantic ordering. `ordered: false` is equality-only. No text capability name,
+operator array, custom function, or third state is admitted.
+
+### 10.1 Normalized comparison-relevant value form
+
+The normalized comparison-relevant value form is the existing normalized
+FieldForm after ignoring only Integer lower/upper bounds and Sequence
+`min_items`/`max_items`, which are predicate-local admissibility members.
+
+The form discriminator, Integer scale, scalar `allowed_values`, Record field
+names, Record presence and closedness, recursively classified Record children,
+Sequence element form, Sequence ordering and uniqueness, recursively classified
+Sequence children, and governed scalar normalization all remain
+comparison-relevant. No other member is removed.
+
+This is a fixed exhaustive specification rule. It is not an object, transform
+language, reusable abstraction, identifier, reference, or another grammar. It
+performs no rescaling, conversion, domain inference, label lookup, or unlisted
+normalization. The result is semantic comparison input and is not emitted as a
+second canonical member. The canonical Predicate Schema continues to emit the
+full `value` FieldForm plus the optional `comparison` map.
+
+For an invoked relation, normalized structural comparison semantics are exactly
+the tuple of the normalized comparison-relevant value form, normalized
+`comparison.domain`, and
+the `ordered` Boolean. Implementations compare that tuple by exact canonical
+structural equality after each Claim value passes the full local `value`
+FieldForm. Bounds and sequence cardinality may therefore differ without
+changing comparability. `allowed_values` remains comparison-relevant.
+
+Scale differences remain comparison-relevant. Absent scale and explicit zero first
+normalize to the same omitted form; any other difference yields `NOT
+COMPARABLE`. Numeric representation does not imply ordered capability.
+
 This map is canonical only when all value validation, normalization, equality,
 dimensionality, and collection semantics are fully represented by permitted
-FieldForm constraints and this v1.0 profile's rules. Validation may use only
-those constraints; normalization may use only this v1.0 profile-defined normalization;
-and equality is canonical-representation equality after that validation and
-normalization. Any additional semantic equality rule, including approximate,
+FieldForm constraints, the Approved Field-Semantic Representation Grammar
+v1.0, and this Draft v1.2 profile's rules. Validation may use only those
+constraints; normalization may use only this Draft v1.2 profile-defined
+normalization; and equality is canonical-representation equality after that
+validation and normalization. Any additional semantic equality rule, including approximate,
 tolerance-based, case-insensitive, domain-specific, custom, or unsupported
 normalized equivalence, MUST cause profile validation failure.
 
 There is no profile-level unit field, Unit object, unit reference, or unit
-registry. Unit meaning remains inside `value_semantics` and, at source
-composition, its existing `value_semantics_ref`. This v1.0 profile defines no
-finite governed unit vocabulary. Therefore, every explicit unit-bearing value
-semantic form is outside the v1.0 portable subset. Free-form labels such as
-`USD` or `metre` are not portable semantic identity under this profile.
+registry. A v1.2 comparison domain may use bounded FieldForm structure as exact
+semantic descriptor material, but no free text label alone becomes a global
+identity or universal unit meaning. Resource policy owns recognition and
+trust. No conversion or arithmetic semantics are admitted.
 
-For a v1.0 profile-valid numeric value, absence of unit semantics means
-**dimensionless**. It MUST NOT mean that a unit exists but is unspecified,
-inferred externally, implied by an alias, name, or documentation, or deferred
-to another system. Any such semantic claim MUST cause profile validation failure.
+For a schema without `comparison`, the Approved v1.1 dimensionless-by-absence
+rule remains unchanged. The optional comparison descriptor does not reinterpret
+that schema or introduce a runtime unit value.
 
 The merged grammar defines no general null form. Accordingly, this profile
 defines no universal null_like member and does not create one. An absent field
@@ -666,7 +726,7 @@ the allowed subset of the existing closed Claim subject-reference union. It
 MUST NOT encode Action/Event/external identifier values, identifier wire forms,
 subject-reference payloads, attempt grouping, a generic reference, or a new
 subject type. Any additional subject semantic constraint not represented by this
-closed subset is outside this Approved v1.1 portable profile and MUST
+closed subset is outside this Draft v1.2 portable profile and MUST
 fail validation.
 
 **Event dependency: non-blocking for Predicate Schema canonical bytes.**
@@ -677,7 +737,7 @@ Schema bytes under this profile.
 
 ## 12. Time-semantics portable boundary
 
-The v1.0 and Approved v1.1 bounded portable subsets admit exactly one canonical time state:
+The v1.0, Approved v1.1, and Draft v1.2 bounded portable subsets admit exactly one canonical time state:
 `time_semantics` is omitted. It means both Claim time fields are forbidden, and
 a Claim containing either `assertion_time` or `observation_time` is semantically
 invalid under that Predicate Schema; the field is not ignored.
@@ -690,7 +750,7 @@ bytes from an already absent source field.
 Present time semantics remain semantically possible under the broader Semantic
 Contract, but epoch, precision, UTC basis, leap-second handling, range, unit,
 and proposition-specific interpretation are not yet expressed by a finite
-governed portable vocabulary. Such content is outside the v1.0 portable
+governed portable vocabulary. Such content is outside the Draft v1.2 portable
 subset and MUST fail profile validation. This profile creates no TimeDomain,
 time-domain reference, or VE Time primitive.
 
@@ -718,6 +778,17 @@ subject-domain member, absent `identifier`, unsupported equality value, unknown
 identifier FieldForm, unsupported identifier normalization or validation, and
 every unknown subject-constraint member. Unsupported referenced subject-domain
 semantics cannot become portable through expansion.
+
+For Draft v1.2 comparison material, the same rule rejects an unknown
+comparison member, missing `domain` or `ordered`, a non-Boolean `ordered`
+value, an invalid or unsupported domain FieldForm, comparison material outside
+`value_semantics`, an opaque domain identifier or reference, and any implied
+ordering or normalization not defined by this profile. No unknown comparison
+content survives canonicalization.
+
+The rule also rejects `ordered: true` unless the top-level normalized
+comparison-relevant value form is IntegerForm. It rejects such ordering for
+Boolean, Text, Bytes, Record, and Sequence forms before canonicalization.
 
 There is no portable semantic metadata channel outside the closed structures in
 this profile. Annotations, metadata maps, opaque descriptors, comments,
@@ -755,11 +826,12 @@ order, bound representation, optionality rule, and recursive node form is fixed
 by this profile and ADR-ENC-001. This claim does not extend to Predicate Schemas
 outside the portable subset.
 
-This Approved v1.1 profile defines the canonical bytes bound to permanent
+Approved v1.1 defines the canonical bytes bound to permanent
 `representation_profile = h'02'` and PSCID suite `h'02'` by Approved
 DIGEST-001 v0.2. Approved v1.0 canonicalization, `representation_profile =
-h'01'`, and PSCID-1 remain unchanged. RFC-005 remains Draft and is not a
-normative dependency.
+h'01'`, and PSCID-1 remain unchanged. This Draft v1.2 candidate defines
+canonical bytes but makes no profile or suite assignment and does not amend
+DIGEST-001. RFC-005 remains Draft and is not a normative dependency.
 
 The relationship to RFC-005 is **B. CONCEPTUAL ALIGNMENT ONLY**. RFC-005 may
 eventually supply digest framing or a portable typed-reference structure, but
@@ -825,16 +897,31 @@ new subject-domain rejection rule. It does not make Claim-body portability,
 runtime-resolution infrastructure, trust, verification, or authorization
 Approved.
 
+The Draft v1.2 candidate vector package MUST additionally cover:
+
+- equality-only comparison semantics;
+- ordered scale-2 CAD descriptor semantics;
+- comparison convergence for identical comparison semantics with differing bounds;
+- an explicitly unordered Integer comparison domain;
+- exact v1.1 canonical-byte replay when `comparison` is absent;
+- rejection of unknown members, unsupported capability values, malformed
+  domain forms, duplicate or ambiguous comparison material, misplaced
+  comparison material, opaque domain identifiers or references, ambiguous
+  bare-label domains, ordered non-Integer forms, inferred ordering, and
+  unsupported normalization; and
+- RS-QTY-001 Q1–Q9 integration outcomes without encoding trust or conversion
+  as Predicate Schema semantics.
+
 ## 17. Architectural Decision Test
 
 | Test | Result |
 |---|---|
-| Founding Principles consistency | Pass. Canonical bytes make immutable semantics inspectable without altering authority. |
-| New primitive burden | Pass. This is representation machinery for Predicate Schema, not a primitive. |
-| Removability | VE-CBOR-1 mechanics, the unchanged fixed grammar, bounded subject-domain map, and normalization boundary are necessary; a second canonicalization system and generic reference layer are removable. |
-| Twenty-year durability | Pass, conditional on retaining semantic material, this profile, the grammar, and immutable identity framing. |
-| Independent implementability | Pass for the bounded portable subset under the Approved v1.1 vector package and DIGEST-001 v0.2 binding. |
-| Total conceptual complexity | Pass. One fixed VE-CBOR-1 profile and the existing FieldForm grammar avoid a second encoding system, grammar family, or identity ontology. |
+| Founding Principles consistency | Pass. Canonical comparison content is deterministic, fail closed, and separate from authority. |
+| New primitive burden | Pass. One inline map reuses FieldForm and creates no ValueDomain or runtime object. |
+| Removability | The domain/capability content and fixed comparison-relevant classification are necessary for Q1–Q9; duplicate representation/equality fields, a second grammar, ontology, registry, and conversion layer are removable. |
+| Twenty-year durability | Pass. Exact structural content has no publisher, resolver, namespace, market, or implementation dependency. |
+| Independent implementability | Pass for the Draft candidate under its closed maps, exhaustive comparison-relevant classification, candidate vectors, and VE-CBOR-1 rules. |
+| Total conceptual complexity | Pass. Reusing `value`, FieldForm, canonical equality, and scale avoids a second representation grammar and universal quantity system. |
 
 ## 18. Governance and normative home
 
@@ -844,27 +931,28 @@ Approved.
 | New Claim field? | No. |
 | New runtime abstraction? | No. |
 | New semantic abstraction? | No. Predicate Schema semantics remain the authority for meaning. |
-| RFC required? | No additional RFC. Accepted RFC-007/ADR-007 and RFC-008/ADR-008 authorize this v1.1 revision and its local PSCID binding. |
-| ADR required? | No additional ADR. ADR-ENC-001 remains the applicable canonical-encoding authority. |
-| Approved-specification revision required? | Complete. This Approved v1.1 revision supersedes v1.0 only where expressly stated. |
-| Correct normative home? | This Approved VE-CBOR-1 Predicate Schema representation profile v1.1. |
+| RFC required? | Complete for this Draft direction. Accepted RFC-010/ADR-010 authorize comparison semantics; RFC-008/ADR-008 govern any later identity allocation. |
+| ADR required? | Complete for architecture. ADR-010 records the semantic decision; ADR-ENC-001 remains the encoding authority. |
+| Approved-specification revision required? | Not yet. Approved v1.1 remains authoritative; this v1.2 candidate is Draft. |
+| Correct normative home? | This Draft VE-CBOR-1 Predicate Schema representation profile v1.2 candidate. |
 
 ## 19. Future evolution
 
 The unchanged field-semantic representation grammar is sufficient for this
-bounded v1.1 profile. Semantic forms outside the subset remain valid abstract
-Predicate Schema content but are not canonicalized by this profile. Future
-machine-affecting changes require a new governed profile revision,
-representation-profile code, PSCID suite/profile binding, and conformance
-evidence; they must not alter Approved v1.0 canonicalization, `h'01'`, or
-PSCID-1.
+bounded Draft v1.2 candidate. The new domain descriptor is a FieldForm, and the
+fixed comparison-relevant classification reuses FieldForm structure rather
+than extending its grammar. Eventual adoption requires a new immutable representation profile and
+PSCID suite under RFC-008/ADR-008 because the supported machine-affecting
+closure changes. No numeric code is selected or assumed available.
 
-No future change may reinterpret profile `h'02'` or PSCID suite `h'02'`.
+No future change may reinterpret profile `h'02'` or PSCID suite `h'02'`, alter
+Approved v1.1 bytes, or change PSCID-1.
 
 ## Revision history
 
 | Version | Date | Change |
 |---|---|---|
+| 1.2 | 2026-09-01 | Draft candidate under Accepted RFC-010/ADR-010: adds optional closed `value_semantics.comparison`, structural FieldForm domain content, Integer-only ordered capability, exhaustive comparison-relevant FieldForm classification, and v1.1 no-op byte preservation; no profile or PSCID suite code is allocated. |
 | 1.1 | 2026-08-30 | Approved coordinated revision under Accepted RFC-007/ADR-007 and RFC-008/ADR-008: adds optional `subject_domain`, source expansion, bounded `SubjectDomain` canonical form, and `ExternalSubjectReference` subject-constraint member; permanently binds the frozen v1.1 closure to profile `h'02'` and PSCID suite `h'02'` through Approved DIGEST-001 v0.2 and Approved v1.1 conformance vectors. Claim Reference Semantics v0.2 remains Draft. |
 | 1.0 | 2026-08-28 | Approved machine-behavior freeze for the bounded portable canonicalization profile; pins Grammar v1.0, Semantic Contract v1.0, and ADR-ENC-001 v0.1, with normative canonicalization vectors. |
 | 0.1 | 2026-08-28 | Revised Draft to define canonical bytes only for the bounded portable subset, with exhaustive closed-world admission before encoding. |
