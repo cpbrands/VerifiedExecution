@@ -1,13 +1,13 @@
 ---
 id: PREDICATE-SCHEMA-CANONICALIZATION-V1.2-CANDIDATE
-title: Predicate Schema Canonicalization v1.2 Candidate Vectors
-version: "0.1"
-status: Draft
+title: Predicate Schema Canonicalization v1.2 Vectors
+version: "1.2"
+status: Approved
 document_type: Conformance Vectors
 category: Conformance
 author: Verified Execution Editorial Board
 created: 2026-09-01
-updated: 2026-09-01
+updated: 2026-09-02
 depends_on:
   - PREDICATE-SCHEMA-SEMANTIC-CONTRACT
   - PREDICATE-SCHEMA-CANONICAL-REPRESENTATION-PROFILE
@@ -25,16 +25,16 @@ supersedes: null
 superseded_by: null
 ---
 
-# Predicate Schema Canonicalization v1.2 Candidate Vectors
+# Predicate Schema Canonicalization v1.2 Vectors
 
 ## Status and authority boundary
 
-These vectors are Draft candidate evidence for Draft Predicate Schema
-Semantic Contract v1.2 and Draft Canonical Representation Profile v1.2. They
-do not approve either specification, allocate a representation-profile or
-PSCID suite code, amend DIGEST-001, or reinterpret Approved v1.1 bytes.
+These Approved vectors are authoritative conformance evidence for Approved
+Predicate Schema Semantic Contract v1.2 and Approved Canonical Representation
+Profile v1.2. Approved DIGEST-001 v0.3 permanently binds representation-profile
+and PSCID suite code `h'03'`; Approved v1.1 bytes are not reinterpreted.
 
-The candidate shape under test is exactly:
+The v1.2 shape under test is exactly:
 
 ```text
 ValueSemantics {
@@ -123,7 +123,7 @@ a26d6973737565725f646f6d61696ea268657175616c6974796963616e6f6e6963616c6a6964656e
 This is byte-for-byte Approved v1.1 V1.1-C and Approved v1.0 V1-A. The two
 validators also directly replay Approved V1.1-A through V1.1-E, including
 inline/reference convergence and subject-constraint ordering. Every fixture
-retains its exact Approved bytes. The Draft v1.2 profile adds no empty/default
+retains its exact Approved bytes. The Approved v1.2 profile adds no empty/default
 member when `comparison` is absent.
 
 This replay does not assert PSCID equality under a future suite. It proves only
@@ -208,28 +208,24 @@ hexadecimal bytes, and final counts:
 PASS accepted=6 rejected=13 q=9 legacy=5
 ```
 
-## Draft PSCID v1.2 candidate evidence
+## Approved PSCID v1.2 evidence
 
 A fresh 2026-09-01 audit of authoritative `origin/main` and all reachable refs
 found `h'03'` to be the smallest unused and unreserved value in both PSCID-local
-tables. The validators therefore use `representation_profile = h'03'` and
-`suite = h'03'` solely as provisional candidate test values.
+tables. Approved DIGEST-001 v0.3 permanently assigns
+`representation_profile = h'03'` and `suite = h'03'`.
 
-**Provisional candidate code does not mean permanent assignment or
-reservation.** Approved code handling continues to treat the values as unknown
-until a future coordinated approval assigns them.
+The permanent profile is limited exactly to:
 
-The candidate profile is limited exactly to:
-
-- Predicate Schema Semantic Contract v1.2 Draft;
-- Predicate Schema Canonical Representation Profile v1.2 Draft;
+- Predicate Schema Semantic Contract v1.2 Approved;
+- Predicate Schema Canonical Representation Profile v1.2 Approved;
 - Predicate Schema Field-Semantic Representation Grammar v1.0 Approved; and
 - ADR-ENC-001 / VE-CBOR-1 v0.1 Accepted.
 
 Claim Reference, VE-002, RFC-010, ADR-010, DIGEST-001 itself, these vectors and
 validators, and the security review are not part of the byte-producing closure.
 
-The candidate construction is:
+The permanent construction is:
 
 ```ini
 frame = VE-CBOR-1([
@@ -254,7 +250,7 @@ Both implementations independently normalize each exact source, derive exact
 canonical `C`, construct the exact four-element frame, hash it, and compare the
 result with these fixed anchors:
 
-| Anchor | Coverage | `C` octets | Frame octets | SHA-256(frame) | Final candidate identity |
+| Anchor | Coverage | `C` octets | Frame octets | SHA-256(frame) | Final identity |
 |---|---|---:|---:|---|---|
 | A | Ordered Integer, structural CAD domain | 358 | 375 | `2ff55e9de79fae803c62de0bfcd14632a19cc007039f7bd2c16fb01bd54df010` | `032ff55e9de79fae803c62de0bfcd14632a19cc007039f7bd2c16fb01bd54df010` |
 | B | Equality-only Text comparison | 211 | 227 | `6c1653e4a2d10b5bb1de6e070406888510cd805633fbcf2ebeb6a7e07d89fa0b` | `036c1653e4a2d10b5bb1de6e070406888510cd805633fbcf2ebeb6a7e07d89fa0b` |
@@ -273,7 +269,7 @@ Anchor C is byte-for-byte identical to Approved v1.1 V1.1-C:
 ```text
 C_v1.1 == C_v1.2
 h'02' identity = 021f2ba2e17d8589cfc976e7284f869b47349902b21d15222bed967aae1779f03d
-h'03' candidate identity = 03cfd11fb27684b51ca191d1c1a39b11f62180c6c2e9d4fcac7bf2dabb542de3f2
+h'03' identity = 03cfd11fb27684b51ca191d1c1a39b11f62180c6c2e9d4fcac7bf2dabb542de3f2
 ```
 
 The identities differ solely because the suite/profile bytes in the frame
@@ -284,12 +280,12 @@ equivalence.
 
 | Case | Mutation | Required result |
 |---|---|---|
-| N1 | Relabel candidate identity externally as `h'02'` | `identity-mismatch` |
+| N1 | Relabel v1.2 identity externally as `h'02'` | `identity-mismatch` |
 | N2 | Candidate suite with representation profile `h'02'` | `identity-mismatch` |
-| N3 | Verify candidate identity through permanent `h'02'` suite | `identity-mismatch` |
+| N3 | Verify v1.2 identity through permanent `h'02'` suite | `identity-mismatch` |
 | N4 | Carry unknown suite `h'04'` | `unknown-suite` |
-| N5 | Check candidate identity against substituted frame/C | `identity-mismatch` |
-| N6 | Check historical `h'02'` identity under candidate suite | `identity-mismatch` |
+| N5 | Check v1.2 identity against substituted frame/C | `identity-mismatch` |
+| N6 | Check historical `h'02'` identity under v1.2 suite | `identity-mismatch` |
 | N7 | Change comparison domain from structural CAD semantics to structural USD semantics without changing identity | `identity-mismatch` |
 | N8 | Delete comparison semantics without changing identity | `identity-mismatch` |
 | N9 | Change a predicate-local upper bound without changing identity | `identity-mismatch` |
@@ -315,20 +311,19 @@ are not rewritten.
 
 ## Governance consequence
 
-The Draft v1.2 profile changes closed admission and can emit new canonical
-content when `comparison` is present. Eventual adoption therefore requires a
-new immutable representation-profile binding and a new PSCID suite under
-Accepted RFC-008/ADR-008, with security review and permanent vectors. The
-provisional `h'03'/h'03'` test values are selected only because the fresh audit
-found them available; they are not allocated, reserved, or authoritative.
+The Approved v1.2 profile changes closed admission and can emit new canonical
+content when `comparison` is present. The coordinated adoption permanently
+assigns immutable representation-profile and PSCID suite code `h'03'` under
+Accepted RFC-008/ADR-008, with security review and these permanent vectors.
 
 Approved v1.1 profile `h'02'`, suite `h'02'`, and PSCID-1 remain unchanged.
-No successor code is permanently selected. In particular, `h'03'` remains
-unallocated and unreserved outside this Draft candidate.
+Successor profile and suite code `h'03'` are permanently assigned to the exact
+frozen closure and construction documented here.
 
 ## Revision history
 
 | Version | Date | Change |
 |---|---|---|
+| 1.2 | 2026-09-02 | Approved the v1.2 canonicalization vectors and permanent `h'03'/h'03'` identity evidence without changing any canonical fixture or historical identity. |
 | 0.1 | 2026-09-01 | Added provisional `h'03'/h'03'` candidate anchors A–D, same-C cross-profile proof, historical PSCID replay, N1–N9, and the ordered-flag binding check without allocation. |
 | 0.1 | 2026-09-01 | Initial Draft candidate vectors for optional structural comparison semantics, Q1–Q9 integration, rejection behavior, and exact v1.1 canonical-byte replay. |

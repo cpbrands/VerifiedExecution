@@ -2,12 +2,12 @@
 id: PREDICATE-SCHEMA-SEMANTIC-CONTRACT
 title: Predicate Schema Semantic Contract
 version: "1.2"
-status: Draft
+status: Approved
 document_type: Specification
 category: Claim Semantics
 author: Verified Execution Editorial Board
 created: 2026-08-28
-updated: 2026-09-01
+updated: 2026-09-02
 depends_on: []
 related_documents:
   - CLAIM-BODY-SEMANTIC-FIELD-CONTRACT
@@ -27,14 +27,14 @@ superseded_by: null
 
 ## Status and authority boundary
 
-This Draft v1.2 candidate adds only the cross-predicate value-comparison
+This Approved v1.2 revision adds only the cross-predicate value-comparison
 semantics authorized by Accepted RFC-010 and ADR-010. It does not accept
 RFC-005, create a VE primitive, add a Claim-body field, define a universal
-quantity ontology, or allocate a representation-profile or PSCID suite code.
+quantity ontology, or introduce generic conversion or arithmetic.
 
-Approved v1.1 remains authoritative and immutable. This Draft does not alter
+Approved v1.1 remains historically authoritative and immutable. This revision does not alter
 the semantics of a v1.1-valid Predicate Schema that omits the new optional
-comparison extension. The coordinated Draft v1.2 Canonical Representation
+comparison extension. The coordinated Approved v1.2 Canonical Representation
 Profile preserves that schema's normalized content and canonical bytes.
 
 The accepted Claim envelope remains unchanged:
@@ -82,9 +82,11 @@ not machine-affecting dependencies of this v1.0 contract.
 
 Approved v1.1 supplies the semantic portion of the permanent v1.1 closure. The
 separately Approved Canonical Representation Profile v1.1 and DIGEST-001 v0.2
-define its portable representation and PSCID binding. This Draft v1.2
-candidate proposes new semantic content only; it does not encode CBOR,
-construct a digest, or alter the v1.1 closure.
+define its portable representation and PSCID binding. This Approved v1.2
+revision defines new semantic content only; the coordinated Approved Canonical
+Representation Profile v1.2 defines canonical bytes and Approved DIGEST-001
+v0.3 defines content identity. This contract does not encode CBOR, construct a
+digest, or alter the v1.1 closure.
 
 ## 1. Purpose
 
@@ -210,7 +212,7 @@ A schema MAY define structured values. It MUST define relevant structure, field 
 ### 5.1 Optional cross-predicate comparison semantics
 
 `value_semantics` MAY contain one optional inline `comparison` member. The
-field name is fixed for this Draft candidate after pressure-testing
+field name is fixed for v1.2 after pressure-testing
 `comparison_semantics`, a second representation grammar, whole-field equality,
 and external identifiers. The smallest semantic shape is:
 
@@ -629,10 +631,10 @@ profile remains unchanged and continues to define deterministic bytes only for
 its bounded portable subset. The Approved v1.1 Canonical Representation
 Profile and DIGEST-001 v0.2 separately define portable `subject_domain`, the
 fourth permitted `subject_constraints` member, profile `h'02'`, and PSCID suite
-`h'02'` for the coordinated v1.1 closure. The Draft v1.2 Canonical
-Representation Profile candidate defines deterministic bytes for the optional
-`comparison` extension without allocating a representation-profile or PSCID
-suite code.
+`h'02'` for the coordinated v1.1 closure. The Approved v1.2 Canonical
+Representation Profile defines deterministic bytes for the optional
+`comparison` extension, and Approved DIGEST-001 v0.3 permanently binds that
+closure to representation profile `h'03'` and PSCID suite `h'03'`.
 
 ## 12. Architectural Decision Test
 
@@ -642,7 +644,7 @@ suite code.
 | New primitive burden | Pass. Comparison content remains inside existing `value_semantics`; it creates no Quantity, Unit, ValueDomain, registry, or other primitive. |
 | Removability | Removing the extension loses deterministic Q1–Q9 evaluation; removing a second grammar, duplicate equality/scale fields, ontology, registry, or conversion layer loses no required capability. |
 | Twenty-year durability | Pass. Closed normalized structural equality does not depend on a publisher, registry, resolver, market source, or implementation language. |
-| Independent implementability | Pass for the candidate: implementations can validate locally, apply the exhaustive comparison-relevant classification, compare normalized structures, and fail closed. |
+| Independent implementability | Pass: implementations can validate locally, apply the exhaustive comparison-relevant classification, compare normalized structures, and fail closed. |
 | Total conceptual complexity | Pass. One two-member inline map and a fixed FieldForm classification are smaller than Quantity + Money + Currency + Unit + conversion machinery. |
 
 Predicate Schema remains a necessary non-primitive normative abstraction. It is not mere documentation metadata because implementations need it to interpret Claim bodies consistently. It is not a kernel primitive because it owns no independent execution, lifecycle, authorization, or authority semantics.
@@ -654,25 +656,27 @@ Predicate Schema remains a necessary non-primitive normative abstraction. It is 
 | New primitive? | No. |
 | New Claim field? | No. |
 | New normative abstractions? | No. Predicate Schema remains the existing non-primitive normative abstraction; reused field semantics are not separate architectural abstractions. |
-| RFC required? | Complete for this Draft direction. Accepted RFC-010 and ADR-010 authorize the v1.2 comparison candidate. |
-| Approved-specification revision required? | Not yet. Approved v1.1 remains authoritative; this v1.2 candidate is Draft. |
-| Correct normative home? | This standalone Draft Predicate Schema Semantic Contract v1.2 candidate. |
+| RFC required? | Complete. Accepted RFC-010 and ADR-010 authorize the v1.2 comparison semantics. |
+| Approved-specification revision required? | Complete through this coordinated v1.2 approval. |
+| Correct normative home? | This standalone Approved Predicate Schema Semantic Contract v1.2. |
 
 ## 14. Future evolution
 
 The coordinated v1.1 representation profile, profile code, PSCID suite, and
-conformance vectors remain Approved and unchanged. This Draft v1.2 candidate
-requires a new representation profile because profile admission and canonical
-bytes gain optional comparison content. Under RFC-008/ADR-008, eventual
-authoritative identity binding will require a new PSCID suite even though
-schemas omitting `comparison` preserve their canonical bytes. No numeric code
-is selected or assumed available. The work remains separate from CEL mapping,
+conformance vectors remain Approved and unchanged. The v1.2 extension requires
+a distinct representation profile because admission and canonical bytes gain
+optional comparison content. Under RFC-008/ADR-008, representation profile
+`h'03'` and PSCID suite `h'03'` are permanently assigned by the coordinated
+v1.2 adoption. Schemas omitting `comparison` preserve their canonical bytes,
+but identities remain suite-specific with no cross-suite aliasing. The work
+remains separate from CEL mapping,
 verification mechanics, trust policy, conversion, and a global registry.
 
 ## Revision history
 
 | Version | Date | Change |
 |---|---|---|
+| 1.2 | 2026-09-02 | Status transitioned from Draft to Approved in the coordinated v1.2 adoption; representation profile `h'03'`, PSCID suite `h'03'`, DIGEST-001 v0.3, and v1.2 conformance vectors are approved separately in the same atomic closure. Existing v1.1 semantics and bytes remain unchanged when `comparison` is omitted. |
 | 1.2 | 2026-09-01 | Draft candidate under Accepted RFC-010/ADR-010: adds optional inline structural `comparison` semantics inside `value_semantics`, exhaustive comparison-relevant FieldForm classification, equality/Integer-only ordered capability distinction, fail-closed cross-predicate invariant, and no profile or PSCID allocation. Approved v1.1 remains authoritative. |
 | 1.1 | 2026-08-30 | Approved coordinated v1.1 revision under Accepted RFC-007/ADR-007 and RFC-008/ADR-008: adds optional `subject_domain`, four-form subject constraints, external-subject validity, and contextual cross-predicate comparability; profile `h'02'`, PSCID suite `h'02'`, and the v1.1 canonicalization conformance vectors are approved separately in the same governed closure. Claim Reference Semantics v0.2 remains Draft. |
 | 1.0 | 2026-08-28 | Approved machine-behavior freeze for Predicate Schema source composition, reference resolution, normalization, and fail-closed semantics used by canonicalization v1.0. |
