@@ -19,6 +19,8 @@ related_documents:
   - RFC-010
   - ADR-010
   - PREDICATE-SCHEMA-CANONICALIZATION-V1.1
+  - DIGEST-001-PREDICATE-SCHEMA-CONTENT-IDENTITY
+  - SECURITY-REVIEW-PSCID-V1.2-CANDIDATE
 supersedes: null
 superseded_by: null
 ---
@@ -199,27 +201,134 @@ rejected cases, Q1–Q9 assertions, and the v1.1 replay:
 - `validate-predicate-schema-canonicalization-v1.2-candidate.mjs`
 - `validate-predicate-schema-canonicalization-v1.2-candidate.py`
 
-Both MUST emit identical A1–A5 lengths, diagnostic hashes, complete canonical
+Both MUST emit identical A1–A6 lengths, diagnostic hashes, complete canonical
 hexadecimal bytes, and final counts:
 
 ```text
 PASS accepted=6 rejected=13 q=9 legacy=5
 ```
 
+## Draft PSCID v1.2 candidate evidence
+
+A fresh 2026-09-01 audit of authoritative `origin/main` and all reachable refs
+found `h'03'` to be the smallest unused and unreserved value in both PSCID-local
+tables. The validators therefore use `representation_profile = h'03'` and
+`suite = h'03'` solely as provisional candidate test values.
+
+**Provisional candidate code does not mean permanent assignment or
+reservation.** Approved code handling continues to treat the values as unknown
+until a future coordinated approval assigns them.
+
+The candidate profile is limited exactly to:
+
+- Predicate Schema Semantic Contract v1.2 Draft;
+- Predicate Schema Canonical Representation Profile v1.2 Draft;
+- Predicate Schema Field-Semantic Representation Grammar v1.0 Approved; and
+- ADR-ENC-001 / VE-CBOR-1 v0.1 Accepted.
+
+Claim Reference, VE-002, RFC-010, ADR-010, DIGEST-001 itself, these vectors and
+validators, and the security review are not part of the byte-producing closure.
+
+The candidate construction is:
+
+```ini
+frame = VE-CBOR-1([
+  bstr h'5645505343494431',
+  bstr h'03',
+  bstr h'03',
+  bstr C
+])
+digest   = SHA-256(frame)
+identity = h'03' || digest
+```
+
+### Candidate identity anchors
+
+The source definitions of A, B, and C are A2, A6, and A5 above. Anchor D adds
+a nested Record value with required scale-2 bounded Integer `amount` and an
+optional unordered-unique Text Sequence `tags`; its structural comparison
+domain is a Record descriptor containing `PAYMENT` and `settlement record`.
+This exercises Record/Sequence normalization and comparison-map ordering.
+
+Both implementations independently normalize each exact source, derive exact
+canonical `C`, construct the exact four-element frame, hash it, and compare the
+result with these fixed anchors:
+
+| Anchor | Coverage | `C` octets | Frame octets | SHA-256(frame) | Final candidate identity |
+|---|---|---:|---:|---|---|
+| A | Ordered Integer, structural CAD domain | 358 | 375 | `2ff55e9de79fae803c62de0bfcd14632a19cc007039f7bd2c16fb01bd54df010` | `032ff55e9de79fae803c62de0bfcd14632a19cc007039f7bd2c16fb01bd54df010` |
+| B | Equality-only Text comparison | 211 | 227 | `6c1653e4a2d10b5bb1de6e070406888510cd805633fbcf2ebeb6a7e07d89fa0b` | `036c1653e4a2d10b5bb1de6e070406888510cd805633fbcf2ebeb6a7e07d89fa0b` |
+| C | Legacy Boolean schema | 94 | 110 | `cfd11fb27684b51ca191d1c1a39b11f62180c6c2e9d4fcac7bf2dabb542de3f2` | `03cfd11fb27684b51ca191d1c1a39b11f62180c6c2e9d4fcac7bf2dabb542de3f2` |
+| D | Nested Record/Sequence | 562 | 579 | `aa9513dc1e22b93ba4166cd8846e7fc687afd3a81474ae8201395500c541ba17` | `03aa9513dc1e22b93ba4166cd8846e7fc687afd3a81474ae8201395500c541ba17` |
+
+The complete canonical `C` bytes are emitted above for A–C and independently
+derived for D by both validators. In every case, the frame bytes are the unique
+VE-CBOR-1 encoding of the displayed four-element construction; the fixed frame
+length and SHA-256 anchor make any byte change fail validation.
+
+### Same-C cross-profile proof
+
+Anchor C is byte-for-byte identical to Approved v1.1 V1.1-C:
+
+```text
+C_v1.1 == C_v1.2
+h'02' identity = 021f2ba2e17d8589cfc976e7284f869b47349902b21d15222bed967aae1779f03d
+h'03' candidate identity = 03cfd11fb27684b51ca191d1c1a39b11f62180c6c2e9d4fcac7bf2dabb542de3f2
+```
+
+The identities differ solely because the suite/profile bytes in the frame
+differ. PSCID equality remains exact 33-octet equality. There is no cross-suite
+equivalence.
+
+### Candidate negative cases
+
+| Case | Mutation | Required result |
+|---|---|---|
+| N1 | Relabel candidate identity externally as `h'02'` | `identity-mismatch` |
+| N2 | Candidate suite with representation profile `h'02'` | `identity-mismatch` |
+| N3 | Verify candidate identity through permanent `h'02'` suite | `identity-mismatch` |
+| N4 | Carry unknown suite `h'04'` | `unknown-suite` |
+| N5 | Check candidate identity against substituted frame/C | `identity-mismatch` |
+| N6 | Check historical `h'02'` identity under candidate suite | `identity-mismatch` |
+| N7 | Change comparison domain from structural CAD semantics to structural USD semantics without changing identity | `identity-mismatch` |
+| N8 | Delete comparison semantics without changing identity | `identity-mismatch` |
+| N9 | Change a predicate-local upper bound without changing identity | `identity-mismatch` |
+
+The validators separately change `comparison.ordered` from `true` to `false`
+under Anchor A and require `identity-mismatch`. Together N7, that ordered-flag
+check, N8, and N9 prove that comparison domain, ordering capability, comparison
+presence, and predicate-local bounds each affect full canonical Predicate
+Schema `C`.
+
+N9 is deliberately not a comparison-incompatibility test. A2 and A3 retain
+identical comparison tuples and remain comparison-compatible even though their
+different upper bounds produce different full canonical Predicate Schema bytes
+and therefore different content identities:
+
+```text
+comparison compatibility projection != Predicate Schema content identity
+```
+
+The same independent paths replay PSCID-1 Anchor C and permanent `h'02'`
+Anchors A/C/D exactly. Historical vectors and Approved v1.1 canonicalization
+are not rewritten.
+
 ## Governance consequence
 
 The Draft v1.2 profile changes closed admission and can emit new canonical
 content when `comparison` is present. Eventual adoption therefore requires a
 new immutable representation-profile binding and a new PSCID suite under
-Accepted RFC-008/ADR-008, with security review and permanent vectors. No code
-is selected or assumed available by this candidate.
+Accepted RFC-008/ADR-008, with security review and permanent vectors. The
+provisional `h'03'/h'03'` test values are selected only because the fresh audit
+found them available; they are not allocated, reserved, or authoritative.
 
 Approved v1.1 profile `h'02'`, suite `h'02'`, and PSCID-1 remain unchanged.
-No successor code is selected; in particular, `h'03'` remains unallocated and
-unassumed.
+No successor code is permanently selected. In particular, `h'03'` remains
+unallocated and unreserved outside this Draft candidate.
 
 ## Revision history
 
 | Version | Date | Change |
 |---|---|---|
+| 0.1 | 2026-09-01 | Added provisional `h'03'/h'03'` candidate anchors A–D, same-C cross-profile proof, historical PSCID replay, N1–N9, and the ordered-flag binding check without allocation. |
 | 0.1 | 2026-09-01 | Initial Draft candidate vectors for optional structural comparison semantics, Q1–Q9 integration, rejection behavior, and exact v1.1 canonical-byte replay. |

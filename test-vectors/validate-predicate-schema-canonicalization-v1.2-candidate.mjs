@@ -299,4 +299,99 @@ for (const [name, source] of Object.entries(LEGACY)) assert.equal(encode(normali
 
 const legacy = encode(normalizeSchema(ACCEPTED.A5));
 assert.equal(legacy.toString("hex"), "a26d6973737565725f646f6d61696ea268657175616c6974796963616e6f6e6963616c6a6964656e746966696572a164666f726d64746578746f76616c75655f73656d616e74696373a16576616c7565a164666f726d67626f6f6c65616e", "v1.1 no-op replay");
+
+// Draft PSCID v1.2 candidate evidence. h'03' is provisional test data only.
+const MAGIC = Buffer.from("VEPSCID1", "ascii");
+const CANDIDATE_SUITE = 0x03;
+const CANDIDATE_PROFILE = 0x03;
+const suiteProfile = (suite) => {
+  if (suite === 0x01) return 0x01;
+  if (suite === 0x02) return 0x02;
+  if (suite === CANDIDATE_SUITE) return CANDIDATE_PROFILE;
+  fail("unknown-suite");
+};
+const suiteFrame = (c, suite, profile = suiteProfile(suite)) => encode([MAGIC, Buffer.from([suite]), Buffer.from([profile]), c]);
+const suiteDigest = (frame) => createHash("sha256").update(frame).digest();
+const suiteIdentity = (c, suite) => Buffer.concat([Buffer.from([suite]), suiteDigest(suiteFrame(c, suite))]);
+function verifyAsSuite(suite, identity, c) {
+  suiteProfile(suite);
+  if (!identity.equals(suiteIdentity(c, suite))) fail("identity-mismatch");
+  return true;
+}
+function verifyIdentity(identity, c) {
+  if (!Buffer.isBuffer(identity) || identity.length !== 33) fail("identity-mismatch");
+  return verifyAsSuite(identity[0], identity, c);
+}
+function verifySuppliedFrame(identity, suite, profile, c) {
+  if (suiteProfile(suite) !== profile) fail("identity-mismatch");
+  const expected = Buffer.concat([Buffer.from([suite]), suiteDigest(suiteFrame(c, suite, profile))]);
+  if (!identity.equals(expected)) fail("identity-mismatch");
+  return true;
+}
+
+const NESTED_ANCHOR = schema({
+  form: "record",
+  fields: {
+    amount: { presence: "required", grammar: integer(2, 0, 100000000) },
+    tags: { presence: "optional", grammar: { form: "sequence", element: { form: "text", allowed_values: ["priority", "settled"] }, ordering_significant: false, uniqueness: true, min_items: 0, max_items: 4 } },
+  },
+}, contextualMarker("PAYMENT", "settlement record"), false);
+const PSCID_ANCHORS = { A: ACCEPTED.A2, B: ACCEPTED.A6, C: ACCEPTED.A5, D: NESTED_ANCHOR };
+const PSCID_EXPECTED = {
+  A: { c: 358, frame: 375, digest: "2ff55e9de79fae803c62de0bfcd14632a19cc007039f7bd2c16fb01bd54df010", identity: "032ff55e9de79fae803c62de0bfcd14632a19cc007039f7bd2c16fb01bd54df010" },
+  B: { c: 211, frame: 227, digest: "6c1653e4a2d10b5bb1de6e070406888510cd805633fbcf2ebeb6a7e07d89fa0b", identity: "036c1653e4a2d10b5bb1de6e070406888510cd805633fbcf2ebeb6a7e07d89fa0b" },
+  C: { c: 94, frame: 110, digest: "cfd11fb27684b51ca191d1c1a39b11f62180c6c2e9d4fcac7bf2dabb542de3f2", identity: "03cfd11fb27684b51ca191d1c1a39b11f62180c6c2e9d4fcac7bf2dabb542de3f2" },
+  D: { c: 562, frame: 579, digest: "aa9513dc1e22b93ba4166cd8846e7fc687afd3a81474ae8201395500c541ba17", identity: "03aa9513dc1e22b93ba4166cd8846e7fc687afd3a81474ae8201395500c541ba17" },
+};
+const pscidCanonical = {};
+for (const [name, source] of Object.entries(PSCID_ANCHORS)) {
+  const c = encode(normalizeSchema(source));
+  const frame = suiteFrame(c, CANDIDATE_SUITE);
+  const digest = suiteDigest(frame);
+  const identity = suiteIdentity(c, CANDIDATE_SUITE);
+  pscidCanonical[name] = c;
+  assert.equal(c.length, PSCID_EXPECTED[name].c, `${name} C length`);
+  assert.equal(frame.length, PSCID_EXPECTED[name].frame, `${name} frame length`);
+  assert.equal(digest.toString("hex"), PSCID_EXPECTED[name].digest, `${name} digest`);
+  assert.equal(identity.toString("hex"), PSCID_EXPECTED[name].identity, `${name} identity`);
+  assert.equal(identity.length, 33, `${name} identity length`);
+  console.log(`PSCID-${name} C=${c.length} frame=${frame.length} digest=${digest.toString("hex")} identity=${identity.toString("hex")}`);
+}
+
+const HISTORICAL_PSCID1_C = Buffer.from(LEGACY_EXPECTED.get("V1.1-C"), "hex");
+const HISTORICAL_PSCID1_ID = "01634b3118ec88e36cf5eab44b86092e88f309fe918a99db460222fbd76946b80a";
+assert.equal(suiteIdentity(HISTORICAL_PSCID1_C, 0x01).toString("hex"), HISTORICAL_PSCID1_ID, "historical PSCID-1 Anchor C");
+const HISTORICAL_H02 = new Map([
+  ["A", [Buffer.from(LEGACY_EXPECTED.get("V1.1-A"), "hex"), "02038df64019001d19588a6d0d7910148b4f416baf34a4283258f7c0243538107f"]],
+  ["C", [HISTORICAL_PSCID1_C, "021f2ba2e17d8589cfc976e7284f869b47349902b21d15222bed967aae1779f03d"]],
+  ["D", [Buffer.from(LEGACY_EXPECTED.get("V1.1-D"), "hex"), "020d4c08b338d10559a20ebe123fe0b54d34d5dc581cde3e30319619ffa6a2d2cc"]],
+]);
+for (const [name, [c, expected]] of HISTORICAL_H02) assert.equal(suiteIdentity(c, 0x02).toString("hex"), expected, `historical h02 ${name}`);
+const candidateLegacyIdentity = suiteIdentity(HISTORICAL_PSCID1_C, CANDIDATE_SUITE);
+assert.notEqual(candidateLegacyIdentity.toString("hex"), HISTORICAL_H02.get("C")[1], "same C cross-profile identity separation");
+
+const candidateAIdentity = suiteIdentity(pscidCanonical.A, CANDIDATE_SUITE);
+const expectFailure = (name, expected, operation) => {
+  assert.throws(operation, (error) => error.message === expected, name);
+  console.log(`${name} ${expected}`);
+};
+expectFailure("N1", "identity-mismatch", () => verifyIdentity(Buffer.concat([Buffer.from([0x02]), candidateAIdentity.subarray(1)]), pscidCanonical.A));
+expectFailure("N2", "identity-mismatch", () => verifySuppliedFrame(candidateAIdentity, CANDIDATE_SUITE, 0x02, pscidCanonical.A));
+expectFailure("N3", "identity-mismatch", () => verifyAsSuite(0x02, candidateAIdentity, pscidCanonical.A));
+expectFailure("N4", "unknown-suite", () => verifyIdentity(Buffer.concat([Buffer.from([0x04]), candidateAIdentity.subarray(1)]), pscidCanonical.A));
+expectFailure("N5", "identity-mismatch", () => verifySuppliedFrame(candidateAIdentity, CANDIDATE_SUITE, CANDIDATE_PROFILE, pscidCanonical.B));
+expectFailure("N6", "identity-mismatch", () => verifyAsSuite(CANDIDATE_SUITE, Buffer.from(HISTORICAL_H02.get("C")[1], "hex"), HISTORICAL_PSCID1_C));
+const domainMutation = encode(normalizeSchema(schema(integer(2, 0, 100000000), USD_DOMAIN, true)));
+assert.equal(domainMutation.equals(pscidCanonical.A), false, "comparison-domain mutation changes C");
+expectFailure("N7", "identity-mismatch", () => verifyAsSuite(CANDIDATE_SUITE, candidateAIdentity, domainMutation));
+const withoutComparison = encode(normalizeSchema({ issuer_domain: ISSUER, value_semantics: { value: ACCEPTED.A2.value_semantics.value } }));
+assert.equal(withoutComparison.equals(pscidCanonical.A), false, "comparison deletion changes C");
+expectFailure("N8", "identity-mismatch", () => verifyAsSuite(CANDIDATE_SUITE, candidateAIdentity, withoutComparison));
+assert.equal(comparable(ACCEPTED.A2, ACCEPTED.A3, "le"), true, "bound mutation preserves comparison compatibility");
+assert.equal(canonical.A3.equals(pscidCanonical.A), false, "predicate-local bound mutation changes C");
+expectFailure("N9", "identity-mismatch", () => verifyAsSuite(CANDIDATE_SUITE, candidateAIdentity, canonical.A3));
+const orderedMutation = encode(normalizeSchema(schema(integer(2, 0, 100000000), CAD_DOMAIN, false)));
+assert.equal(orderedMutation.equals(pscidCanonical.A), false, "comparison-ordered mutation changes C");
+expectFailure("B1-ordered-mutation", "identity-mismatch", () => verifyAsSuite(CANDIDATE_SUITE, candidateAIdentity, orderedMutation));
 console.log(`PASS accepted=${Object.keys(ACCEPTED).length} rejected=13 q=9 legacy=5`);
+console.log("PASS PSCID candidate=4 historical-pscid1=1 historical-h02=3 negatives=9 critical-bindings=4 provisional=03/03");

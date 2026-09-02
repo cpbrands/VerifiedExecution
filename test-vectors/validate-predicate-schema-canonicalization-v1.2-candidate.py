@@ -353,4 +353,128 @@ for name, source in LEGACY.items():
 
 legacy = encode(normalize_schema(ACCEPTED["A5"]))
 assert legacy.hex() == "a26d6973737565725f646f6d61696ea268657175616c6974796963616e6f6e6963616c6a6964656e746966696572a164666f726d64746578746f76616c75655f73656d616e74696373a16576616c7565a164666f726d67626f6f6c65616e"
+
+# Draft PSCID v1.2 candidate evidence. h'03' is provisional test data only.
+MAGIC = b"VEPSCID1"
+CANDIDATE_SUITE = 0x03
+CANDIDATE_PROFILE = 0x03
+
+
+def suite_profile(suite: int) -> int:
+    if suite == 0x01:
+        return 0x01
+    if suite == 0x02:
+        return 0x02
+    if suite == CANDIDATE_SUITE:
+        return CANDIDATE_PROFILE
+    fail("unknown-suite")
+
+
+def suite_frame(canonical: bytes, suite: int, profile=None) -> bytes:
+    profile = suite_profile(suite) if profile is None else profile
+    return encode([MAGIC, bytes([suite]), bytes([profile]), canonical])
+
+
+def suite_digest(frame: bytes) -> bytes:
+    return hashlib.sha256(frame).digest()
+
+
+def suite_identity(canonical: bytes, suite: int) -> bytes:
+    return bytes([suite]) + suite_digest(suite_frame(canonical, suite))
+
+
+def verify_as_suite(suite: int, identity: bytes, canonical: bytes):
+    suite_profile(suite)
+    if identity != suite_identity(canonical, suite):
+        fail("identity-mismatch")
+    return True
+
+
+def verify_identity(identity: bytes, canonical: bytes):
+    if not isinstance(identity, bytes) or len(identity) != 33:
+        fail("identity-mismatch")
+    return verify_as_suite(identity[0], identity, canonical)
+
+
+def verify_supplied_frame(identity: bytes, suite: int, profile: int, canonical: bytes):
+    if suite_profile(suite) != profile:
+        fail("identity-mismatch")
+    expected = bytes([suite]) + suite_digest(suite_frame(canonical, suite, profile))
+    if identity != expected:
+        fail("identity-mismatch")
+    return True
+
+
+NESTED_ANCHOR = schema({
+    "form": "record",
+    "fields": {
+        "amount": {"presence": "required", "grammar": integer(2, 0, 100_000_000)},
+        "tags": {"presence": "optional", "grammar": {"form": "sequence", "element": {"form": "text", "allowed_values": ["priority", "settled"]}, "ordering_significant": False, "uniqueness": True, "min_items": 0, "max_items": 4}},
+    },
+}, contextual_marker("PAYMENT", "settlement record"), False)
+PSCID_ANCHORS = {"A": ACCEPTED["A2"], "B": ACCEPTED["A6"], "C": ACCEPTED["A5"], "D": NESTED_ANCHOR}
+PSCID_EXPECTED = {
+    "A": {"c": 358, "frame": 375, "digest": "2ff55e9de79fae803c62de0bfcd14632a19cc007039f7bd2c16fb01bd54df010", "identity": "032ff55e9de79fae803c62de0bfcd14632a19cc007039f7bd2c16fb01bd54df010"},
+    "B": {"c": 211, "frame": 227, "digest": "6c1653e4a2d10b5bb1de6e070406888510cd805633fbcf2ebeb6a7e07d89fa0b", "identity": "036c1653e4a2d10b5bb1de6e070406888510cd805633fbcf2ebeb6a7e07d89fa0b"},
+    "C": {"c": 94, "frame": 110, "digest": "cfd11fb27684b51ca191d1c1a39b11f62180c6c2e9d4fcac7bf2dabb542de3f2", "identity": "03cfd11fb27684b51ca191d1c1a39b11f62180c6c2e9d4fcac7bf2dabb542de3f2"},
+    "D": {"c": 562, "frame": 579, "digest": "aa9513dc1e22b93ba4166cd8846e7fc687afd3a81474ae8201395500c541ba17", "identity": "03aa9513dc1e22b93ba4166cd8846e7fc687afd3a81474ae8201395500c541ba17"},
+}
+pscid_canonical = {}
+for name, source in PSCID_ANCHORS.items():
+    c = encode(normalize_schema(source))
+    frame = suite_frame(c, CANDIDATE_SUITE)
+    digest = suite_digest(frame)
+    identity = suite_identity(c, CANDIDATE_SUITE)
+    pscid_canonical[name] = c
+    assert len(c) == PSCID_EXPECTED[name]["c"]
+    assert len(frame) == PSCID_EXPECTED[name]["frame"]
+    assert digest.hex() == PSCID_EXPECTED[name]["digest"]
+    assert identity.hex() == PSCID_EXPECTED[name]["identity"]
+    assert len(identity) == 33
+    print(f"PSCID-{name} C={len(c)} frame={len(frame)} digest={digest.hex()} identity={identity.hex()}")
+
+HISTORICAL_PSCID1_C = bytes.fromhex(LEGACY_EXPECTED["V1.1-C"])
+HISTORICAL_PSCID1_ID = "01634b3118ec88e36cf5eab44b86092e88f309fe918a99db460222fbd76946b80a"
+assert suite_identity(HISTORICAL_PSCID1_C, 0x01).hex() == HISTORICAL_PSCID1_ID
+HISTORICAL_H02 = {
+    "A": (bytes.fromhex(LEGACY_EXPECTED["V1.1-A"]), "02038df64019001d19588a6d0d7910148b4f416baf34a4283258f7c0243538107f"),
+    "C": (HISTORICAL_PSCID1_C, "021f2ba2e17d8589cfc976e7284f869b47349902b21d15222bed967aae1779f03d"),
+    "D": (bytes.fromhex(LEGACY_EXPECTED["V1.1-D"]), "020d4c08b338d10559a20ebe123fe0b54d34d5dc581cde3e30319619ffa6a2d2cc"),
+}
+for name, (c, expected) in HISTORICAL_H02.items():
+    assert suite_identity(c, 0x02).hex() == expected, name
+candidate_legacy_identity = suite_identity(HISTORICAL_PSCID1_C, CANDIDATE_SUITE)
+assert candidate_legacy_identity.hex() != HISTORICAL_H02["C"][1]
+
+
+def expect_failure(name: str, expected: str, operation):
+    try:
+        operation()
+    except ValueError as error:
+        assert str(error) == expected, name
+    else:
+        raise AssertionError(name)
+    print(f"{name} {expected}")
+
+
+candidate_a_identity = suite_identity(pscid_canonical["A"], CANDIDATE_SUITE)
+expect_failure("N1", "identity-mismatch", lambda: verify_identity(bytes([0x02]) + candidate_a_identity[1:], pscid_canonical["A"]))
+expect_failure("N2", "identity-mismatch", lambda: verify_supplied_frame(candidate_a_identity, CANDIDATE_SUITE, 0x02, pscid_canonical["A"]))
+expect_failure("N3", "identity-mismatch", lambda: verify_as_suite(0x02, candidate_a_identity, pscid_canonical["A"]))
+expect_failure("N4", "unknown-suite", lambda: verify_identity(bytes([0x04]) + candidate_a_identity[1:], pscid_canonical["A"]))
+expect_failure("N5", "identity-mismatch", lambda: verify_supplied_frame(candidate_a_identity, CANDIDATE_SUITE, CANDIDATE_PROFILE, pscid_canonical["B"]))
+expect_failure("N6", "identity-mismatch", lambda: verify_as_suite(CANDIDATE_SUITE, bytes.fromhex(HISTORICAL_H02["C"][1]), HISTORICAL_PSCID1_C))
+domain_mutation = encode(normalize_schema(schema(integer(2, 0, 100_000_000), USD_DOMAIN, True)))
+assert domain_mutation != pscid_canonical["A"]
+expect_failure("N7", "identity-mismatch", lambda: verify_as_suite(CANDIDATE_SUITE, candidate_a_identity, domain_mutation))
+without_comparison = encode(normalize_schema({"issuer_domain": ISSUER, "value_semantics": {"value": ACCEPTED["A2"]["value_semantics"]["value"]}}))
+assert without_comparison != pscid_canonical["A"]
+expect_failure("N8", "identity-mismatch", lambda: verify_as_suite(CANDIDATE_SUITE, candidate_a_identity, without_comparison))
+assert comparable(ACCEPTED["A2"], ACCEPTED["A3"], "le")
+assert CANONICAL["A3"] != pscid_canonical["A"]
+expect_failure("N9", "identity-mismatch", lambda: verify_as_suite(CANDIDATE_SUITE, candidate_a_identity, CANONICAL["A3"]))
+ordered_mutation = encode(normalize_schema(schema(integer(2, 0, 100_000_000), CAD_DOMAIN, False)))
+assert ordered_mutation != pscid_canonical["A"]
+expect_failure("B1-ordered-mutation", "identity-mismatch", lambda: verify_as_suite(CANDIDATE_SUITE, candidate_a_identity, ordered_mutation))
 print(f"PASS accepted={len(ACCEPTED)} rejected=13 q=9 legacy=5")
+print("PASS PSCID candidate=4 historical-pscid1=1 historical-h02=3 negatives=9 critical-bindings=4 provisional=03/03")
