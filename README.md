@@ -101,4 +101,6 @@ Every significant proposal must pass the Architectural Decision Test in `SPECIFI
 
 This repository contains draft and approved specification material. Each document's metadata determines its status. No implementation may claim conformance beyond the requirements of approved normative documents and completed mandatory profiles.
 
+For an evidence-based account of the repository audit and reconciliation process, see the [Repository audit case study](https://github.com/cpbrands/repository-clarity-portfolio/blob/main/case-studies/verified-execution.md).
+
 Licensing must be finalized before the first public standard release.
