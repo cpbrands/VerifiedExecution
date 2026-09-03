@@ -180,6 +180,16 @@ authorization; it does not authorize an executor to ignore Action semantics.
 This demonstrates that effect-changing execution-time validity normally belongs
 in Action semantic content.
 
+This applies to `execute_before`, `execute_after`, and `effective_at` constraints
+when they change whether execution is valid. Because those constraints are
+canonical semantic Action content, changing the temporal constraint changes the
+bounded Action semantics and therefore may change `action_digest`. In
+particular, `execute transfer before T1` and `execute transfer before T2` are
+different canonical bounded Actions when the two deadlines impose different
+semantic limits. A textual time change that leaves canonical Action semantics
+unchanged does not by itself imply different canonical bytes or a different
+digest.
+
 ## Authorization-time constraint
 
 Suppose the authority says, "this authorization is valid for ten minutes,"
@@ -207,6 +217,16 @@ Between `T1` and `T2`, two kinds of change can occur:
 
 RS-QTY-002 already places atomic state invariants with the authoritative state
 owner. Resource-state change is not evidence for re-running VE authorization.
+
+Authorization replay is not duplicate canonical state commitment. Presenting
+the same valid authorization artifact again does not itself authorize multiple
+committed state transitions. The authoritative execution/state domain owns
+atomic commitment, idempotency, and duplicate-transition prevention.
+
+An `UNCERTAIN` execution outcome does not mutate, consume, revoke, or implicitly
+invalidate the Execution Right. Right validity is not retry safety: only the
+authoritative execution/outcome state establishes whether another attempt is
+safe.
 
 ## Snapshot definition
 

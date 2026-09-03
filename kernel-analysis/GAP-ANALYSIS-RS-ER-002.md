@@ -93,6 +93,14 @@ constraint "authorization expires at T" does not make it irreducibly
 right-specific; placing it only in the right would create identical Actions
 with different permitted transitions.
 
+The same classification applies to `execute_before`, `execute_after`, and
+`effective_at` when they change execution validity. Because these are canonical
+semantic Action constraints, changing one changes the bounded Action semantics
+and therefore may change `action_digest`. For example, `execute transfer before
+T1` and `execute transfer before T2` are different canonical bounded Actions
+when `T1` and `T2` impose different semantic limits. A merely textual change
+that leaves canonical Action semantics unchanged does not imply a digest change.
+
 No independent core authorization-age field survives.
 
 ### TOCTOU
@@ -149,6 +157,17 @@ verification and avoids hidden policy or revocation services. Emergency
 revocation is weaker than P2, but P2's cost is duplicate live authority and
 loss of offline operation. Atomic/replay safety remains with the protected
 state domain under every model.
+
+Authorization replay is not duplicate canonical state commitment. Presenting
+the same valid authorization artifact again does not itself authorize multiple
+committed state transitions. The authoritative execution/state domain owns
+atomic commitment, idempotency, and duplicate-transition prevention, consistent
+with RS-QTY-002.
+
+An `UNCERTAIN` execution outcome does not mutate, consume, revoke, or implicitly
+invalidate the Execution Right. Right validity is not retry safety: only
+authoritative execution/outcome state establishes whether another attempt is
+safe.
 
 ## Primitive findings
 
