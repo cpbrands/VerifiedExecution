@@ -172,10 +172,14 @@ ADR-011 does not decide:
 - field encoding or VE-CBOR-1 map layout;
 - exact object/domain framing;
 - a verification profile or COSE, JWS, MAC, or signature selection;
-- verification-profile dispatch encoding;
+- verification-profile dispatch representation;
+- authenticated-coverage construction;
 - protected-header construction;
 - external associated data;
-- public error codes; or
+- parsing rules;
+- unknown-field, extension, or ignorable-field processing;
+- version negotiation;
+- concrete fail-closed processing or public error codes; or
 - conformance vectors.
 
 Those are future normative specification/profile concerns. Accepted
@@ -226,20 +230,14 @@ ADR-011 introduces no generic digest abstraction to conceal that dependency.
 
 ## 8. Security and failure implications
 
-Future normative work must fail closed for malformed representation,
-unsupported profile, profile/dispatch mismatch, authentication failure,
-unrecognized or unauthorized attester, `action_id` mismatch, `action_digest`
-mismatch, unsupported Action semantics, ambiguous parsing, unknown semantic
-fields, duplicate fields, ignored or trailing data, and cross-object relabeling.
+Verification and profile selection must not permit substitution that changes
+enforceability. A malformed, unauthenticated, ambiguously interpreted, or
+otherwise non-conforming artifact cannot establish enforceability.
 
-An initially unauthenticated dispatch hint is permissible only when successful
-authentication cryptographically confirms the same profile choice; mismatch
-fails closed. Unknown authenticated semantic fields fail closed unless the
-selected governed profile/version explicitly defines their interpretation.
-Profile-defined ignorable representation metadata may remain possible when its
-safe treatment is explicit and cannot affect enforceability.
-
-ADR-011 does not require a public error-code taxonomy.
+ADR-011 does not decide dispatch, bootstrap, hint handling, parser selection,
+unknown-field or extension behavior, ignorable metadata, version negotiation,
+concrete failure processing, or a public error-code taxonomy. Future governed
+specification/profile work defines those rules.
 
 ## 9. Alternatives considered
 
@@ -272,10 +270,13 @@ may define:
 - concrete structure and field encoding;
 - VE-CBOR-1 layout;
 - object/domain framing;
-- verification-profile dispatch and authenticated coverage;
+- verification-profile definition;
+- profile dispatch representation;
+- authenticated-coverage construction;
 - protected headers and external associated data;
-- parsing and unknown-field processing;
-- failure behavior; and
+- parsing rules;
+- unknown-field and extension processing;
+- concrete fail-closed processing; and
 - conformance vectors.
 
 That work remains blocked from claiming complete portability until VE-001 Action
