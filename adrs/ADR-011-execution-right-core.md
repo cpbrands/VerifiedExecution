@@ -2,7 +2,7 @@
 id: ADR-011
 title: Execution Right Core
 version: "0.1"
-status: Proposed
+status: Accepted
 document_type: ADR
 category: Authorization
 author: Verified Execution Editorial Board
@@ -26,12 +26,13 @@ superseded_by: null
 
 ## 1. Status and scope
 
-**Status:** Proposed
+**Status:** Accepted
 **Related RFC:** RFC-011 — Execution Right Core
 **Decision:** A. ACCEPT RFC-011 EXECUTION RIGHT CORE ARCHITECTURE.
 
-This Proposed ADR records the architectural decision supported by RS-ER-001,
-RS-ER-002, and RFC-011. It does not approve RFC-011, create or approve an
+This Accepted ADR is authoritative at its declared architectural scope and
+records the architectural decision supported by RS-ER-001, RS-ER-002, and
+RFC-011. It does not approve RFC-011, create or approve an
 Execution Right specification, modify VE-001, select a verification profile, or
 define a wire representation.
 
@@ -264,8 +265,8 @@ specification/profile work defines those rules.
 
 ## 11. Future normative boundary
 
-After RFC-011 and ADR-011 complete governance, future specification/profile work
-may define:
+After RFC-011 completes governance, future specification/profile work may
+define:
 
 - concrete structure and field encoding;
 - VE-CBOR-1 layout;
@@ -287,3 +288,4 @@ canonicalization and `action_digest` interoperability are resolved.
 | Version | Date | Change |
 |---|---|---|
 | 0.1 | 2026-09-03 | Initial Proposed ADR recording the four-part Execution Right core architecture from RS-ER-001, RS-ER-002, and RFC-011. |
+| 0.1 | 2026-09-04 | Status transitioned from Proposed to Accepted; decision and scope unchanged. |
