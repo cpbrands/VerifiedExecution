@@ -2,7 +2,7 @@
 id: RFC-011
 title: Execution Right Core
 version: "0.1"
-status: Proposed
+status: Accepted
 document_type: RFC
 category: Authorization
 author: Verified Execution Editorial Board
@@ -28,16 +28,16 @@ superseded_by: null
 
 ## 1. Status and narrow scope
 
-**Status:** Proposed
+**Status:** Accepted
 
-This RFC proposes the minimum semantic contract by which an independent
+This Accepted RFC records the minimum semantic contract by which an independent
 executor can determine whether an authentic authorization applies to one exact
 Action. It formalizes the Execution Right role already present in VE
 architecture; it does not approve an Execution Right specification, select a
 wire encoding or cryptographic mechanism, create an ADR, or modify VE-001 or
 another Approved specification.
 
-The proposed decision is:
+The accepted decision is:
 
 > Minimum Execution Right semantics consist of exact Action occurrence/content
 > binding. An enforceable artifact is an authenticated, domain-separated,
@@ -125,7 +125,7 @@ This RFC does not define:
 - a final encoding, signature algorithm, COSE profile, JWS profile, MAC, or raw
   signature construction.
 
-## 5. Proposed change
+## 5. Accepted architectural direction
 
 ### 5.1 Minimum semantic contract
 
@@ -252,7 +252,7 @@ bytes.
 ## 7. Issuer and verifier-local trust boundary
 
 A cryptographically valid signer is not necessarily an authorized Execution
-Right issuer. The proposed model is:
+Right issuer. The accepted model is:
 
 ```text
 verification establishes signer/credential validity
@@ -553,15 +553,15 @@ and reduces total conceptual complexity.
 
 ## 19. Specification impact
 
-There is no existing Execution Right specification to revise. If accepted,
-RFC-011 requires:
+There is no existing Execution Right specification to revise. This Accepted
+RFC, together with Accepted ADR-011, authorizes subsequent Draft
+specification/profile work. That work requires:
 
-1. ADR-011 recording the architectural decision;
-2. a new, narrowly scoped Execution Right specification defining the semantic
+1. a new, narrowly scoped Execution Right specification defining the semantic
    contract and its relationship to VE-001;
-3. a separately governed VE-CBOR-1 representation and verification profile
+2. a separately governed VE-CBOR-1 representation and verification profile
    decision, whether within that specification or a subordinate profile; and
-4. conformance vectors for binding, substitution resistance, malformed input,
+3. conformance vectors for binding, substitution resistance, malformed input,
    issuer recognition, and fail-closed behavior.
 
 VE-001 need not change merely to restate its existing Action-pair invariant.
@@ -584,7 +584,7 @@ An eventual conforming executor will need to:
   authoritative state commitment.
 
 No Rule engine, policy database, online VE callback, or mutable right store is
-required by the core proposal.
+required by the accepted core decision.
 
 ## 21. Architectural Decision Test
 
@@ -613,7 +613,7 @@ Field-level removability is:
 
 ## 22. Open questions
 
-The architectural minimum is proposed as closed. The following representation
+The architectural minimum is accepted as closed. The following representation
 and profile questions remain for subsequent governed work:
 
 1. flat versus authenticated-body envelope and exact map structure;
@@ -634,7 +634,7 @@ None of these questions justifies adding semantic fields to the minimum right.
 domain-separated representation of that pair and current verifier-local
 recognition of an authorized attester.**
 
-The minimum semantic candidate is:
+The accepted semantic minimum is:
 
 ```text
 ExecutionRightSemantics {
@@ -649,7 +649,14 @@ decision, while current verifier-local trust still governs artifact acceptance.
 Execution-time validity constraints belong in canonical Action semantics.
 Right validity remains distinct from state commitment and retry safety.
 
-The next step is independent audit of this corrected RFC-011. ADR-011 and
-specification work do not begin until the corrected RFC is audited and accepted.
-RFC-011 does not itself approve a normative wire format or modify an Approved
-specification.
+This Accepted RFC and Accepted ADR-011 authorize proceeding to Draft
+specification/profile work. RFC-011 does not itself approve a normative wire
+format, complete portable conformance, resolve VE-001 Action canonicalization
+or `action_digest` portability, or modify an Approved specification.
+
+## Revision history
+
+| Version | Date | Change |
+|---|---|---|
+| 0.1 | 2026-09-03 | Initial Proposed RFC defining the Execution Right core architecture. |
+| 0.1 | 2026-09-04 | Status transitioned from Proposed to Accepted; architecture, exclusions, and unresolved dependencies unchanged. |
