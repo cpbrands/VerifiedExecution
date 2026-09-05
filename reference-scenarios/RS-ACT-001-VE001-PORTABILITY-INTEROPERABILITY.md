@@ -372,4 +372,3 @@ The closure dependency is already stated by the profile and is satisfied by
 the explicit test-only schema in this scenario. Profile applicability is
 satisfied by existing governing context. The portability profile requires no
 revision, VE-001 requires no revision, and no RFC or ADR is required.
-
