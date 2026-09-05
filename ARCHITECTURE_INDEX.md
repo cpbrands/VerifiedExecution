@@ -77,7 +77,7 @@ allocate identifiers or override this table.
 | `VE-011` | Verification | Provisional/reserved | Draft VE-000 future specification family |
 | `VE-012` | Security Model | Provisional/reserved | Draft VE-000 future specification family |
 | `VE-013` | Conformance | Provisional/reserved | Draft VE-006 future specification association |
-| `VE-014` | Execution Right | Allocated; not yet instantiated | Accepted RFC-011 and ADR-011; specification file not yet created |
+| `VE-014` | Execution Right | Instantiated — Draft v0.1 | Accepted RFC-011 and ADR-011; VE-014 specification artifact exists |
 
 Historical references in Draft RFC-005 and non-normative kernel evidence that
 use `VE-007` for representation work are stale and non-allocating. This
