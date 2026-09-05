@@ -25,12 +25,12 @@ superseded_by: null
 
 # VE-014 — Execution Right Specification
 
-**Version:** 0.1  
-**Status:** Draft  
-**Category:** Authorization  
-**Identifier:** VE-014  
-**Project:** Verified Execution  
-**Change authority:** RFC-011; ADR-011  
+**Version:** 0.1
+**Status:** Draft
+**Category:** Authorization
+**Identifier:** VE-014
+**Project:** Verified Execution
+**Change authority:** RFC-011; ADR-011
 **Normative dependencies:** VE-001; ADR-ENC-001 / VE-CBOR-1
 
 ------------------------------------------------------------------------
