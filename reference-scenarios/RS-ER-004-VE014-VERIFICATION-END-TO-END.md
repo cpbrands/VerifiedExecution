@@ -519,5 +519,5 @@ No new primitive or semantic rule is required.
 ## 22. Cadence implication
 
 The next cadence artifact is the non-normative Gap Analysis for RS-ER-004. It
-should verify the no-gap finding and the ordinary replay/lifecycle dependency
+should verify the no-gap finding and the existing downstream replay/lifecycle ownership boundary
 before any profile lifecycle change is considered.
