@@ -293,7 +293,7 @@ Failures map to VE-014 as follows:
 | Unknown but unambiguous `verification.profile` | `UNSUPPORTED` | VE-014 dispatch |
 | Exact profile selected but protected `alg` is an unambiguous unsupported value | `UNSUPPORTED` | Profile dispatch |
 | Malformed/noncanonical artifact, wrong shape or width, extra metadata, trailing bytes, or ambiguity | `MALFORMED` | Profile parsing |
-| Correctly sized but noncanonical, undecodable, identity, low-order, torsion-bearing, or non-prime-order `A` or `R`; `S >= L`; invalid signature; wrong key; signature mutation; reconstructed-frame mismatch; or algorithm substitution | `AUTHENTICATION_FAILED` | Profile authentication |
+| Correctly sized but noncanonical, undecodable, identity, low-order, torsion-bearing, or non-prime-order `A` or `R`; `S >= L`; invalid signature; wrong key; signature mutation; or reconstructed-frame mismatch | `AUTHENTICATION_FAILED` | Profile authentication |
 | Authentication succeeds but the attester is not locally authorized for the applicable context | `ATTESTER_NOT_AUTHORIZED` | VE-014 after profile success |
 | Supplied Action occurrence differs | `ACTION_ID_MISMATCH` | VE-014 after authorization recognition |
 | Supplied Action semantic content differs | `ACTION_DIGEST_MISMATCH` | VE-014 after authorization recognition |
