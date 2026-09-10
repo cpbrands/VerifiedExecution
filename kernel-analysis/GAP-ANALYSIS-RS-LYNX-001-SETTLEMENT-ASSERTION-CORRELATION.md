@@ -430,6 +430,90 @@ to Action, Event, or Claim content identity. No Claim digest primitive is
 recommended. No broad RFC-005 acceptance is a prerequisite merely for filling
 already-owned representations.
 
+### 11.1 Existing Claim-body model and bounded time applicability
+
+The following records existing source contracts, not new Claim semantics.
+[Claim Body Semantic Field Contract §§1, 4, 6–9](../specifications/CLAIM-BODY-SEMANTIC-FIELD-CONTRACT.md)
+and [VE-CBOR-1 Claim Body Schema §4](../specifications/VE-CBOR-1-CLAIM-BODY-SCHEMA.md)
+record this six-field abstract body; both documents remain Draft:
+
+| Existing field | Abstract presence | Existing semantic owner / meaning |
+|---|---|---|
+| `subject_reference` | Required | Claim Reference Semantics owns the closed subject alternatives and their equality. |
+| `issuer_ref` | Required | Semantic issuer under the Predicate Schema's issuer domain; not verification-key identity and not a source of trust. |
+| `predicate` | Required | Existing immutable Predicate Schema content identity, using current DIGEST-001 / PSCID semantics. |
+| `value` | Required | Meaning, validation and equality are Predicate Schema-defined. |
+| `assertion_time` | Optional in the abstract contract | Schema-governed assertion time; applicability may forbid it. |
+| `observation_time` | Optional in the abstract contract | Schema-governed observation time; applicability may forbid it. |
+
+Current [Claim Reference Semantics v0.2 §§4–6](../specifications/VE-CLAIM-REFERENCE-SEMANTICS.md)
+already includes ActionContentReference, ActionOccurrenceReference,
+EventReference and ExternalSubjectReference. No fifth alternative or redesign
+is proposed. [DIGEST-001 §§5–6](../specifications/DIGEST-001-PREDICATE-SCHEMA-CONTENT-IDENTITY.md)
+already defines portable Predicate Schema identity; its Claim-side embedding
+remains representation work, not a new predicate string or namespace.
+
+Verification information is outside the body in the existing
+[ADR-VERIFY-002 envelope](../adrs/ADR-VERIFY-002-CLAIM-VERIFICATION-ENVELOPE.md):
+
+```text
+Claim {
+  body,
+  verification {
+    profile,
+    artifact
+  }
+}
+```
+
+The narrower current time result is explicit in
+[Approved Predicate Schema Canonical Representation Profile v1.2 §12](../specifications/PREDICATE-SCHEMA-CANONICAL-REPRESENTATION-PROFILE.md#12-time-semantics-portable-boundary):
+the supported bounded subset omits `time_semantics`, which means
+`assertion_time` is forbidden and `observation_time` is forbidden. A Claim
+containing either field is invalid under that Predicate Schema, not a Claim
+whose time field can simply be ignored.
+
+Consequently, the first Claim-body completion may stay within that existing
+bounded subset and encode only `subject_reference`, `issuer_ref`, `predicate`
+and `value` for admitted Claims. It does not need a universal timestamp
+representation. This does not remove either time field from abstract Claim
+semantics or mean that Claims can never contain time. Future time-supporting
+profiles remain possible under normal governance; none is defined here.
+
+The representation work remains mapping supported Predicate field forms to
+exact canonical runtime representations: subject-union encoding/discrimination,
+nested field/member rejection, Claim-side PSCID embedding, `issuer_ref` and
+`value` mappings, presence/null/default behavior, bounded time policy, nested
+unknown-field handling, and applicability/version interpretation. Existing
+top-level unknown-field rejection and absence-versus-null semantics are not
+reopened. Canonical positive and negative/rejection vectors, including
+independent Python/Node reconstruction, are recommended completion evidence.
+No new Claim-body field or wire form is selected by this analysis.
+
+### 11.2 Independent non-Lynx evidence of the existing dependency
+
+The non-normative
+[verified-Claim Rule/Evaluate input-mapping pressure test, Attack 3](PRESSURE-TEST-verified-claim-rule-evaluate-input-mapping.md)
+compares bank-balance Claims with the same subject, predicate and value but
+different banks. Their existing `issuer_ref` semantics can distinguish them
+for Rule evaluation; they are not interchangeable merely because the other
+fields match. This is non-Lynx evidence for preserving semantic issuer content,
+not a completed bank-balance wire format or a new issuer primitive.
+
+The current Draft
+[VE-CEL-1 Rule Evaluate Input Contract §10.2](../specifications/VE-CEL-1-RULE-EVALUATE-INPUT-CONTRACT.md#102-critical-dependency-result)
+separately identifies complete portable canonical `Claim.body` representation
+as its smallest blocking dependency. Its sequence is Claim semantics, then
+Claim-body canonical representation, then VE-CEL-1 binding. Thus independent
+construction and deterministic Rule/Evaluate interoperability already need
+portable Claim bodies outside Lynx. Body completion alone does not finish the
+remaining CEL binding or alter the accepted Rule ordering contract.
+
+RS-LYNX-001 did not create this dependency. It independently confirms and
+prioritizes a Claim-body portability dependency already exposed by non-Lynx
+Claim and Rule/Evaluate work, consistent with the existing specification tasks.
+This is not a claim that every VE subsystem is blocked by it.
+
 ## 12. Verification reuse and remaining profile work
 
 Accepted ADR-VERIFY-002 already supplies a reusable optional detached COSE
@@ -672,6 +756,30 @@ The immediate next artifact is completion of the **existing**
 Claim-body canonical representation profile. The YES for new subordinate
 specification concerns later Lynx-specific instantiation, not creation of a
 second shared representation specification or implementation in this task.
+
+The exact existing artifact and version recommendation are:
+
+| Item | Current artifact / recommendation |
+|---|---|
+| Path | `specifications/VE-CBOR-1-CLAIM-BODY-SCHEMA.md` |
+| Title | VE-CBOR-1 Claim Body Schema |
+| Identifier | `VE-CBOR-1-CLAIM-BODY-SCHEMA` |
+| Current status | Draft v0.1 |
+| Current role | Candidate representation specification for Claim-body structure and eventual canonical VE-CBOR-1 Claim-body bytes |
+| Recommended next drafting target | Draft v0.2: substantive completion of this existing Draft's delegated representation scope |
+
+Draft v0.2 is recommended because the completion would add
+interoperability-significant representation rules and vectors. This is a
+recommendation for this substantive Draft completion, not a general rule that
+every Draft modification requires a version increment. It neither changes the
+current Draft v0.1 nor creates a parallel representation profile, new general
+Claim specification, Claim primitive, or canonicalization architecture.
+
+The version recommendation does not itself trigger an RFC, ADR, Approved-spec
+revision, VE-xxx allocation, new primitive, or CHANGELOG requirement under
+Approved-specification change governance. The NO findings above remain
+conditional on drafting staying within the existing delegated scope without
+conflicting with an Approved specification or Accepted architectural decision.
 
 The future Draft's narrow acceptance questions are exact supported Claim body
 bytes, unambiguous closed-subject encoding, governed Predicate Schema reference
