@@ -2,7 +2,7 @@
 id: RFC-012
 title: Predicate Integer Canonical-Key Conformance Correction
 version: "0.1"
-status: Proposed
+status: Accepted
 document_type: RFC
 category: Representation
 author: Verified Execution Editorial Board
@@ -31,16 +31,17 @@ superseded_by: null
 
 ## 1. Status and authority boundary
 
-**Status:** Proposed
+**Status:** Accepted
 
-This RFC proposes a narrow governed correction to Approved DIGEST-001 v0.3,
+This Accepted RFC records the approved proposal for a narrow governed
+correction to Approved DIGEST-001 v0.3,
 the Approved Predicate Schema Canonicalization v1.2 conformance vectors, and
-their derived Python and Node validators. It is a proposal, not current
-authority. Repository inclusion, review, or merge does not itself change an
-Approved specification, canonical byte, PSCID, conformance result, or
-validator.
+their derived Python and Node validators. Acceptance authorizes the later
+coordinated correction together with Accepted ADR-012; it does not itself
+change an Approved specification, canonical byte, PSCID, conformance result,
+or validator.
 
-The proposal reaffirms the ownership already expressed by the Approved
+The accepted proposal reaffirms the ownership already expressed by the Approved
 Predicate Schema Canonical Representation Profile v1.2:
 
 ~~~text
@@ -56,9 +57,9 @@ conceptual Integer limits as `lower_bound` and `upper_bound`. Semantic
 concept labels and canonical serialized member names need not be identical.
 That difference is not the defect addressed here.
 
-This RFC does not authorize the correction. If accepted, a corresponding ADR
-and the governed revisions identified below are still required before any
-normative or conformance material changes.
+This RFC and Accepted ADR-012 authorize the later coordinated correction. The
+governed revisions identified below remain required before any normative or
+conformance material changes.
 
 ## 2. Context and problem statement
 
@@ -117,13 +118,13 @@ Rule/Evaluate input, or Reference Scenario embedding either anchor-A PSCID.
 That repository search does not establish whether an external deployment has
 used the nonconforming output.
 
-## 3. Proposed decision
+## 3. Accepted decision
 
 Adopt **Option A: retain `minimum` / `maximum` as the authoritative
 canonical Integer-node serialized keys and correct the conflicting downstream
 conformance material.**
 
-If accepted, the coordinated correction will:
+The later coordinated correction will:
 
 1. preserve Predicate Schema semantic meaning and equality;
 2. preserve the Field-Semantic Representation Grammar's conceptual
@@ -193,7 +194,7 @@ cryptographic framing, suite allocation, or the kernel primitive set.
 
 ### 5.1 Goals
 
-This proposal aims to:
+The accepted proposal aims to:
 
 - restore agreement between the canonical profile, DIGEST-001 anchors,
   conformance evidence, and validators;
@@ -225,7 +226,7 @@ This RFC does not propose:
 
 ## 6. Authority and immutable-suite consequences
 
-The proposed correction changes conformance statements and outputs, not the
+The accepted correction changes conformance statements and outputs, not the
 canonical recipe bound to `h'03'`.
 
 DIGEST-001 v0.3 defines `C` by reference to its frozen byte-producing
@@ -242,7 +243,7 @@ successor-profile/suite governance. This RFC does not authorize such a change.
 
 ## 7. Compatibility classification
 
-This proposal preserves:
+The accepted proposal preserves:
 
 | Dimension | Option A impact |
 |---|---|
@@ -272,7 +273,7 @@ governed representation and authentication processes.
 
 ### 8.1 Option A — preserve minimum / maximum
 
-**Proposed.** This option follows the existing representation owner, corrects
+**Accepted.** This option follows the existing representation owner, corrects
 downstream conformance material, preserves the frozen recipe, and adds no
 identity or migration mechanism.
 
@@ -312,7 +313,7 @@ byte equality and existing collision handling remain unchanged.
 
 ## 10. Complexity impact
 
-The proposal removes accidental dual behavior. It adds no runtime object,
+The accepted proposal removes accidental dual behavior. It adds no runtime object,
 field, service, identifier family, alias table, negotiation mechanism, or
 primitive. The implementation correction is local to canonicalization and
 conformance evidence.
@@ -323,7 +324,7 @@ risk.
 
 ## 11. Specification and artifact impact
 
-This RFC proposes the following exact future correction scope. It does not
+This RFC authorizes the following exact future correction scope. It does not
 modify these files itself.
 
 ### 11.1 Approved specification requiring revision
@@ -335,7 +336,7 @@ specifications/DIGEST-001-PREDICATE-SCHEMA-CONTENT-IDENTITY.md
 DIGEST-001 requires a governed version increment, corrected affected anchors,
 revision history, and references to the accepted RFC/ADR. A next minor
 revision such as v0.4 is plausible from repository progression, but this
-Proposed RFC does not make that version authoritative.
+Accepted RFC does not make that version authoritative.
 
 ### 11.2 Governed conformance artifact requiring revision
 
@@ -413,18 +414,17 @@ increment, revision history, CHANGELOG entry, and applicable conformance-test
 updates for an Approved-specification change. It provides no narrower erratum
 exception.
 
-The proposed sequence is:
+The accepted governance sequence is:
 
-1. review and accept this RFC;
-2. create and accept one corresponding ADR recording the existing canonical
-   ownership boundary and the selected correction;
-3. revise DIGEST-001 with a version increment;
-4. revise the governed v1.2 conformance-vector artifact;
-5. correct both derived validators;
-6. update CHANGELOG and the OPEN_DECISIONS current-version pointer;
-7. independently reproduce all affected and unaffected regression evidence;
-8. merge and verify the coordinated correction on authoritative main; and
-9. resume VE-CBOR-1 Claim Body Schema v0.2 work.
+1. RFC-012 and ADR-012 are accepted, recording the approved proposal and the
+   existing canonical ownership boundary and selected correction;
+2. revise DIGEST-001 with a version increment;
+3. revise the governed v1.2 conformance-vector artifact;
+4. correct both derived validators;
+5. update CHANGELOG and the OPEN_DECISIONS current-version pointer;
+6. independently reproduce all affected and unaffected regression evidence;
+7. merge and verify the coordinated correction on authoritative main; and
+8. resume VE-CBOR-1 Claim Body Schema v0.2 work.
 
 Until step 8 is complete, Claim Body Schema v0.2 remains blocked because its
 Predicate PSCID embedding cannot safely be finalized while an Approved
@@ -441,12 +441,12 @@ compatibility mechanism is required.
 | Primitive burden | Pass. No new primitive, registry, resolver, alias or identity form. |
 | Removability | Pass. No new architectural object is introduced; removing the correction would restore consequential ambiguity. |
 | Twenty-year durability | Pass. Fixed canonical keys and retained governance do not depend on a library, deployment or online service. |
-| Independent implementability | Pass for the proposal. Independent Python and Node reconstructions converge on the proposed existing recipe. |
+| Independent implementability | Pass for the accepted proposal. Independent Python and Node reconstructions converge on the retained existing recipe. |
 | Reduced conceptual complexity | Pass. One canonical representation replaces accidental dual behavior without compatibility machinery. |
 
 ## 15. Open questions
 
-The architecture and selected canonical keys are not open in this proposal.
+The architecture and selected canonical keys are not open in this accepted proposal.
 The coordinated correction review must still confirm:
 
 1. the exact next DIGEST-001 version number;
@@ -459,9 +459,9 @@ The coordinated correction review must still confirm:
 These questions do not reopen Predicate semantics, canonical representation
 ownership, suite/profile `h'03'/h'03'`, or the no-alias decision.
 
-## 16. Decision requested
+## 16. Accepted decision
 
-Accept Option A:
+Option A is accepted:
 
 > Preserve the existing canonical Predicate Integer members `minimum` and
 > `maximum`. Correct DIGEST-001, governed conformance evidence, and derived
@@ -471,12 +471,13 @@ Accept Option A:
 > value as nonconforming for anchor A; introduce no alias, primitive, registry,
 > or VE-xxx allocation.
 
-Acceptance of this RFC records the approved proposal only. The correction
-becomes authoritative through the corresponding accepted ADR and coordinated
-governed revisions.
+This Accepted RFC records the approved proposal. Accepted ADR-012 makes the
+architectural and governance decision authoritative; implementation remains
+pending in the coordinated governed revisions.
 
 ## Revision history
 
 | Version | Date | Change |
 |---|---|---|
 | 0.1 | 2026-09-11 | Initial Proposed RFC selecting Option A for the Predicate Integer canonical-key conformance correction. |
+| 0.1 | 2026-09-11 | Status transitioned from Proposed to Accepted; proposal, correction scope, compatibility analysis, and governance rationale unchanged. |
