@@ -1,13 +1,13 @@
 ---
 id: PREDICATE-SCHEMA-CANONICALIZATION-V1.2-CANDIDATE
-title: Predicate Schema Canonicalization v1.2 Vectors
-version: "1.2"
+title: Predicate Schema Canonicalization v1.2.1 Corrected Vectors
+version: "1.2.1"
 status: Approved
 document_type: Conformance Vectors
 category: Conformance
 author: Verified Execution Editorial Board
 created: 2026-09-01
-updated: 2026-09-02
+updated: 2026-09-11
 depends_on:
   - PREDICATE-SCHEMA-SEMANTIC-CONTRACT
   - PREDICATE-SCHEMA-CANONICAL-REPRESENTATION-PROFILE
@@ -21,18 +21,23 @@ related_documents:
   - PREDICATE-SCHEMA-CANONICALIZATION-V1.1
   - DIGEST-001-PREDICATE-SCHEMA-CONTENT-IDENTITY
   - SECURITY-REVIEW-PSCID-V1.2-CANDIDATE
+  - RFC-012
+  - ADR-012
 supersedes: null
 superseded_by: null
 ---
 
-# Predicate Schema Canonicalization v1.2 Vectors
+# Predicate Schema Canonicalization v1.2.1 Corrected Vectors
 
 ## Status and authority boundary
 
-These Approved vectors are authoritative conformance evidence for Approved
+These Approved v1.2.1 vectors are corrected authoritative conformance evidence
+for Approved
 Predicate Schema Semantic Contract v1.2 and Approved Canonical Representation
-Profile v1.2. Approved DIGEST-001 v0.3 permanently binds representation-profile
+Profile v1.2. Approved DIGEST-001 v0.4 retains the permanent representation-profile
 and PSCID suite code `h'03'`; Approved v1.1 bytes are not reinterpreted.
+The underlying canonical profile remains v1.2; `1.2.1` distinguishes this
+governed conformance correction from the previously published vector revision.
 
 The v1.2 shape under test is exactly:
 
@@ -102,8 +107,8 @@ The two independent validators derive these exact canonical-byte diagnostics:
 | Vector | Byte length | SHA-256(C), non-identity diagnostic |
 |---|---:|---|
 | A1 | 214 | `fb614c74738b12459e4704ab24dfe37301d03d1998f1e9df814382fb78179adf` |
-| A2 | 358 | `fe3f20b10be766caad7578903a988f45ca43b2cbac45c0500aad3b59ffd06d71` |
-| A3 | 358 | `e45f5ac64d78e43124a5b309a81987b81fe4265bb2650acd398955e0ebc12ce3` |
+| A2 | 350 | `a78f69ac6b31c52ad9fadc7ecdfe04b5bbce7586641632ea09d0aaa45e228c21` |
+| A3 | 350 | `970a039a7ba16b6e63e6ca017166677f9d6fa9aac9252896316b35779d7b5625` |
 | A4 | 220 | `06374be1dde652ba25c939cc03ff59add1cde4fce2141097b62c124689758d24` |
 | A5 | 94 | `95995a2460209edd02218538f85c1863d51ca8b46a456acfa8f734650c55779b` |
 | A6 | 211 | `a3dd539677bb78ee4f43d2d1a2ad33de3cfa0143b588f304bd3f6e7e1975d59a` |
@@ -150,7 +155,7 @@ or whole `value_semantics` equal.
 
 ## Rejected vectors
 
-| Vector | Candidate input/use | Required failure |
+| Vector | Input/use | Required failure |
 |---|---|---|
 | R1 | Unknown member inside `comparison` | Closed-map admission failure. |
 | R2 | `ordered: "yes"` | Unsupported capability value. |
@@ -171,7 +176,7 @@ metadata, looked up, interpreted by custom code, or normalized partially.
 
 ## RS-QTY-001 integration replay
 
-| Case | Candidate result |
+| Case | Required result |
 |---|---|
 | Q1 | A2/A3 tuple match; 4,875,000 <= 5,000,000 is true. |
 | Q2 | A2/A3 tuple match; 5,000,100 <= 5,000,000 is false. |
@@ -212,7 +217,7 @@ PASS accepted=6 rejected=13 q=9 legacy=5
 
 A fresh 2026-09-01 audit of authoritative `origin/main` and all reachable refs
 found `h'03'` to be the smallest unused and unreserved value in both PSCID-local
-tables. Approved DIGEST-001 v0.3 permanently assigns
+tables. Approved DIGEST-001 v0.4 retains the permanent assignments of
 `representation_profile = h'03'` and `suite = h'03'`.
 
 The permanent profile is limited exactly to:
@@ -238,7 +243,7 @@ digest   = SHA-256(frame)
 identity = h'03' || digest
 ```
 
-### Candidate identity anchors
+### Approved identity anchors
 
 The source definitions of A, B, and C are A2, A6, and A5 above. Anchor D adds
 a nested Record value with required scale-2 bounded Integer `amount` and an
@@ -252,10 +257,17 @@ result with these fixed anchors:
 
 | Anchor | Coverage | `C` octets | Frame octets | SHA-256(frame) | Final identity |
 |---|---|---:|---:|---|---|
-| A | Ordered Integer, structural CAD domain | 358 | 375 | `2ff55e9de79fae803c62de0bfcd14632a19cc007039f7bd2c16fb01bd54df010` | `032ff55e9de79fae803c62de0bfcd14632a19cc007039f7bd2c16fb01bd54df010` |
+| A | Ordered Integer, structural CAD domain | 350 | 367 | `9a4774bb744ee566229aac22caa89af19b2b72d0f72df7d9cf62bc5281f96603` | `039a4774bb744ee566229aac22caa89af19b2b72d0f72df7d9cf62bc5281f96603` |
 | B | Equality-only Text comparison | 211 | 227 | `6c1653e4a2d10b5bb1de6e070406888510cd805633fbcf2ebeb6a7e07d89fa0b` | `036c1653e4a2d10b5bb1de6e070406888510cd805633fbcf2ebeb6a7e07d89fa0b` |
 | C | Legacy Boolean schema | 94 | 110 | `cfd11fb27684b51ca191d1c1a39b11f62180c6c2e9d4fcac7bf2dabb542de3f2` | `03cfd11fb27684b51ca191d1c1a39b11f62180c6c2e9d4fcac7bf2dabb542de3f2` |
-| D | Nested Record/Sequence | 562 | 579 | `aa9513dc1e22b93ba4166cd8846e7fc687afd3a81474ae8201395500c541ba17` | `03aa9513dc1e22b93ba4166cd8846e7fc687afd3a81474ae8201395500c541ba17` |
+| D | Nested Record/Sequence | 554 | 571 | `ef45cac153df5390b7916bab7b0fbd3264c569cb6ffb91b68b3e21cae4b3fd54` | `03ef45cac153df5390b7916bab7b0fbd3264c569cb6ffb91b68b3e21cae4b3fd54` |
+
+The previously published Anchor A identity
+`032ff55e9de79fae803c62de0bfcd14632a19cc007039f7bd2c16fb01bd54df010`
+used nonconforming `lower_bound` / `upper_bound` serialized members. It is not
+an alias, legacy-valid identity, or alternate canonical result. The corrected
+vectors retain conceptual bound processing while emitting the canonical
+`minimum` / `maximum` members required by the unchanged v1.2 profile.
 
 The complete canonical `C` bytes are emitted above for A–C and independently
 derived for D by both validators. In every case, the frame bytes are the unique
@@ -276,12 +288,12 @@ The identities differ solely because the suite/profile bytes in the frame
 differ. PSCID equality remains exact 33-octet equality. There is no cross-suite
 equivalence.
 
-### Candidate negative cases
+### Approved negative cases
 
 | Case | Mutation | Required result |
 |---|---|---|
 | N1 | Relabel v1.2 identity externally as `h'02'` | `identity-mismatch` |
-| N2 | Candidate suite with representation profile `h'02'` | `identity-mismatch` |
+| N2 | Suite `h'03'` with representation profile `h'02'` | `identity-mismatch` |
 | N3 | Verify v1.2 identity through permanent `h'02'` suite | `identity-mismatch` |
 | N4 | Carry unknown suite `h'04'` | `unknown-suite` |
 | N5 | Check v1.2 identity against substituted frame/C | `identity-mismatch` |
@@ -324,6 +336,7 @@ frozen closure and construction documented here.
 
 | Version | Date | Change |
 |---|---|---|
+| 1.2.1 | 2026-09-11 | Corrected A2/A3 canonical diagnostics and Anchors A/D to emit canonical `minimum` / `maximum` bounded-Integer members under Accepted RFC-012/ADR-012; added v1.0 bounded-Integer regression replay; preserved the v1.2 canonical profile and suite/profile `h'03'/h'03'`. |
 | 1.2 | 2026-09-02 | Approved the v1.2 canonicalization vectors and permanent `h'03'/h'03'` identity evidence without changing any canonical fixture or historical identity. |
 | 0.1 | 2026-09-01 | Added provisional `h'03'/h'03'` candidate anchors A–D, same-C cross-profile proof, historical PSCID replay, N1–N9, and the ordered-flag binding check without allocation. |
 | 0.1 | 2026-09-01 | Initial Draft candidate vectors for optional structural comparison semantics, Q1–Q9 integration, rejection behavior, and exact v1.1 canonical-byte replay. |

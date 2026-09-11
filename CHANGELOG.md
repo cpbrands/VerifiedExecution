@@ -7,7 +7,7 @@ document_type: Changelog
 category: Governance
 author: Verified Execution Editorial Board
 created: 2026-08-22
-updated: 2026-09-02
+updated: 2026-09-11
 depends_on:
   - SPECIFICATION-GOVERNANCE
 supersedes: null
@@ -17,6 +17,22 @@ superseded_by: null
 # Verified Execution Repository Changelog
 
 This changelog records repository-wide semantic, governance, status, and structural changes. Specification-specific changelogs remain authoritative for changes to their specifications.
+
+## 2026-09-11 — Predicate Integer canonical-key conformance correction
+
+- **Specifications:** DIGEST-001 v0.4 and Predicate Schema Canonicalization
+  v1.2.1 corrected conformance vectors and validators.
+- **Classification:** Conformance correction under Accepted RFC-012/ADR-012.
+- **Summary:** Corrected bounded-Integer serialization in affected DIGEST
+  anchors, vector diagnostics, and Python/Node validators to emit canonical
+  `minimum` / `maximum` members instead of conceptual grammar names
+  `lower_bound` / `upper_bound`.
+- **Compatibility:** Predicate semantics and the Predicate Schema Canonical
+  Representation Profile v1.2 recipe do not change. PSCID suite/profile
+  `h'03'/h'03'` remains unchanged. Affected fixture PSCIDs are corrected; the
+  previously published nonconforming PSCID is not an alias or legacy-valid
+  identity.
+- **Authority:** Accepted RFC-012/ADR-012.
 
 ## 2026-09-02 — Predicate Schema v1.2 comparison semantics and PSCID v0.3 approval
 
