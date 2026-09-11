@@ -69,11 +69,11 @@ function normalizeField(form) {
       if (!Number.isSafeInteger(form.scale) || form.scale < 0) fail("scale");
       if (form.scale !== 0) result.scale = form.scale;
     }
-    if (form.lower_bound) result.lower_bound = normalizeBound(form.lower_bound);
-    if (form.upper_bound) result.upper_bound = normalizeBound(form.upper_bound);
-    if (result.lower_bound && result.upper_bound) {
-      const min = result.lower_bound.value + (result.lower_bound.inclusive ? 0 : 1);
-      const max = result.upper_bound.value - (result.upper_bound.inclusive ? 0 : 1);
+    if (form.lower_bound) result.minimum = normalizeBound(form.lower_bound);
+    if (form.upper_bound) result.maximum = normalizeBound(form.upper_bound);
+    if (result.minimum && result.maximum) {
+      const min = result.minimum.value + (result.minimum.inclusive ? 0 : 1);
+      const max = result.maximum.value - (result.maximum.inclusive ? 0 : 1);
       if (min > max) fail("empty-domain");
     }
     if (Object.hasOwn(form, "allowed_values")) {
@@ -251,8 +251,8 @@ function locallyValidInteger(source, value) {
   if (!Number.isSafeInteger(value)) return false;
   const form = normalizeSchema(source).value_semantics.value;
   if (form.form !== "integer") return false;
-  if (Object.hasOwn(form, "lower_bound") && (value < form.lower_bound.value || (value === form.lower_bound.value && !form.lower_bound.inclusive))) return false;
-  if (Object.hasOwn(form, "upper_bound") && (value > form.upper_bound.value || (value === form.upper_bound.value && !form.upper_bound.inclusive))) return false;
+  if (Object.hasOwn(form, "minimum") && (value < form.minimum.value || (value === form.minimum.value && !form.minimum.inclusive))) return false;
+  if (Object.hasOwn(form, "maximum") && (value > form.maximum.value || (value === form.maximum.value && !form.maximum.inclusive))) return false;
   return !Object.hasOwn(form, "allowed_values") || form.allowed_values.includes(value);
 }
 
@@ -297,10 +297,20 @@ const LEGACY = {
 };
 for (const [name, source] of Object.entries(LEGACY)) assert.equal(encode(normalizeSchema(source)).toString("hex"), LEGACY_EXPECTED.get(name), `${name} direct replay`);
 
+const BOUNDED_V1_EXPECTED = new Map([
+  ["V1-B", "a26d6973737565725f646f6d61696ea268657175616c6974796963616e6f6e6963616c6a6964656e746966696572a164666f726d64746578746f76616c75655f73656d616e74696373a16576616c7565a464666f726d67696e7465676572657363616c6502676d6178696d756da26576616c75651903e869696e636c7573697665f4676d696e696d756da26576616c75650069696e636c7573697665f5"],
+  ["V1-F", "a26d6973737565725f646f6d61696ea268657175616c6974796963616e6f6e6963616c6a6964656e746966696572a164666f726d64746578746f76616c75655f73656d616e74696373a16576616c7565a264666f726d67696e7465676572676d696e696d756da26576616c75650069696e636c7573697665f5"],
+]);
+const boundedV1B = { issuer_domain: ISSUER, value_semantics: { value: { form: "integer", scale: 2, lower_bound: { value: 0, inclusive: true }, upper_bound: { value: 1000, inclusive: false } } } };
+const boundedV1F = { issuer_domain: ISSUER, value_semantics: { value: { form: "integer", scale: 0, lower_bound: { value: 0, inclusive: true } } } };
+assert.equal(encode(normalizeSchema(boundedV1B)).toString("hex"), BOUNDED_V1_EXPECTED.get("V1-B"), "v1.0 V1-B bounded-Integer replay");
+assert.equal(encode(normalizeSchema(boundedV1F)).toString("hex"), BOUNDED_V1_EXPECTED.get("V1-F"), "v1.0 V1-F bounded-Integer replay");
+assert.deepEqual(Object.keys(normalizeSchema(boundedV1B).value_semantics.value).sort(), ["form", "maximum", "minimum", "scale"], "canonical bounded-Integer member vocabulary");
+
 const legacy = encode(normalizeSchema(ACCEPTED.A5));
 assert.equal(legacy.toString("hex"), "a26d6973737565725f646f6d61696ea268657175616c6974796963616e6f6e6963616c6a6964656e746966696572a164666f726d64746578746f76616c75655f73656d616e74696373a16576616c7565a164666f726d67626f6f6c65616e", "v1.1 no-op replay");
 
-// Draft PSCID v1.2 candidate evidence. h'03' is provisional test data only.
+// Approved PSCID v1.2 evidence. h'03' is permanently assigned.
 const MAGIC = Buffer.from("VEPSCID1", "ascii");
 const CANDIDATE_SUITE = 0x03;
 const CANDIDATE_PROFILE = 0x03;
@@ -338,10 +348,10 @@ const NESTED_ANCHOR = schema({
 }, contextualMarker("PAYMENT", "settlement record"), false);
 const PSCID_ANCHORS = { A: ACCEPTED.A2, B: ACCEPTED.A6, C: ACCEPTED.A5, D: NESTED_ANCHOR };
 const PSCID_EXPECTED = {
-  A: { c: 358, frame: 375, digest: "2ff55e9de79fae803c62de0bfcd14632a19cc007039f7bd2c16fb01bd54df010", identity: "032ff55e9de79fae803c62de0bfcd14632a19cc007039f7bd2c16fb01bd54df010" },
+  A: { c: 350, frame: 367, digest: "9a4774bb744ee566229aac22caa89af19b2b72d0f72df7d9cf62bc5281f96603", identity: "039a4774bb744ee566229aac22caa89af19b2b72d0f72df7d9cf62bc5281f96603" },
   B: { c: 211, frame: 227, digest: "6c1653e4a2d10b5bb1de6e070406888510cd805633fbcf2ebeb6a7e07d89fa0b", identity: "036c1653e4a2d10b5bb1de6e070406888510cd805633fbcf2ebeb6a7e07d89fa0b" },
   C: { c: 94, frame: 110, digest: "cfd11fb27684b51ca191d1c1a39b11f62180c6c2e9d4fcac7bf2dabb542de3f2", identity: "03cfd11fb27684b51ca191d1c1a39b11f62180c6c2e9d4fcac7bf2dabb542de3f2" },
-  D: { c: 562, frame: 579, digest: "aa9513dc1e22b93ba4166cd8846e7fc687afd3a81474ae8201395500c541ba17", identity: "03aa9513dc1e22b93ba4166cd8846e7fc687afd3a81474ae8201395500c541ba17" },
+  D: { c: 554, frame: 571, digest: "ef45cac153df5390b7916bab7b0fbd3264c569cb6ffb91b68b3e21cae4b3fd54", identity: "03ef45cac153df5390b7916bab7b0fbd3264c569cb6ffb91b68b3e21cae4b3fd54" },
 };
 const pscidCanonical = {};
 for (const [name, source] of Object.entries(PSCID_ANCHORS)) {
@@ -394,4 +404,4 @@ const orderedMutation = encode(normalizeSchema(schema(integer(2, 0, 100000000), 
 assert.equal(orderedMutation.equals(pscidCanonical.A), false, "comparison-ordered mutation changes C");
 expectFailure("B1-ordered-mutation", "identity-mismatch", () => verifyAsSuite(CANDIDATE_SUITE, candidateAIdentity, orderedMutation));
 console.log(`PASS accepted=${Object.keys(ACCEPTED).length} rejected=13 q=9 legacy=5`);
-console.log("PASS PSCID candidate=4 historical-pscid1=1 historical-h02=3 negatives=9 critical-bindings=4 provisional=03/03");
+console.log("PASS PSCID approved=4 historical-pscid1=1 historical-h02=3 negatives=9 critical-bindings=4 permanent=03/03");

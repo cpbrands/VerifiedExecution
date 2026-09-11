@@ -1,13 +1,13 @@
 ---
 id: DIGEST-001-PREDICATE-SCHEMA-CONTENT-IDENTITY
 title: DIGEST-001 Predicate Schema Content Identity
-version: "0.3"
+version: "0.4"
 status: Approved
 document_type: Specification
 category: Representation
 author: Verified Execution Editorial Board
 created: 2026-08-28
-updated: 2026-09-02
+updated: 2026-09-11
 depends_on:
   - ADR-ENC-001
   - PREDICATE-SCHEMA-CANONICAL-REPRESENTATION-PROFILE
@@ -16,6 +16,8 @@ depends_on:
   - CLAIM-PREDICATE-SCHEMA-REFERENCE-SEMANTICS
   - RFC-008
   - ADR-008
+  - RFC-012
+  - ADR-012
 related_documents:
   - OPEN-DECISIONS
   - RFC-005
@@ -28,10 +30,12 @@ superseded_by: null
 
 ## Status and authority boundary
 
-This Approved v0.3 Predicate-Schema-specific representation specification
+This Approved v0.4 Predicate-Schema-specific representation specification
 derives portable content identity from canonical Predicate Schema bytes.
-Approved v0.2 remains authoritative for its historical construction. This v0.3
-revision permanently assigns the v1.2 successor construction and its codes. It
+This versioned conformance correction retains the v1.2 construction and the
+permanent assignments made in v0.3 while correcting affected anchors to consume
+the exact canonical bytes already required by the v1.2 profile. Approved v0.2
+remains authoritative for its historical construction. This specification
 resolves the scoped PSCID content-identity decision recorded as `PSCID-001` in
 the Open Decision Register; it does not resolve the broader generic
 `DIGEST-001` work owned by Draft RFC-005.
@@ -627,10 +631,19 @@ and Python under permanent suite/profile `h'03'/h'03'`:
 
 | Anchor | Coverage | `C` octets | Frame octets | SHA-256 digest | 33-octet identity |
 |---|---|---:|---:|---|---|
-| A | Ordered Integer comparison with structural CAD domain | 358 | 375 | `2ff55e9de79fae803c62de0bfcd14632a19cc007039f7bd2c16fb01bd54df010` | `032ff55e9de79fae803c62de0bfcd14632a19cc007039f7bd2c16fb01bd54df010` |
+| A | Ordered Integer comparison with structural CAD domain | 350 | 367 | `9a4774bb744ee566229aac22caa89af19b2b72d0f72df7d9cf62bc5281f96603` | `039a4774bb744ee566229aac22caa89af19b2b72d0f72df7d9cf62bc5281f96603` |
 | B | Equality-only Text comparison semantics | 211 | 227 | `6c1653e4a2d10b5bb1de6e070406888510cd805633fbcf2ebeb6a7e07d89fa0b` | `036c1653e4a2d10b5bb1de6e070406888510cd805633fbcf2ebeb6a7e07d89fa0b` |
 | C | Legacy Boolean schema, byte-identical to Approved v1.1 Anchor C | 94 | 110 | `cfd11fb27684b51ca191d1c1a39b11f62180c6c2e9d4fcac7bf2dabb542de3f2` | `03cfd11fb27684b51ca191d1c1a39b11f62180c6c2e9d4fcac7bf2dabb542de3f2` |
-| D | Nested Record/Sequence value and structural comparison domain | 562 | 579 | `aa9513dc1e22b93ba4166cd8846e7fc687afd3a81474ae8201395500c541ba17` | `03aa9513dc1e22b93ba4166cd8846e7fc687afd3a81474ae8201395500c541ba17` |
+| D | Nested Record/Sequence value and structural comparison domain | 554 | 571 | `ef45cac153df5390b7916bab7b0fbd3264c569cb6ffb91b68b3e21cae4b3fd54` | `03ef45cac153df5390b7916bab7b0fbd3264c569cb6ffb91b68b3e21cae4b3fd54` |
+
+The v0.4 correction changes only affected conformance expectations. Canonical
+bounded-Integer members are `minimum` and `maximum`, as required by the
+unchanged v1.2 representation closure. The previously published Anchor A
+identity
+`032ff55e9de79fae803c62de0bfcd14632a19cc007039f7bd2c16fb01bd54df010`
+was derived from nonconforming `lower_bound` / `upper_bound` serialized keys.
+It was never conforming under suite/profile `h'03'/h'03'` and is not an alias,
+legacy-valid identity, or alternate representation.
 
 For Anchor C, `C_v1.1 == C_v1.2`, while its permanent `h'02'` identity
 `021f2ba2e17d8589cfc976e7284f869b47349902b21d15222bed967aae1779f03d`
@@ -668,9 +681,9 @@ replayed exactly and remain unchanged.
 | New Claim field? | No. |
 | New runtime abstraction? | No. |
 | New generic normative abstraction? | No. This is a Predicate-Schema-specific representation construction. |
-| RFC required now? | No additional RFC. Accepted RFC-007/ADR-007 and RFC-008/ADR-008 authorize this coordinated revision. |
-| ADR required now? | No. ADR-ENC-001 remains the canonical-encoding authority. |
-| Approved-specification revision required? | Complete in this v0.3 approval. Approved v0.2 remains authoritative for historical `h'02'` identities. |
+| RFC required now? | No additional RFC. Accepted RFC-012 and ADR-012 authorize this coordinated correction. |
+| ADR required now? | No additional ADR. Accepted ADR-012 records the correction decision; ADR-ENC-001 remains the canonical-encoding authority. |
+| Approved-specification revision required? | Complete in this v0.4 correction. Approved v0.2 remains authoritative for historical `h'02'` identities; v0.4 retains the v0.3 `h'03'/h'03'` construction. |
 | Correct normative home | This standalone Predicate Schema content-identity specification. |
 
 PSCID-1 and permanent suite/profile `h'02'/h'02'` remain authoritative and
@@ -683,6 +696,7 @@ RFC-008 and ADR-008.
 
 | Version | Date | Change |
 |---|---|---|
+| 0.4 | 2026-09-11 | Corrected affected v1.2 bounded-Integer anchors under Accepted RFC-012/ADR-012 to consume canonical `minimum` / `maximum` members; preserved Predicate semantics, the canonical profile recipe, and permanent suite/profile `h'03'/h'03'`; the previously published Anchor A PSCID is nonconforming and receives no alias or legacy-valid status. |
 | 0.3 | 2026-09-02 | Status transitioned from Draft to Approved: permanently assigned profile `h'03'` and PSCID suite `h'03'` to the immutable v1.2 closure; anchors A–D, N1–N9, historical replay, and ordered-flag binding are authoritative; `h'01'` and `h'02'` remain unchanged. |
 | 0.3 | 2026-09-01 | Draft candidate added provisional, unassigned `h'03'/h'03'` evidence for the frozen v1.2 comparison-semantics closure, anchors A–D, historical replay, N1–N9, and the ordered-flag binding check; PSCID-1 and permanent `h'02'/h'02'` remain unchanged. |
 | 0.2 | 2026-08-30 | Draft candidate added the provisional `h'02'` profile/suite construction for the external-subject v1.1 closure and its identity anchors; PSCID-1 unchanged. |

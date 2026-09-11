@@ -80,12 +80,12 @@ def normalize_field(form: dict) -> dict:
             if form["scale"] != 0:
                 result["scale"] = form["scale"]
         if "lower_bound" in form:
-            result["lower_bound"] = normalize_bound(form["lower_bound"])
+            result["minimum"] = normalize_bound(form["lower_bound"])
         if "upper_bound" in form:
-            result["upper_bound"] = normalize_bound(form["upper_bound"])
-        if "lower_bound" in result and "upper_bound" in result:
-            minimum = result["lower_bound"]["value"] + (0 if result["lower_bound"]["inclusive"] else 1)
-            maximum = result["upper_bound"]["value"] - (0 if result["upper_bound"]["inclusive"] else 1)
+            result["maximum"] = normalize_bound(form["upper_bound"])
+        if "minimum" in result and "maximum" in result:
+            minimum = result["minimum"]["value"] + (0 if result["minimum"]["inclusive"] else 1)
+            maximum = result["maximum"]["value"] - (0 if result["maximum"]["inclusive"] else 1)
             if minimum > maximum:
                 fail("empty-domain")
         if "allowed_values" in form:
@@ -293,9 +293,9 @@ def locally_valid_integer(source: dict, value: int) -> bool:
     form = normalize_schema(source)["value_semantics"]["value"]
     if form["form"] != "integer":
         return False
-    if "lower_bound" in form and (value < form["lower_bound"]["value"] or (value == form["lower_bound"]["value"] and not form["lower_bound"]["inclusive"])):
+    if "minimum" in form and (value < form["minimum"]["value"] or (value == form["minimum"]["value"] and not form["minimum"]["inclusive"])):
         return False
-    if "upper_bound" in form and (value > form["upper_bound"]["value"] or (value == form["upper_bound"]["value"] and not form["upper_bound"]["inclusive"])):
+    if "maximum" in form and (value > form["maximum"]["value"] or (value == form["maximum"]["value"] and not form["maximum"]["inclusive"])):
         return False
     return "allowed_values" not in form or value in form["allowed_values"]
 
@@ -351,10 +351,20 @@ LEGACY = {
 for name, source in LEGACY.items():
     assert encode(normalize_schema(source)).hex() == LEGACY_EXPECTED[name]
 
+BOUNDED_V1_EXPECTED = {
+    "V1-B": "a26d6973737565725f646f6d61696ea268657175616c6974796963616e6f6e6963616c6a6964656e746966696572a164666f726d64746578746f76616c75655f73656d616e74696373a16576616c7565a464666f726d67696e7465676572657363616c6502676d6178696d756da26576616c75651903e869696e636c7573697665f4676d696e696d756da26576616c75650069696e636c7573697665f5",
+    "V1-F": "a26d6973737565725f646f6d61696ea268657175616c6974796963616e6f6e6963616c6a6964656e746966696572a164666f726d64746578746f76616c75655f73656d616e74696373a16576616c7565a264666f726d67696e7465676572676d696e696d756da26576616c75650069696e636c7573697665f5",
+}
+bounded_v1_b = {"issuer_domain": ISSUER, "value_semantics": {"value": {"form": "integer", "scale": 2, "lower_bound": {"value": 0, "inclusive": True}, "upper_bound": {"value": 1000, "inclusive": False}}}}
+bounded_v1_f = {"issuer_domain": ISSUER, "value_semantics": {"value": {"form": "integer", "scale": 0, "lower_bound": {"value": 0, "inclusive": True}}}}
+assert encode(normalize_schema(bounded_v1_b)).hex() == BOUNDED_V1_EXPECTED["V1-B"]
+assert encode(normalize_schema(bounded_v1_f)).hex() == BOUNDED_V1_EXPECTED["V1-F"]
+assert set(normalize_schema(bounded_v1_b)["value_semantics"]["value"]) == {"form", "scale", "minimum", "maximum"}
+
 legacy = encode(normalize_schema(ACCEPTED["A5"]))
 assert legacy.hex() == "a26d6973737565725f646f6d61696ea268657175616c6974796963616e6f6e6963616c6a6964656e746966696572a164666f726d64746578746f76616c75655f73656d616e74696373a16576616c7565a164666f726d67626f6f6c65616e"
 
-# Draft PSCID v1.2 candidate evidence. h'03' is provisional test data only.
+# Approved PSCID v1.2 evidence. h'03' is permanently assigned.
 MAGIC = b"VEPSCID1"
 CANDIDATE_SUITE = 0x03
 CANDIDATE_PROFILE = 0x03
@@ -414,10 +424,10 @@ NESTED_ANCHOR = schema({
 }, contextual_marker("PAYMENT", "settlement record"), False)
 PSCID_ANCHORS = {"A": ACCEPTED["A2"], "B": ACCEPTED["A6"], "C": ACCEPTED["A5"], "D": NESTED_ANCHOR}
 PSCID_EXPECTED = {
-    "A": {"c": 358, "frame": 375, "digest": "2ff55e9de79fae803c62de0bfcd14632a19cc007039f7bd2c16fb01bd54df010", "identity": "032ff55e9de79fae803c62de0bfcd14632a19cc007039f7bd2c16fb01bd54df010"},
+    "A": {"c": 350, "frame": 367, "digest": "9a4774bb744ee566229aac22caa89af19b2b72d0f72df7d9cf62bc5281f96603", "identity": "039a4774bb744ee566229aac22caa89af19b2b72d0f72df7d9cf62bc5281f96603"},
     "B": {"c": 211, "frame": 227, "digest": "6c1653e4a2d10b5bb1de6e070406888510cd805633fbcf2ebeb6a7e07d89fa0b", "identity": "036c1653e4a2d10b5bb1de6e070406888510cd805633fbcf2ebeb6a7e07d89fa0b"},
     "C": {"c": 94, "frame": 110, "digest": "cfd11fb27684b51ca191d1c1a39b11f62180c6c2e9d4fcac7bf2dabb542de3f2", "identity": "03cfd11fb27684b51ca191d1c1a39b11f62180c6c2e9d4fcac7bf2dabb542de3f2"},
-    "D": {"c": 562, "frame": 579, "digest": "aa9513dc1e22b93ba4166cd8846e7fc687afd3a81474ae8201395500c541ba17", "identity": "03aa9513dc1e22b93ba4166cd8846e7fc687afd3a81474ae8201395500c541ba17"},
+    "D": {"c": 554, "frame": 571, "digest": "ef45cac153df5390b7916bab7b0fbd3264c569cb6ffb91b68b3e21cae4b3fd54", "identity": "03ef45cac153df5390b7916bab7b0fbd3264c569cb6ffb91b68b3e21cae4b3fd54"},
 }
 pscid_canonical = {}
 for name, source in PSCID_ANCHORS.items():
@@ -477,4 +487,4 @@ ordered_mutation = encode(normalize_schema(schema(integer(2, 0, 100_000_000), CA
 assert ordered_mutation != pscid_canonical["A"]
 expect_failure("B1-ordered-mutation", "identity-mismatch", lambda: verify_as_suite(CANDIDATE_SUITE, candidate_a_identity, ordered_mutation))
 print(f"PASS accepted={len(ACCEPTED)} rejected=13 q=9 legacy=5")
-print("PASS PSCID candidate=4 historical-pscid1=1 historical-h02=3 negatives=9 critical-bindings=4 provisional=03/03")
+print("PASS PSCID approved=4 historical-pscid1=1 historical-h02=3 negatives=9 critical-bindings=4 permanent=03/03")
