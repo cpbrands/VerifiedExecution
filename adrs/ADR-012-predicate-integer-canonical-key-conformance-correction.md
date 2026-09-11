@@ -2,7 +2,7 @@
 id: ADR-012
 title: Predicate Integer Canonical-Key Conformance Correction
 version: "0.1"
-status: Proposed
+status: Accepted
 document_type: ADR
 category: Representation
 author: Verified Execution Editorial Board
@@ -29,15 +29,15 @@ superseded_by: null
 
 ## 1. Status and authority boundary
 
-**Status:** Proposed
+**Status:** Accepted
 **Related RFC:** RFC-012 — Predicate Integer Canonical-Key Conformance
 Correction
 **Decision:** A. RETAIN `minimum` / `maximum` AND CORRECT NONCONFORMING
 CONFORMANCE MATERIAL.
 
-This Proposed ADR is not current architectural or specification authority. It
-records the governance decision that would become authoritative if the ADR is
-accepted. It does not itself revise DIGEST-001, the Predicate Schema
+This Accepted ADR is authoritative at its declared decision scope. It records
+the governance decision authorizing the later coordinated correction. It does
+not itself revise DIGEST-001, the Predicate Schema
 Canonical Representation Profile, conformance vectors, validators, CHANGELOG,
 OPEN_DECISIONS, or any Claim representation.
 
@@ -54,9 +54,10 @@ coordinated governed revisions
     -> actual DIGEST, conformance-vector, validator, and support-file changes
 ~~~
 
-Merging this ADR while it remains Proposed would not authorize an
-implementation to emit new expected values or reinterpret any Approved
-artifact.
+Acceptance authorizes the later coordinated correction, but implementation
+must occur through the governed revisions identified below. This ADR alone
+does not permit an implementation to emit new expected values or reinterpret
+any Approved artifact.
 
 ## 2. Context
 
@@ -108,7 +109,7 @@ published error but cannot make it conforming.
 **A. RETAIN `minimum` / `maximum` AND CORRECT NONCONFORMING CONFORMANCE
 MATERIAL.**
 
-If accepted, this ADR establishes the following decision.
+This Accepted ADR establishes the following decision.
 
 ### 3.1 Canonical representation ownership
 
@@ -200,7 +201,7 @@ distinct PSCIDs.
 
 ## 5. Authorized future correction scope
 
-If accepted, this ADR authorizes a later coordinated governed change to
+This Accepted ADR authorizes a later coordinated governed change to
 exactly these existing paths.
 
 ### 5.1 Approved specification
@@ -254,21 +255,21 @@ or ARCHITECTURE_INDEX.
 
 ## 6. Governance and sequencing
 
-RFC-012 remains the proposal and rationale for this decision. This ADR, if
-accepted, records the architectural and governance resolution. Neither
-artifact implements the correction.
+Accepted RFC-012 remains the approved proposal and rationale for this
+decision. This Accepted ADR records the architectural and governance
+resolution. Neither artifact implements the correction.
 
 Because DIGEST-001 is Approved and the correction changes conformance-critical
-anchors and machine outputs, repository governance requires:
+anchors and machine outputs, RFC-012 and ADR-012 acceptance completes the
+governance prerequisite. Implementation still requires:
 
-1. acceptance of RFC-012 and this ADR through their lifecycle processes;
-2. a versioned DIGEST-001 revision;
-3. a distinguishable governed conformance-artifact revision;
-4. coordinated Python and Node validator corrections;
-5. a CHANGELOG entry;
-6. an OPEN_DECISIONS current-version pointer update when the DIGEST revision
+1. a versioned DIGEST-001 revision;
+2. a distinguishable governed conformance-artifact revision;
+3. coordinated Python and Node validator corrections;
+4. a CHANGELOG entry;
+5. an OPEN_DECISIONS current-version pointer update when the DIGEST revision
    is Approved; and
-7. independent validation before the coordinated correction is merged.
+6. independent validation before the coordinated correction is merged.
 
 One RFC and one ADR are sufficient because the problem is one coherent
 ownership and conformance correction. No additional architectural decision,
@@ -367,12 +368,13 @@ The decision requested is:
 > identity is not conforming or aliased; the conforming identity is
 > `039a4774bb744ee566229aac22caa89af19b2b72d0f72df7d9cf62bc5281f96603`.
 
-Acceptance makes this architectural and governance resolution authoritative.
-The resolution is implemented only by the later coordinated revisions listed
-in Section 5.
+This Accepted ADR makes the architectural and governance resolution
+authoritative. The resolution is implemented only by the later coordinated
+revisions listed in Section 5.
 
 ## Revision history
 
 | Version | Date | Change |
 |---|---|---|
 | 0.1 | 2026-09-11 | Initial Proposed ADR recording the Predicate Integer canonical-key conformance correction. |
+| 0.1 | 2026-09-11 | Status transitioned from Proposed to Accepted; decision, correction scope, compatibility analysis, and governance rationale unchanged. |
