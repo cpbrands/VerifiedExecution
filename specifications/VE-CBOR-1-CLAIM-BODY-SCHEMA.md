@@ -1,19 +1,26 @@
 ---
 id: VE-CBOR-1-CLAIM-BODY-SCHEMA
 title: VE-CBOR-1 Claim Body Schema
-version: "0.1"
+version: "0.2"
 status: Draft
 document_type: Candidate Specification
 category: Representation
 author: Verified Execution Editorial Board
 created: 2026-08-27
-updated: 2026-08-27
+updated: 2026-09-11
 depends_on:
   - ADR-ENC-001
   - ADR-VERIFY-002
   - VE-001
+  - VE-001-ACTION-CANONICAL-REPRESENTATION-PROFILE
   - VE-002
   - VE-CLAIM-REFERENCE-SEMANTICS
+  - CLAIM-BODY-SEMANTIC-FIELD-CONTRACT
+  - CLAIM-PREDICATE-SCHEMA-REFERENCE-SEMANTICS
+  - PREDICATE-SCHEMA-SEMANTIC-CONTRACT
+  - PREDICATE-SCHEMA-FIELD-SEMANTIC-REPRESENTATION-GRAMMAR
+  - PREDICATE-SCHEMA-CANONICAL-REPRESENTATION-PROFILE
+  - DIGEST-001-PREDICATE-SCHEMA-CONTENT-IDENTITY
 related_documents:
   - VE-CEL-1-RULE-EVALUATE-INPUT-CONTRACT
   - RFC-005
@@ -25,15 +32,15 @@ superseded_by: null
 
 ## Status and authority boundary
 
-This is a Draft candidate representation artifact. It distinguishes the
-accepted deterministic mechanics of `VE-CBOR-1` from the unresolved Claim
-semantic and profile choices that determine which concrete values are encoded.
-It does not amend an Approved specification, accept a Draft RFC, or define a
-new VE primitive.
+This Draft v0.2 is a bounded representation specification for existing Claim
+semantics. It defines portable canonical bytes only for Claims whose governing
+Predicate Schema is valid under an Approved Predicate canonical representation
+profile supported by Approved DIGEST-001 v0.4 and whose runtime fields fit the
+closed FieldForm subset below.
 
-This specification applies ADR-ENC-001's accepted canonical-encoding rules to
-the candidate Claim-body semantics. It preserves the Claim envelope accepted
-by ADR-VERIFY-002:
+It does not change Claim, Predicate, Action, Event, verification, trust, or
+Rule/Evaluate semantics. It creates no Claim identifier, Claim digest, generic
+reference, registry, resolver, or new VE primitive. The Claim envelope remains:
 
 ```text
 Claim {
@@ -45,351 +52,316 @@ Claim {
 }
 ```
 
-This document concerns `body` only. It does not define Claim verification,
-trust, issuer resolution, Action or Event semantics, Rule/Evaluate behavior,
-CEL binding, or a generic VE reference ontology.
+This specification concerns `body` only. Verification data is neither encoded
+in nor made visible through the body.
 
-VE-002 and Canonical Claim Reference Semantics are Draft. In particular,
-`EventReference` conformance remains provisional until the relevant Event and
-encoding work reaches its governed maturity. RFC-005 remains Draft and is not
-a normative dependency of this document.
+## 1. Governing closure and applicability
 
-## 1. Purpose
+The imported representation closure is:
 
-This Draft records the local Claim-body field structure and the `VE-CBOR-1`
-mechanics that a complete Claim-body profile will use. It does not yet define
-enough portable semantic/profile forms to guarantee one byte sequence for
-every semantic Claim body across independent implementations.
-
-## 2. Terminology
-
-**Claim body**
-
-The semantic assertion portion of a Claim. It excludes the verification
-envelope.
-
-**Canonical bytes**
-
-The exact output of the `VE-CBOR-1` encoder for a Claim body valid under a
-complete applicable Claim-body profile.
-
-**Subject reference**
-
-The Claim-body value that identifies the Action content, Action occurrence, or
-Event about which the Claim asserts something. Its semantic meaning is defined
-by Draft Canonical Claim Reference Semantics.
-
-**Value schema**
-
-The domain/schema contract identified by a Claim predicate that defines the
-meaning, allowed structure, units, and scale of `value`.
-
-## 3. Conformance profile
-
-A conforming implementation MUST apply the following `VE-CBOR-1` mechanics
-when an applicable Claim-body profile resolves every semantic field to a
-concrete representation.
-
-In particular, a conforming encoding MUST use RFC 8949 Core Deterministic
-Encoding, definite-length items, shortest valid integer and length encodings,
-and map keys sorted by bytewise lexicographic order of their deterministic
-CBOR encodings. All text strings MUST be valid UTF-8 and Unicode NFC. A
-decoder MUST reject non-NFC text rather than normalize it, duplicate map keys,
-indefinite-length items, floating-point values, and unstandardized CBOR
-semantic tags.
-
-These are deterministic encoding mechanics. They do not by themselves decide
-what an issuer identifier, predicate identifier, timestamp, Action identifier,
-Event identifier, or Claim value is.
-
-## 4. Claim-body map schema
-
-The current candidate Claim-body semantic model contains:
-
-| Local field label | Presence | Representation status |
-|---|---:|---|
-| `subject_reference` | Required | Semantic union known; exact profile encoding unresolved. |
-| `issuer_ref` | Required | Semantic content known; portable primitive representation unresolved. |
-| `predicate` | Required | Semantic content known; portable identifier representation and namespace unresolved. |
-| `value` | Required | Schema/predicate-defined semantic content; portable value representation unresolved. |
-| `assertion_time` | Optional | Presence/absence known; value semantics and representation unresolved. |
-| `observation_time` | Optional | Presence/absence known; value semantics and representation unresolved. |
-
-The exact field labels above are this Draft's candidate labels. They are text
-labels rather than integer labels because ADR-ENC-001 requires text map keys
-and no accepted authority establishes a separate Claim field-label registry.
-Their scope is only this Claim-body map.
-
-The top-level schema is closed for a versioned Claim-body profile: an
-implementation interpreting a particular profile version MUST reject unknown
-top-level Claim-body fields for that version. Future evolution occurs through a
-new or revised governed schema/profile version, not through extension maps.
-This Draft does not yet define profile selection or version negotiation.
-
-When the field representations are defined by an applicable Claim-body
-profile, the body map MUST use the deterministic encoded-key order required by
-ADR-ENC-001. Field source order, lexical label order, and implementation
-iteration order are not permitted substitutes.
-
-## 5. Subject-reference representation boundary
-
-Draft Canonical Claim Reference Semantics defines the following legal semantic
-members:
-
-```text
-ActionContentReference { action_digest }
-ActionOccurrenceReference { action_id, action_digest }
-EventReference { event_id }
-```
-
-Their semantic membership is known. Their exact profile-level CBOR encoding is
-not yet established by current authority.
-
-In particular:
-
-- VE-001 defines `action_digest` semantic content identity, but does not
-  establish a universal CBOR primitive representation for the digest;
-- VE-001 explicitly leaves `action_id` generation format protocol/profile-
-  defined; and
-- Draft VE-002 defines immutable, globally unique Event identity but does not
-  establish a universal Event-ID wire encoding.
-
-This Draft therefore MUST NOT prescribe `action_digest = bstr`,
-`action_id = tstr`, or `event_id = tstr`. It also MUST NOT introduce
-`event_digest`, `ObjectReference`, `DigestReference`, a generic reference,
-attempt reference, or a semantic `reference_kind`.
-
-If a later representation profile needs a discriminator or structural form to
-preserve these three semantic alternatives, that is representation machinery.
-It must not broaden the legal semantic union or create a generic reference
-ontology.
-
-## 6. Issuer and predicate representation
-
-`issuer_ref` is required semantic Claim-body content. ADR-VERIFY-002 requires
-the applicable VerificationContext to establish the `issuer_ref`-to-
-verifier/key binding. It does not define the portable primitive representation
-of `issuer_ref`.
-
-This Draft MUST NOT choose whether `issuer_ref` is a text identifier, bytes,
-URI, DID, structured reference, or authority-specific identifier. It does not
-create a VE identity system and does not reinterpret an issuer as a signer,
-verification key, certificate subject, or VE-managed identity object.
-
-Canonical encoding remains blocked until a Claim semantic/profile contract
-constrains the representation of `issuer_ref`.
-
-`predicate` is required semantic Claim-body content. No accepted authority
-defines its portable identifier representation or namespace.
-
-This Draft MUST NOT choose a text, integer, structured, or registry-based
-predicate form. It does not create a global predicate registry, VE-owned
-predicate semantics, integer predicate codes, or schema-independent meaning.
-Canonical bytes for `predicate` remain profile-dependent until the applicable
-Claim semantic/profile contract defines them.
-
-## 7. Value representation
-
-`value` is schema/predicate-defined semantic content. `VE-CBOR-1` constrains
-only the deterministic encoding of the representation that the applicable
-schema/profile authorizes. This Draft does not define a universal recursive
-Claim value grammar, VE type system, or generic object container.
-
-If an applicable schema/profile authorizes maps, their keys MUST be text
-strings and they MUST use the accepted `VE-CBOR-1` ordering and duplicate-key
-rules. That restriction follows ADR-ENC-001; it is not a CEL-specific or
-independently invented rule.
-
-This Draft does not determine whether arbitrary recursive maps or lists are
-required by all Claim domains. Their structure and meaning remain
-schema/predicate-specific.
-
-### 7.1 Numeric values
-
-Floating-point numbers MUST NOT appear. A decision-relevant fractional value
-MUST be represented as an exact integer in `value`; the applicable
-predicate/value schema MUST define the associated scale and unit. For example,
-a schema may define `7300` as 0.7300 in a named unit.
-
-This Draft does not add a universal decimal wrapper, scale field, or
-numeric-tag convention. Portable equality requires the governing schema/predicate
-contract to define one canonical scale and unit representation. Without that
-contract, two implementations may encode the same intended decimal quantity
-differently.
-
-## 8. Optional timestamp representation
-
-`assertion_time` and `observation_time` remain optional Claim-body fields:
-
-```text
-field absent  = corresponding time is not asserted
-field present = a corresponding time value is asserted
-```
-
-An absent optional field and a field whose value is `null` are distinct
-structural conditions. However, this Draft does not universally prohibit a
-Claim value from representing null-like semantics. The legality and meaning of
-`null` as an asserted `value` belong to the applicable Claim/value schema.
-
-No epoch basis, precision, range, UTC-normalization rule, leap-second policy,
-or timestamp primitive representation is established here. Timestamp value
-semantics and representation remain unresolved.
-
-## 9. Unknown fields and future compatibility
-
-The Claim-body schema is closed for the particular governed profile version
-that interprets it. Unknown top-level fields MUST be rejected rather than
-preserved, ignored, or treated as extensions. Future body evolution requires a
-new or revised governed schema/profile version.
-
-This Draft does not define profile selection, version negotiation, extension
-maps, or encoded subject-reference field handling. A future profile that
-defines any of those mechanisms must define their namespace, compatibility,
-canonical encoding, and semantic ownership before it is accepted.
-
-For schema-defined structured values, permitted domain-specific members are
-determined by the applicable predicate/value schema. This is not an open
-extension mechanism for the top-level Claim body.
-
-## 10. Canonical bytes and verification boundary
-
-For a Claim body valid under a complete applicable Claim-body profile:
-
-```text
-claim_body_canonical_bytes = VE-CBOR-1 encode(profile-valid Claim.body)
-```
-
-This produces deterministic bytes once every semantic field has been resolved
-to a concrete representation by that profile. This Draft does not yet define
-enough representation semantics to guarantee one portable byte sequence for
-every semantic Claim body.
-
-These bytes are the detached payload required by the applicable optional COSE
-profiles in ADR-VERIFY-002. This specification does not encode or interpret:
-
-```text
-Claim.verification
-verification.profile
-verification.artifact
-```
-
-It also does not define a semantic `claim_digest`, `claim_id`, or
-`ClaimReference`. A future digest operation may operate over canonical bytes
-where an applicable approved profile defines one; that is not Claim identity.
-
-## 11. Ordering and duplicate consequence
-
-Once complete canonical Claim-body bytes are defined, they provide a
-mechanically available deterministic bytewise comparison. They may then serve
-as material for a future governed collision tie-break rule.
-
-This fact does not replace the accepted ADR-RULE-001/002 criterion of
-content-digest ordering when Claims are represented as a list. Any replacement
-of that criterion with canonical-byte ordering requires governance. Nor does
-this specification establish a portable Claim content-digest construction.
-
-Canonicalization does not collapse collection multiplicity. Once bytes are
-defined, two identical Claim bodies produce identical bytes, but an input
-collection containing:
-
-```text
-[X, X]
-```
-
-still contains two members at the Rule/Evaluate layer.
-
-## 12. VE-CEL-1 dependency impact
-
-This Draft establishes useful `VE-CBOR-1` mechanics and local Claim-body
-structure, but it does not fully unblock portable CEL binding:
-
-| VE-CEL-1 dependency | Effect of this Draft |
+| Imported value | Governing representation |
 |---|---|
-| Deterministic CBOR mechanics | Available through ADR-ENC-001. |
-| Local Claim-body labels and field membership | Candidate only. |
-| Portable Claim-body bytes | Blocked. |
-| Claim collision tie-break material | Blocked on complete portable bytes. |
-| Subject-reference encoded forms | Blocked on identifier/digest representations. |
-| Optional-field value representation | Blocked on Claim/timestamp semantics. |
-| CBOR-to-CEL value mapping | Blocked on schema/profile value forms. |
-| CEL list ordering | Not changed. |
-| Full `SPEC-CEL-003` resolution | Not resolved here. |
+| `action_id` | `VE001ActionIdValue`: exactly one canonical CBOR `bstr(32)` under the Draft VE-001 Action canonical-representation profile. |
+| `action_digest` | `VE001ActionDigestValue`: exactly one canonical CBOR `bstr(32)` under that profile. |
+| `event_id` | exactly one canonical CBOR `bstr(32)` under Approved VE-002 v0.2. |
+| `predicate` | the exact 33 identity octets defined by Approved DIGEST-001 v0.4, encoded directly as one canonical CBOR `bstr(33)`. |
+| issuer, external-subject, and asserted values | runtime values admitted by the applicable normalized Predicate Schema `FieldForm`, represented as specified in Section 4. |
 
-`SPEC-CEL-003` remains **PARTIALLY EXPLORED — NOT RESOLVED**. The remaining
-work includes Claim semantic/profile representations, followed by the
-engine-specific `VE-CEL-1` binding for CEL value types, range behavior,
-map/list conversion, omitted-field presence testing, collection form, and any
-governed ordering/collision rule.
+This Draft supports the immutable Predicate representation/PSCID suite pairs
+defined by DIGEST-001 v0.4: `h'01'/h'01'`, `h'02'/h'02'`, and
+`h'03'/h'03'`. For the current v1.2 closure, the pair is exactly
+`h'03'/h'03'`; canonical Integer-node keys are `minimum` and `maximum`.
+Conceptual grammar names `lower_bound` and `upper_bound` are not serialized
+keys. This Draft does not define a second PSCID construction or reinterpret an
+identity from another suite.
 
-## 13. Security considerations
+An encoder or decoder MUST be given the retained normalized Predicate Schema
+and canonical schema bytes that correspond to `predicate`. It MUST validate
+the schema through the profile selected by the carried PSCID suite, recompute
+the PSCID under DIGEST-001 v0.4, and require exact 33-octet equality. Missing,
+unknown, unsupported, mismatched, or unavailable governing schema material
+makes this Claim-body profile inapplicable. There is no encoded Claim-body
+version member, discovery algorithm, latest-version rule, registry lookup, or
+fallback. Governing context explicitly invokes Draft v0.2.
 
-Canonical encoding protects against ambiguous field order, duplicate keys,
-silent Unicode normalization, float variation, and semantic-tag variation.
-The closed top-level schema prevents an implementation from silently accepting
-an unreviewed Claim-body extension under a given profile version.
+## 2. Exact Claim-body structure
 
-Canonical bytes establish representation integrity, not Claim truth or issuer
-acceptability. Verification and Trust Context remain responsible for their own
-authority decisions. A conforming encoder or decoder MUST NOT use canonical
-bytes as evidence that a Claim is verified, trusted, or applicable to a Rule.
+A supported Claim body is exactly this closed map:
 
-## 14. Architectural Decision Test
+```text
+ClaimBodyV02 := {
+  "subject_reference": SubjectReferenceV02,
+  "issuer_ref": IssuerRefValue,
+  "predicate": PredicateSchemaContentIdentity,
+  "value": ClaimValue
+}
+```
+
+All four members are required. No other top-level member is permitted. In
+VE-CBOR-1 deterministic encoded-key order they are emitted as:
+
+```text
+"value"
+"predicate"
+"issuer_ref"
+"subject_reference"
+```
+
+The semantic Claim fields `assertion_time` and `observation_time` remain
+abstractly optional. Every Predicate canonical profile currently supported by
+this Draft admits only absent `time_semantics`, which means both fields are
+forbidden. Their presence with any value, including CBOR `null`, is invalid.
+This is a bounded profile rule, not a claim that future Claims can never carry
+time.
+
+## 3. Closed subject-reference representation
+
+`SubjectReferenceV02` is one of four closed, structurally discriminated arrays:
+
+```text
+ActionContentReference := [
+  "ActionContentReference",
+  VE001ActionDigestValue
+]
+
+ActionOccurrenceReference := [
+  "ActionOccurrenceReference",
+  VE001ActionIdValue,
+  VE001ActionDigestValue
+]
+
+EventReference := [
+  "EventReference",
+  EventIdValue
+]
+
+ExternalSubjectReference := [
+  "ExternalSubjectReference",
+  ExternalIdentifierValue
+]
+```
+
+The first array member is representation-only union discrimination. It is not
+a new semantic `reference_kind` Claim field. The four tag strings, array
+lengths, member order, and member types are exact. Unknown tags, missing or
+extra members, a payload from another arm, and a non-array representation are
+invalid.
+
+The applicable Predicate Schema MUST permit the selected form through
+`subject_constraints`, or impose no restriction beyond the closed union.
+`ExternalSubjectReference` additionally requires a present `subject_domain`;
+its identifier is represented and validated using
+`subject_domain.identifier`. That domain does not reinterpret Action or Event
+references. No equality is inferred across union arms or identifier kinds.
+
+## 4. FieldForm runtime representation
+
+`IssuerRefValue` is the normalized runtime value admitted by
+`issuer_domain.identifier`. `ClaimValue` is the normalized runtime value
+admitted by `value_semantics.value`. `ExternalIdentifierValue` is the
+normalized runtime value admitted by `subject_domain.identifier`.
+
+The applicable normalized Predicate Schema selects the form. Runtime values do
+not carry a FieldForm wrapper. The complete mapping is:
+
+| FieldForm | Runtime representation and validation |
+|---|---|
+| `boolean` | one CBOR Boolean; apply any `allowed_values` restriction. |
+| `integer` | one mathematical CBOR integer; enforce `minimum`, `maximum`, inclusion, scale semantics, and any `allowed_values` against the coefficient. No float or conversion is permitted. |
+| `text` | one valid UTF-8/NFC CBOR text string; non-NFC input is rejected, not normalized; apply any `allowed_values`. |
+| `bytes` | one CBOR byte string; apply any `allowed_values`. |
+| `record` | one closed CBOR map whose keys are the exact NFC field names. Every required field is present, optional fields may be absent, unknown or duplicate fields are rejected, and each value is recursively represented by its field grammar. |
+| `sequence` | one CBOR array whose members recursively satisfy `element`; enforce cardinality and uniqueness. If `ordering_significant` is false, normalize by ascending bytewise order of each member's canonical VE-CBOR-1 bytes while preserving multiplicity when allowed. |
+
+For a sequence with `ordering_significant: true`, input order is semantic and
+is preserved. With `ordering_significant: false`, canonical-member sorting is
+required. Duplicate normalized members are invalid when `uniqueness: true`.
+The profile applies no normalization other than the behavior already defined
+by the Approved Field-Semantic Grammar and Predicate canonical profile.
+
+Issuer equality, external-subject equality, and value equality remain owned by
+the Predicate Schema. For the supported closure their mechanical comparison is
+exact canonical-representation equality after governed validation and
+normalization. Equal-looking issuer values under different Predicate Schemas
+are not thereby the same semantic issuer.
+
+## 5. Absence, null, and defaults
+
+The policy is closed:
+
+- the four Claim-body members are required and MUST NOT be `null`;
+- `assertion_time` and `observation_time` are absent and forbidden;
+- an optional record field is represented only by omission;
+- omission is distinct from a present value;
+- CBOR `null` never represents omission;
+- the current bounded FieldForm grammar has no portable null-like runtime
+  form, so `null` anywhere in an issuer, external identifier, or value is
+  invalid; and
+- no Claim-body or runtime-value default is inserted.
+
+Schema normalization such as omitted `scale` for semantic zero and omitted
+`min_items` for zero is Predicate Schema normalization, not a Claim-body
+runtime default.
+
+## 6. VE-CBOR-1 canonical bytes
+
+After schema selection, validation, and the Section 4 normalization:
+
+```text
+claim_body_canonical_bytes = VE-CBOR-1(ClaimBodyV02)
+```
+
+The encoder and decoder MUST apply RFC 8949 Core Deterministic Encoding,
+definite lengths, shortest integer and length encodings, text-string map keys,
+encoded-key ordering, valid UTF-8/NFC text, duplicate-key rejection, no
+floating point, and no CBOR semantic tags. A decoder MUST consume exactly one
+complete item, re-encode the decoded and schema-validated value, and require
+byte-for-byte equality with the input. It MUST NOT accept and silently
+canonicalize a noncanonical byte sequence.
+
+Unknown members are rejected at every closed map: the Claim body, every
+runtime record, and every governed schema structure used for validation.
+Trailing bytes and an ambiguous or invalid subject-union arm are rejected.
+
+## 7. Verification and Rule/Evaluate boundaries
+
+These bytes may be supplied as the canonical Claim body to an applicable
+verification profile. This specification does not encode or interpret
+`verification.profile`, `verification.artifact`, a signer, a key, a trust
+decision, or verification success. An identical body can be carried by
+different verification envelopes without changing its canonical bytes.
+
+Decoding produces the same semantic Claim-body fields consumed by the Draft
+VE-CEL-1 Rule/Evaluate input contract. The union array is converted back to
+the corresponding existing semantic subject-reference form; it is not exposed
+as a new semantic field. This Draft does not select CEL types, Claim collection
+ordering, or a Claim digest. It supplies the previously missing portable body
+bytes while leaving engine-specific binding work separate.
+
+## 8. Positive conformance vectors
+
+The vectors use deterministic test-only 32-octet identities. `A32` is
+`000102...1f`, `D32` is `202122...3f`, and `E32` is `404142...5f`.
+Predicate `P03-C` is Approved v1.2 Anchor C:
+
+```text
+03cfd11fb27684b51ca191d1c1a39b11f62180c6c2e9d4fcac7bf2dabb542de3f2
+```
+
+Its issuer form is text and value form is Boolean. Predicate `P02-A` is
+Approved v1.1 Anchor A:
+
+```text
+02038df64019001d19588a6d0d7910148b4f416baf34a4283258f7c0243538107f
+```
+
+It additionally supplies a text `subject_domain` and permits the external
+form. Each displayed PSCID is the 33 raw identity octets, not hexadecimal
+text. Predicate `P03-D` is Approved v1.2 Anchor D:
+
+```text
+03ef45cac153df5390b7916bab7b0fbd3264c569cb6ffb91b68b3e21cae4b3fd54
+```
+
+It has a closed record value with required scale-2 bounded Integer `amount`
+and optional unordered-unique Text sequence `tags`.
+
+| Vector | Semantic body | Expected canonical bytes (hex) |
+|---|---|---|
+| P1 | Action content; issuer `bank-A`; predicate `P03-C`; value `true`; digest `D32` | `a46576616c7565f569707265646963617465582103cfd11fb27684b51ca191d1c1a39b11f62180c6c2e9d4fcac7bf2dabb542de3f26a6973737565725f7265666662616e6b2d41717375626a6563745f7265666572656e63658276416374696f6e436f6e74656e745265666572656e63655820202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f` |
+| P2 | Action occurrence; same issuer/predicate/value; id `A32`; digest `D32` | `a46576616c7565f569707265646963617465582103cfd11fb27684b51ca191d1c1a39b11f62180c6c2e9d4fcac7bf2dabb542de3f26a6973737565725f7265666662616e6b2d41717375626a6563745f7265666572656e6365837819416374696f6e4f6363757272656e63655265666572656e63655820000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f5820202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f` |
+| P3 | Event; same issuer/predicate/value; event id `E32` | `a46576616c7565f569707265646963617465582103cfd11fb27684b51ca191d1c1a39b11f62180c6c2e9d4fcac7bf2dabb542de3f26a6973737565725f7265666662616e6b2d41717375626a6563745f7265666572656e6365826e4576656e745265666572656e63655820404142434445464748494a4b4c4d4e4f505152535455565758595a5b5c5d5e5f` |
+| P4 | External subject `account-X`; issuer `bank-A`; predicate `P02-A`; value `true` | `a46576616c7565f569707265646963617465582102038df64019001d19588a6d0d7910148b4f416baf34a4283258f7c0243538107f6a6973737565725f7265666662616e6b2d41717375626a6563745f7265666572656e636582781845787465726e616c5375626a6563745265666572656e6365696163636f756e742d58` |
+| P5 | Action content; issuer `bank-A`; predicate `P03-D`; value `{ amount: 50000, tags: ["settled", "priority"] }`; digest `D32` | `a46576616c7565a264746167738267736574746c6564687072696f7269747966616d6f756e7419c35069707265646963617465582103ef45cac153df5390b7916bab7b0fbd3264c569cb6ffb91b68b3e21cae4b3fd546a6973737565725f7265666662616e6b2d41717375626a6563745f7265666572656e63658276416374696f6e436f6e74656e745265666572656e63655820202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f` |
+
+P1 through P4 cover every union arm, direct imported identity embedding, the
+two currently relevant PSCID closures, top-level key order, and verification-
+envelope independence. P5 covers recursive Record, Integer, Sequence, Text,
+optional-field, and order-insensitive sequence normalization.
+
+## 9. Rejection vectors
+
+Each rejection is evaluated against otherwise valid P1 unless stated:
+
+| Vector | Mutation | Required result |
+|---|---|---|
+| R1 | omit any one required top-level member | reject |
+| R2 | add an unknown top-level member | reject |
+| R3 | encode a required member as `null` | reject |
+| R4 | add `assertion_time` or `observation_time`, including as `null` | reject |
+| R5 | unknown subject tag, wrong array length, payload shape inconsistent with the selected arm, or trailing union member | reject |
+| R6 | use `bstr(31)`, `bstr(33)`, text, tag, or indefinite bytes for an Action/Event 32-octet value | reject |
+| R7 | use a non-33-octet predicate, unknown suite, suite/profile mismatch, or PSCID not matching retained schema bytes | reject |
+| R8 | use ExternalSubjectReference without a permitted form and resolved `subject_domain` | reject |
+| R9 | make issuer, external identifier, or value disagree with its FieldForm | reject |
+| R10 | use non-NFC text | reject without normalization |
+| R11 | omit a required nested record member or add an unknown nested member | reject |
+| R12 | violate sequence cardinality or uniqueness, or supply noncanonical raw member order for an order-insensitive sequence to a decoder | reject |
+| R13 | violate Integer bounds or an `allowed_values` restriction | reject |
+| R14 | duplicate any map key, use noncanonical map order, non-shortest encoding, indefinite length, float, or semantic tag | reject |
+| R15 | append bytes after the complete Claim body | reject |
+| R16 | supply a verification envelope member inside `body` | reject |
+
+No rejection creates an alias, fallback profile, open extension, or
+normalization registry.
+
+## 10. Cross-boundary conformance checks
+
+An implementation test suite MUST additionally establish:
+
+1. **Round trip:** each P vector decodes, schema-validates, re-encodes, and
+   reproduces identical bytes.
+2. **Rule/Evaluate compatibility:** decoding exposes exactly the four semantic
+   body fields and never exposes verification data.
+3. **Issuer distinction:** two otherwise identical bank-balance-like Claims
+   with different `issuer_ref` values produce different bytes; equal-looking
+   issuer values under different predicates are not asserted equal across
+   issuer domains.
+4. **Future occurrence compatibility:** P2 remains a valid ordinary
+   `ActionOccurrenceReference`; it introduces no attempt or lifecycle
+   reference.
+5. **Envelope independence:** changing or removing the external verification
+   envelope does not change body bytes.
+
+## 11. Security considerations
+
+Closed maps, exact union discrimination, canonical imported identities, and
+schema-driven runtime forms prevent type confusion, unknown-field smuggling,
+silent normalization, and alternative byte representations. PSCID verification
+prevents applying an unrelated schema merely because a local label looks
+similar.
+
+Canonical representation is not authenticity, authority, trust, truth,
+applicability to a Rule, execution authorization, or evidence of an outcome.
+Those gates remain outside `Claim.body`.
+
+## 12. Architectural Decision Test
 
 | Test | Result |
 |---|---|
-| Founding Principles consistency | Pass. Exact bytes make assertions inspectable without altering their semantic authority. |
-| New primitive burden | Pass. This is a representation profile for an existing Claim body, not a primitive or Claim identity. |
-| Removability | The accepted encoding mechanics are necessary, but the proposed universal field representations are removable and therefore not adopted here. |
-| Twenty-year durability | Conditional. Durable Claim bytes require semantic/profile choices to be explicit before encoding is fixed. |
-| Independent implementability | Blocked. Issuer, predicate, value, timestamp, and identifier/digest representations are not fully specified. |
-| Total conceptual complexity | Pass. The Draft avoids a premature identity system, predicate registry, time system, or value ontology. |
+| Founding Principles consistency | Pass. The representation is deterministic and keeps assertion, verification, authority, and execution separate. |
+| New primitive burden | Pass. It represents the existing Claim body and closed subject union without adding an object or identity kind. |
+| Removability | Pass. The profile is a replaceable representation layer; removing it removes portability, not Claim semantics. |
+| Twenty-year durability | Pass at Draft scope. Explicit versions, closed forms, exact bytes, and immutable imported suites remain interpretable without registries. |
+| Independent implementability | Pass. The full structure, mappings, canonical rules, and rejection behavior are specified and vector-bound. |
+| Total conceptual complexity | Pass. Existing FieldForm, VE-CBOR-1, PSCID, Action, Event, and Claim-reference owners are reused directly. |
 
-**Verdict: B. BLOCKED ON IDENTIFIER / ISSUER / PREDICATE REPRESENTATION.**
+**Verdict: A. BOUNDED PORTABLE CLAIM-BODY REPRESENTATION COMPLETE AT DRAFT v0.2 SCOPE.**
 
-## 15. Governance and normative home
+## 13. Governance and remaining work
 
-No RFC is required for this Draft correction. It does not revise an Approved
-specification, Accepted ADR, Open Decision, or architectural primitive. A
-future attempt to change Approved Action semantics, adopt a new global field
-registry, replace accepted Rule ordering, or accept RFC-005 conclusions would
-require normal governance.
+This Draft revision stays within representation scope already delegated to this
+artifact. It does not revise an Approved specification or require an RFC, ADR,
+new VE identifier, registry, or primitive.
 
-A standalone Draft representation artifact remains an appropriate normative
-home for the eventual byte-level profile. It cannot claim complete portable
-Claim-body conformance until the semantic/profile field contract is defined.
-
-## 16. Open dependencies and next artifact
-
-The remaining dependencies are:
-
-- portable `issuer_ref` representation without a VE identity system;
-- portable `predicate` identifier/namespace representation without a global
-  predicate registry;
-- schema/profile-defined value and null conventions;
-- timestamp semantic forms and representations;
-- Action/Event identifier and digest representations used by subject
-  references; and
-- explicit Claim-body profile selection/version negotiation.
-
-The next artifact is **Claim Body Semantic Field Contract**. It must determine
-the minimum portable semantic/profile-bound forms of:
-
-```text
-issuer_ref
-predicate
-value
-assertion_time
-observation_time
-Action/Event identifier representations used by subject_reference
-```
-
-It must resolve these semantics before a CBOR profile claims complete portable
-Claim-body bytes. It must not create an identity system, predicate registry,
-universal timestamp primitive, generic reference ontology, or new Claim
-primitive.
+Draft v0.2 does not support Claim time fields, arbitrary Predicate semantics,
+unrecognized PSCID suites, verification profiles, trust, or engine-specific
+CEL conversion. Supporting any of those requires its own governed work. This
+Draft does not resume or resolve generic proposals in RFC-005.
 
 ## Revision history
 
-| Date | Change |
-|---|---|
-| 2026-08-27 | Initial Draft candidate; corrected after independent audit to separate VE-CBOR mechanics from unresolved Claim semantic/profile representations. |
+| Version | Date | Change |
+|---|---|---|
+| 0.2 | 2026-09-11 | Completed the bounded portable Claim-body map, four-arm subject-reference representation, imported Action/Event/PSCID forms, schema-driven issuer/value/external mappings, closed rejection behavior, and portable conformance vectors; time remains forbidden in the supported Predicate closure. |
+| 0.1 | 2026-08-27 | Initial Draft candidate; separated VE-CBOR mechanics from then-unresolved Claim semantic/profile representations. |
