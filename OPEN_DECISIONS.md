@@ -1,13 +1,13 @@
 ---
 id: OPEN-DECISIONS
 title: Verified Execution Open Decision Register
-version: 1.4
+version: 1.5
 status: Active
 document_type: Decision Register
 category: Governance
 author: Verified Execution Editorial Board
 created: 2026-08-22
-updated: 2026-09-11
+updated: 2026-09-13
 depends_on:
   - SPECIFICATION-GOVERNANCE
 related_documents:
@@ -25,7 +25,7 @@ superseded_by: null
 | PRED-001 | Predicate Schema external-subject semantics | Resolved | Accepted RFC-007/ADR-007; Approved Predicate Schema Semantic Contract v1.1 and Canonical Representation Profile v1.1 | `subject_domain` and the fourth permitted `subject_constraints` member are authoritative for Predicate Schema semantics and bounded canonicalization. Claim Reference v0.2 remains Draft for separate representation-level conformance. |
 | PRED-002 | Predicate Schema cross-predicate value comparison | Resolved | Accepted RFC-010/ADR-010; Approved Predicate Schema Semantic Contract v1.2 and Canonical Representation Profile v1.2 | Optional normalized structural comparison semantics inside `value_semantics` govern equality capability and Integer-only ordering. Incompatible or unsupported semantics yield `NOT COMPARABLE`; no conversion or value-domain primitive is introduced. |
 | PSCID-001 | Predicate-Schema-specific content identity | Resolved | Accepted RFC-008/ADR-008 and RFC-012/ADR-012; Approved DIGEST-001 v0.4 | PSCID-1 and permanent v1.1 profile/suite `h'02'` remain unchanged; permanent profile and suite `h'03'` bind the approved v1.2 Predicate Schema canonicalization closure. DIGEST-001 v0.4 corrects affected bounded-Integer conformance anchors without changing the closure or suite/profile. Generic digest infrastructure remains open under RFC-005. |
-| RULE-001 | Portable v0.1 Rule representation | Resolved | ADR-RULE-001/002 | VE-CEL-1 selected. |
+| RULE-001 | Portable v0.1 Rule representation | Resolved | Accepted ADR-RULE-001/002 and ADR-013 | The canonical Rule semantic boundary is exactly `language`, `semantics_version`, and `source`; `id` and release `version` are external metadata, and input/output contracts are profile-owned. Remaining immutable-profile allocation, authority binding, representation, and content-identity work is downstream specification work tracked in `SPECIFICATION_TASKS.md`, not an open architectural decision. |
 | RULE-002 | Deterministic Rule execution | Resolved | ADR-RULE-001/002 | Explicit immutable inputs; no hidden side effects. |
 | VERIFY-001 | Mandatory algorithms/profiles | Open | RFC-005 Draft | Requires interoperability and lifecycle evidence. |
 | VERIFY-002 | Claim verification envelope | Resolved — limited | ADR-VERIFY-002 | `Claim.verification` is `{ profile, artifact }`; COSE is optional and not the sole VE signature representation. |

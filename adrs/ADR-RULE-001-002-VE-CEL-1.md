@@ -7,9 +7,10 @@ document_type: "Architectural Decision Record"
 category: "Protocol"
 author: "Verified Execution Editorial Board"
 created: 2026-08-21
-updated: 2026-08-22
+updated: 2026-09-13
 depends_on: []
-related_documents: []
+related_documents:
+  - ADR-013
 supersedes: null
 superseded_by: null
 ---
@@ -20,7 +21,51 @@ superseded_by: null
 **Scope:** This decision selects the mandatory portable Rule representation and execution constraints for VE Kernel Protocol v0.1. It does not establish CEL as a universal VE programming model.  
 **Decision:** Adopt `VE-CEL-1`, a constrained profile of the Common Expression Language (CEL), as the mandatory portable Rule execution format for v0.1.
 
-## Decision
+## Current authority and partial supersession
+
+Accepted [ADR-013](ADR-013-canonical-rule-semantic-boundary.md) partially
+supersedes only this record's seven-field canonical Rule-object boundary and
+its direct field implications. The statement below requiring at least `id`,
+`version`, `language`, `source`, `input_contract`, `output_contract`, and
+`semantics_version` remains as historical decision text; it is no longer the
+current canonical Rule semantic boundary.
+
+Current authority defines the boundary as:
+
+```text
+Rule {
+  language,
+  semantics_version,
+  source
+}
+```
+
+`language` identifies the evaluation-profile family; the current family is
+`VE-CEL-1`. `semantics_version` identifies one immutable, complete,
+historically resolvable evaluation-semantics closure within that family. It is
+not a document, policy, Rule-release, or deployment version. `source` is the
+exact admitted Rule source artifact: valid UTF-8 text that is already NFC,
+rejected rather than normalized when non-NFC, and bounded by the selected
+profile's source-size limit. Admitted textual differences remain exact-artifact
+distinctions.
+
+`id` is external policy/catalog/organizational metadata, and `version` is
+external release/lifecycle metadata. The selected immutable
+`(language, semantics_version)` profile transitively owns the input and output
+contracts. No immutable VE-CEL `semantics_version` is allocated yet, so
+canonical Rule representation and content identity remain blocked.
+
+This reconciliation does not choose a source wire type, an identifier wire
+syntax, the first VE-CEL semantic-version value, or a Rule content digest.
+
+All other decisions in this record remain Accepted and authoritative. This
+reconciliation does not change Rule as a kernel primitive, deterministic
+side-effect-free execution, exactly the immutable `action` and `claims`
+bindings, deterministic Claim-list construction, duplicate Claim cardinality,
+Evaluate outcomes, Predicate ownership of comparison semantics, or the
+absence of an EvaluationResult or EvaluationAttempt primitive.
+
+## Historical decision (partially superseded)
 
 A v0.1 portable Rule MUST identify the language profile `VE-CEL-1` and carry the exact CEL source text as part of the canonical Rule object.
 
