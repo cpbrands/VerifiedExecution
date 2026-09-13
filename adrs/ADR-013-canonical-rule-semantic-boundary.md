@@ -2,7 +2,7 @@
 id: ADR-013
 title: Canonical Rule Semantic Boundary
 version: "0.1"
-status: Proposed
+status: Accepted
 document_type: Architectural Decision Record
 category: Semantics
 author: Verified Execution Editorial Board
@@ -27,28 +27,26 @@ superseded_by: null
 
 ## 1. Status and authority boundary
 
-**Status:** Proposed
+**Status:** Accepted
 
 **Related RFC:** RFC-013 — Canonical Rule Semantic Boundary
 
 **Decision:** Adopt the three-field canonical Rule semantic boundary and the
 immutable semantic-profile invariant described below.
 
-This Proposed ADR is non-authoritative. It records the decision requested by
-RFC-013 for governance review; it does not change Accepted ADR-RULE-001/002,
-VE-CEL-1 Draft v0.2, Rule or Evaluate semantics, any canonical
-representation, or any content-identity construction. The partial
-supersession described in Section 11 takes effect only when ADR-013 itself is
-changed from `Proposed` to `Accepted` through the repository's governed
-process and that Accepted transition is merged into authoritative `main`.
-RFC-013 has an independent governance status; changing either document's
-status does not change the other document's status.
+This Accepted ADR is authoritative at its declared architectural scope when
+this governed status transition is merged into authoritative `main`. It
+records the decision requested by RFC-013; it does not revise VE-CEL-1 Draft
+v0.2, Rule or Evaluate execution semantics, any canonical representation, or
+any content-identity construction. Its acceptance makes only the partial
+supersession described in Section 11 authoritative.
 
-A merged ADR whose status remains `Proposed` is non-authoritative. Successful
-validation, audit, review, or merge of this Proposed document does not
-constitute architectural acceptance.
+RFC-013 has an independent governance status. Acceptance of ADR-013 does not
+accept RFC-013, and acceptance of RFC-013 does not accept ADR-013. Successful
+validation, audit, or review without this explicit Accepted transition merged
+into authoritative `main` would not constitute architectural acceptance.
 
-This candidate does not:
+This acceptance does not:
 
 - allocate an immutable VE-CEL semantic profile;
 - choose the wire type or syntax of `semantics_version`;
@@ -275,7 +273,7 @@ do not currently constitute an accepted immutable semantic-profile
 allocation. VE-CEL-1 Draft v0.2 is candidate semantic content only.
 
 This ADR does not allocate the first VE-CEL immutable semantic version. A
-governed follow-up after acceptance MUST:
+governed follow-up after this acceptance MUST:
 
 1. select and freeze one exact VE-CEL semantic closure;
 2. assign an immutable `semantics_version`;
@@ -319,7 +317,7 @@ fields, but neither is defined here.
 
 ## 11. Partial supersession of ADR-RULE-001/002
 
-Upon acceptance, this decision partially supersedes only the canonical
+This Accepted decision partially supersedes only the canonical
 seven-field Rule-object boundary in ADR-RULE-001/002.
 
 Specifically superseded are:
@@ -356,10 +354,10 @@ The following ADR-RULE-001/002 decisions remain unaffected and authoritative:
 - no general Wasm Rule profile is introduced.
 
 This is not a broad supersession of ADR-RULE-001/002. The front-matter
-`supersedes` relation remains null in this one-file Proposed candidate because
+`supersedes` relation remains null in this one-file acceptance change because
 repository metadata requires reciprocal supersession and the Accepted source
 ADR is intentionally not modified in this task. The governed reconciliation
-after acceptance must record the partial relationship without erasing the
+after this acceptance must record the partial relationship without erasing the
 prior decision's historical authority.
 
 ## 12. Externalized fields
@@ -438,10 +436,10 @@ move catalog and release metadata outside canonical Rule and select a governed
 immutable semantic profile. Repository evidence does not quantify external
 adoption, so deployment impact remains unknown.
 
-A post-acceptance `CHANGELOG.md` entry is mandatory. It must record the Class C
-change, unchanged Rule evaluation behavior, and absence of a standardized
-wire artifact requiring migration. `CHANGELOG.md` is not changed by this
-Proposed ADR candidate.
+This acceptance creates a mandatory `CHANGELOG.md` follow-up. It must record
+the Class C change, unchanged Rule evaluation behavior, and absence of a
+standardized wire artifact requiring migration. `CHANGELOG.md` is not changed
+by this ADR acceptance.
 
 ## 16. Security consequences
 
@@ -512,7 +510,7 @@ Rule verification profile, or content digest is introduced.
 
 ## 19. Affected authority
 
-If accepted, this ADR affects only the Rule-boundary portion of
+This Accepted ADR affects only the Rule-boundary portion of
 ADR-RULE-001/002 and the subsequent Rule semantic/profile governance work.
 
 It does not itself revise:
@@ -529,29 +527,28 @@ It does not itself revise:
 Those artifacts change, if required, only through the governed follow-up
 sequence below.
 
-## 20. Required post-acceptance work
+## 20. Required work after acceptance
 
-The governed follow-up sequence is:
+After this Accepted transition is merged into authoritative `main`, the
+remaining governed sequence is:
 
-1. transition ADR-013 through its own governed change from `Proposed` to
-   `Accepted` and merge that Accepted transition into authoritative `main`;
-2. resolve RFC-013's status independently through repository governance; its
+1. resolve RFC-013's status independently through repository governance; its
    transition may occur separately or in the same governed reconciliation
    only when that change explicitly transitions RFC-013 itself;
-3. after ADR-013 is authoritative, reconcile and explicitly record the partial
+2. reconcile and explicitly record the partial
    supersession of only the
    affected ADR-RULE-001/002 Rule-boundary text;
-4. reconcile authoritative Rule semantic documentation while preserving the
+3. reconcile authoritative Rule semantic documentation while preserving the
    unaffected decisions listed in Section 11;
-5. add the required `CHANGELOG.md` entry for the Class C semantic change;
-6. freeze one exact VE-CEL semantic closure;
-7. allocate its immutable `semantics_version`;
-8. bind that identifier permanently to immutable normative authority and
+4. add the required `CHANGELOG.md` entry for the Class C semantic change;
+5. freeze one exact VE-CEL semantic closure;
+6. allocate its immutable `semantics_version`;
+7. bind that identifier permanently to immutable normative authority and
    preserve historical resolution;
-9. add a superseding or corrective non-normative analysis recording that the
+8. add a superseding or corrective non-normative analysis recording that the
    RS-CEL-001 Gap Analysis closed Rule input/evaluation portability but that
    canonical Rule field semantics required this governance correction; and
-10. only after the immutable VE-CEL semantic profile exists, resume canonical
+9. only after the immutable VE-CEL semantic profile exists, resume canonical
    Rule representation and Rule content-identity
    specification.
 
@@ -559,28 +556,26 @@ Repository governance may combine reconciliation steps in one pull request
 provided every dependency and each document's independent status transition
 remain explicit.
 
-No step in that sequence is performed by this one-file Proposed ADR draft.
+No remaining step in that sequence is performed by this one-file acceptance
+change.
 
 ## 21. RFC disposition
 
-RFC-013 remains Proposed and non-authoritative during this ADR drafting task.
-RFC-013 and ADR-013 have independent governance status. Acceptance of ADR-013
-does not accept RFC-013, and acceptance of RFC-013 does not accept ADR-013.
-Each transition requires an explicit governed repository change to that
-document. A single governed change may transition the two documents at the
-same time only when it explicitly changes each status.
+RFC-013 remains Proposed and non-authoritative. RFC-013 and ADR-013 have
+independent governance status. This ADR's acceptance does not accept RFC-013,
+and later acceptance of RFC-013 would not alter this ADR's status. Each
+transition requires an explicit governed repository change to the affected
+document. A single governed change may transition two documents at the same
+time only when it explicitly changes each status.
 
-ADR-013 may reference RFC-013 as its proposal and rationale source regardless
-of RFC-013's current status. ADR-013 becomes authoritative only when its own
-status is changed from `Proposed` to `Accepted` through repository governance
-and that Accepted transition is merged into authoritative `main`. Merely
-merging this Proposed candidate, or passing validation, audit, or review, does
-not accept it.
+ADR-013 references RFC-013 as its proposal and rationale source regardless of
+RFC-013's status. ADR-013 becomes authoritative when this explicit Accepted
+transition is merged into authoritative `main`; validation, audit, or review
+without that merged transition is insufficient.
 
-This candidate performs no status transition. Until ADR-013 itself becomes
-authoritative, the seven-field ADR-RULE-001/002 boundary remains authoritative
-and its partial supersession does not take effect. RFC-013's disposition must
-be resolved independently under the governance applicable to subsequent
+Once this Accepted version is authoritative, the partial supersession in
+Section 11 governs the Rule semantic boundary. RFC-013's disposition remains
+to be resolved independently under the governance applicable to subsequent
 reconciliation and implementation work.
 
 ## 22. Architectural Decision Test
@@ -613,14 +608,16 @@ immutable, historically resolvable, complete evaluation-semantics closure.
 The pair cannot be retargeted, and any interpretation-affecting change
 requires a new `semantics_version`.
 
-This Proposed ADR allocates no semantic version and changes no authority.
+This Accepted ADR allocates no VE-CEL semantic version and performs no
+downstream reconciliation.
 Canonical Rule representation and content identity remain blocked until
-ADR-013 is authoritative, RFC-013's disposition has been resolved independently
-as required by repository governance, and the initial VE-CEL immutable profile
-is governed, frozen, allocated, and permanently anchored.
+RFC-013's disposition has been resolved independently as required by
+repository governance and the initial VE-CEL immutable profile is governed,
+frozen, allocated, and permanently anchored.
 
 ## Revision history
 
 | Version | Date | Change |
 |---|---|---|
 | 0.1 | 2026-09-12 | Initial Proposed ADR selecting the three-field Rule semantic boundary and immutable, non-retargetable, historically resolvable evaluation-profile invariant. |
+| 0.1 | 2026-09-12 | Status transitioned from Proposed to Accepted; decision, partial-supersession scope, compatibility classification, and downstream blockers unchanged. |
