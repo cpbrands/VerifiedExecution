@@ -7,7 +7,7 @@ document_type: Changelog
 category: Governance
 author: Verified Execution Editorial Board
 created: 2026-08-22
-updated: 2026-09-11
+updated: 2026-09-13
 depends_on:
   - SPECIFICATION-GOVERNANCE
 supersedes: null
@@ -17,6 +17,28 @@ superseded_by: null
 # Verified Execution Repository Changelog
 
 This changelog records repository-wide semantic, governance, status, and structural changes. Specification-specific changelogs remain authoritative for changes to their specifications.
+
+## 2026-09-13 — Canonical Rule semantic-boundary correction
+
+- **Decision:** Accepted ADR-013 partially supersedes the seven-field canonical
+  Rule-object boundary in ADR-RULE-001/002.
+- **Classification:** Class C — Breaking Semantic Change.
+- **Canonical boundary:** Canonical Rule semantics change from `id`, `version`,
+  `language`, `source`, `input_contract`, `output_contract`, and
+  `semantics_version` to exactly `language`, `semantics_version`, and `source`.
+- **Field disposition:** `id` and `version` leave kernel Rule semantics and may
+  remain external policy/catalog and release/lifecycle metadata. The immutable
+  evaluation profile owns the input and output contracts transitively.
+- **Semantic-profile requirement:** Every `(language, semantics_version)` pair
+  must bind permanently to one immutable, complete, historically resolvable
+  evaluation closure.
+- **Unaffected behavior:** Rule evaluation behavior is unchanged. Evaluate
+  remains distinct from authorization and Execution Right issuance, and
+  Execution Right remains `(action_id, action_digest)`.
+- **Representation status:** No standardized Rule wire representation or Rule
+  content identity existed before this change. Both remain blocked until an
+  immutable VE-CEL semantic profile is frozen, allocated, and bound to
+  immutable normative authority.
 
 ## 2026-09-11 — Predicate Integer canonical-key conformance correction
 
