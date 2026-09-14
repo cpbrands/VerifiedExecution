@@ -36,7 +36,7 @@ These tasks make accepted decisions independently implementable. They are not ar
 - [ ] SPEC-CEL-003 — Define exact verified-Claim-to-CEL value mapping.
 - [ ] SPEC-CEL-004 — Define the VE-CEL-1 feature and operator allowlist.
 - [ ] SPEC-CEL-005 — Define normative Rule resource and cost limits.
-- [ ] SPEC-CEL-006 — Freeze one exact VE-CEL evaluation-semantics closure, allocate its first immutable `semantics_version`, and bind that identifier permanently to immutable normative authority with historical resolution. Only after this task is complete may canonical Rule representation and content-identity work resume.
+- [x] SPEC-CEL-006 — Completed by `VE-CEL-1-SEMANTIC-PROFILE-001`: freezes the complete VE-CEL semantic closure, allocates immutable `semantics_version = 001`, permanently binds it to historical immutable authority, freezes Unicode 15.0.0 repertoire/NFC semantics, and guarantees historical resolution. Canonical Rule representation and content-identity work is now unblocked but remains unspecified.
 
 ## Interoperability
 
