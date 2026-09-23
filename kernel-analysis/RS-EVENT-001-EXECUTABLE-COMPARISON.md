@@ -1,7 +1,7 @@
 ---
 id: RS-EVENT-001-EXECUTABLE-COMPARISON
 title: RS-EVENT-001 Executable Semantic Replay Comparison
-version: "0.1"
+version: "0.2"
 status: Draft
 document_type: Experimental Comparison Report
 category: Non-normative Validation
@@ -31,7 +31,7 @@ This is **non-normative, bounded experimental evidence**, not a specification,
 Draft approval, or general Event conformance certificate. It executes the
 23 cases documented in [RS-EVENT-001](../reference-scenarios/RS-EVENT-001-DETERMINISTIC-EVENT-SEMANTICS.md)
 following the [merged Gap Analysis](GAP-ANALYSIS-RS-EVENT-001-DETERMINISTIC-EVENT-SEMANTICS.md).
-Neither source document is changed. Their historical statement that they
+The original experiment changed neither source document. Their historical statement that they
 supplied no executed comparison remains accurate; this report supplies later,
 separately scoped evidence, not a retroactive execution claim.
 
@@ -53,7 +53,10 @@ The commands read files and execute in memory; no fixture regeneration, source
 editing, bytecode files, or stash operations are involved. Runtime differences
 remain visible and should be reported, not used to change the oracle.
 
-The experiment revision is the commit containing these exact file fingerprints:
+The original experiment revision is commit
+`83ff96fb301c317f0502827b275bc7f0d7e95b50`, containing these exact file
+fingerprints. This table remains historical; the runner correction is recorded
+separately below:
 
 | Artifact | SHA-256 |
 |---|---|
@@ -70,8 +73,64 @@ The experiment revision is the commit containing these exact file fingerprints:
 [VE-004](../specifications/VE-004-receipt-specification.md),
 [VE-005](../specifications/VE-005-adapter-specification.md),
 [VE-006](../specifications/VE-006-execution-boundary-specification.md),
-the imported Rule specification and governance. The runner verifies their Git
-blob identities from file contents, without requiring network access.
+the imported Rule specification and governance. These identify the historical
+inputs at the recorded base, not a current-governing-source synchronization
+requirement. The original runner incorrectly read mutable working-file bytes.
+The corrected runner verifies bytes at the recorded commit as described below.
+
+### 1.1 Historical-source verification correction
+
+The gap-analysis follow-up at `56f755cc73421f472dc176e4f14194d6c7a54b88`
+changed the analysis but preserved the experiment. Its 77/78 test result exposed
+the original reader's conflation of current files with historical source pins.
+The original ten blob pins, fixture `base`, oracle and semantic fixtures remain
+unchanged. No source is repinned to the new analysis or latest authority.
+
+The corrected runner loads **all ten** source paths using
+`git --no-replace-objects cat-file blob <recorded-base>:<path>` at exactly
+`9169fc0f1017e2b657691a9c5b001ad82dffe981`, then recomputes each Git blob hash
+from the returned bytes against its original pin. Commit/path lookup preserves
+provenance as well as byte integrity; an arbitrary matching blob is insufficient.
+Replacement objects are disabled, lazy network fetching is disabled, and missing
+history/path or a byte mismatch fails without falling back to HEAD or disk.
+The original fixture SHA-256 and exact base are also asserted, preventing a
+silent edit to the source-pin map or recorded commit from passing this test.
+
+Corrected runner SHA-256:
+`506b92011d83ba03487579308115394f33d38d9ab0924080394f2e2c64e7da57`.
+The correction revision is the commit containing that runner fingerprint and
+this report revision. The original runner fingerprint above remains available
+at the original experiment commit. Both semantic implementations and the
+oracle retain their original fingerprints; this correction changes only
+provenance checking and adds two integrity regressions.
+
+Reproduction requires Node, Python, Git and a clean checkout with the recorded
+base commit's source tree available. A normal full clone followed by checkout
+of the reviewed correction revision provides this history. Before running the
+commands above, verify availability with:
+
+```sh
+git cat-file -e 9169fc0f1017e2b657691a9c5b001ad82dffe981^{commit}
+```
+
+For a shallow checkout missing that commit, explicitly fetch it first:
+
+```sh
+git fetch origin 9169fc0f1017e2b657691a9c5b001ad82dffe981
+```
+
+The tests themselves never fetch or repair source material. A source archive
+without Git history is insufficient; a full clone works offline once populated.
+One added regression flips a byte in each of the ten historical sources and
+requires the same production integrity assertion to reject it. The other
+requires missing-commit and missing-path rejection, including a path present
+in today's checkout but absent at the recorded base. Neither test edits sources.
+
+Rerunning this corrected harness reproduces the original bounded experiment;
+it does not validate changed governing specifications. A current-authority
+experiment would need explicitly reviewed new provenance and applicable cases,
+not replacement of these historical pins. Same-author and coverage limitations
+remain unchanged.
 
 ## 2. Inputs, oracle and implementation separation
 
@@ -208,12 +267,16 @@ exhaustive fault coverage or absence of shared bugs.
 
 ## 5. Validation and limitations
 
-The standalone executable suite passed **51/51 tests**: one fixture/source/oracle
+At the original experiment revision, the standalone executable suite passed
+**51/51 tests**: one fixture/source/oracle
 integrity test, 23 scenario comparisons, three supplemental groups and 24 mutant
 detection tests. Source anchors passed **10/10**. The full `node --test` run
 passed **78/78**, comprising these 51 and the existing 27 documentation-validator
 tests. Documentation/reference validation separately passed **146 Markdown
-documents**. Diff and text hygiene checks passed.
+documents**. Diff and text hygiene checks passed. With the source-reader
+correction, the suite contains those same 51 tests plus two focused integrity
+regressions: **53 experimental tests / 80 complete repository tests**. These
+extra checks do not increase the 23 scenario cases or 24 semantic mutants.
 
 The unchanged GitHub Documentation Integrity workflow runs documentation
 validation and the existing **27 documentation-validator tests only**. Its
@@ -253,4 +316,5 @@ certified, and no representation or new normative artifact is begun here.
 
 | Version | Date | Change |
 |---|---|---|
+| 0.2 | 2026-09-22 | Preserve original experiment provenance; resolve all ten source pins at their recorded immutable base, assert unchanged fixture provenance, document clean-checkout requirements and add byte-tampering/missing-history regressions. |
 | 0.1 | 2026-09-22 | Record bounded Python/Node execution, immutable source/fixture fingerprints, separate source oracle, per-case results, deliberate-fault detection and evidence limitations. |

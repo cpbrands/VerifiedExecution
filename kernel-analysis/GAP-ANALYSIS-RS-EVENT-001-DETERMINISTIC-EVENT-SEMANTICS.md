@@ -1,7 +1,7 @@
 ---
 id: GAP-ANALYSIS-RS-EVENT-001-DETERMINISTIC-EVENT-SEMANTICS
 title: Gap Analysis for RS-EVENT-001 Deterministic Event Semantics
-version: "0.1"
+version: "0.2"
 status: Draft
 document_type: Gap Analysis
 category: Non-normative Analysis
@@ -13,6 +13,7 @@ depends_on:
   - EVENT-SEMANTIC-FIELD-CONTRACT
   - VE-002
 related_documents:
+  - RS-EVENT-001-EXECUTABLE-COMPARISON
   - VE-003
   - VE-004
   - VE-005
@@ -25,6 +26,28 @@ superseded_by: null
 ---
 
 # Gap Analysis for RS-EVENT-001 Deterministic Event Semantics
+
+## Current reading and historical baseline
+
+Revision 0.2 incorporates the merged executable comparison at
+`ba35f26dd760a39aa384f986654bbdfe0dd68875` (PR #93). Freshly fetched
+`origin/main` equals that revision at this reassessment; there are no
+intervening remote changes to classify. This remains Draft non-normative
+analysis. The report is evidence, not an additional normative authority.
+
+**Current disposition:** the bounded executable task is complete: both
+same-author implementations matched the 23-case oracle and each other, and
+24 deliberately injected mutants were detected. General conformance,
+independent-team replication, reusable lifecycle-profile closure and Event
+representation readiness remain unproved. The single next specification-sized
+artifact is a **Bounded Lifecycle Event-Type Semantic Profile**, scoped in §10.
+
+Sections 1–8 below preserve the original v0.1 findings and recommendation
+verbatim as a historical assessment of the documented scenario. Their
+present-tense statements, including “outstanding” executable evidence and the
+old next artifact, describe that earlier assessment only. Sections 9–11 give
+the current evidence disposition and replace its forward-looking recommendation;
+they do not retroactively turn the original modeled analysis into execution.
 
 ## 1. Authority and bounded question
 
@@ -355,8 +378,217 @@ This analysis closes the requested classification exercise, not the outstanding
 evidence or profile work. Documentation/reference validation and repository Node
 tests validate this document's integration, not any Event scenario execution.
 
+## 9. Disposition of the merged executable evidence
+
+The [Executable Comparison Report](RS-EVENT-001-EXECUTABLE-COMPARISON.md)
+records the original Draft v0.1 experiment as non-normative validation;
+report v0.2 documents its historical-source reader correction. Its original implementation commit is
+`83ff96fb301c317f0502827b275bc7f0d7e95b50`; PR #93 merged it at the revision
+above. The report pins the fixture, oracle, both implementations and runner by
+SHA-256, and the fixture pins ten historical source blobs. Those pins, semantic
+fixtures, oracle and both implementations remain unchanged. The supporting
+runner correction below changes provenance verification only.
+
+| Historical question | New evidence and bounded closure | What remains unproved |
+|---|---|---|
+| Were the 23 cases actually executed? | Yes. Python append-first and Node history-first each matched the separately recorded source oracle in 23/23 cases and agreed in 23/23 comparisons. No baseline discrepancy or oracle adjustment was reported. The §6 report task is complete at this bounded scope. | Behavior outside these exact inputs; general Event or Draft-contract conformance. |
+| Can selected semantic mistakes escape a vacuous comparison? | Twelve faults in each implementation produced 24/24 detected mutants. Detection required a well-formed divergent result; a crash did not count. | Exhaustive fault coverage, absence of shared bugs, or correctness of the shared interpretation of source prose. |
+| Were the implementations separated? | Different languages and replay/admission strategies; no shared semantic helper or oracle-reading code. The oracle was recorded before execution. | Independent authorship or independent engineering-team replication: both implementations were developed in the same task. |
+| Are missing-material and authority boundaries exercised? | T3/T4/R4 preserve unsupported retained history; O1–O3 distinguish supplied protected assignments; B3/V1 reject observation/Receipt substitution. The isolated protected-selection control detects bypass independently of evidence admission. | Actual source authentication, settlement truth, production concurrency, successor selection, or authenticated historical distribution. |
+| Are full field and lifecycle contracts exercised? | The finite type/time/actor/reference fixtures suffice for these results. Supplemental groups exercise admission without selection, delivery without membership, and actor/time rejection. | A reusable type profile, portable Policy identity, every Event-contract §21 pressure, or the entire VE-003 state machine. The three supplemental groups are not extra cases in the 23-case count. |
+
+The report records 51/51 experimental tests (integrity, 23 cases, three
+supplemental groups and 24 mutants), 10/10 source anchors, and 78/78 complete
+repository tests at its pinned revision. Those are historical measured results,
+not an assertion that this revised document has the old source bytes.
+
+At follow-up head `56f755cc73421f472dc176e4f14194d6c7a54b88`, the original
+runner compared current working files with historical pins, producing 77/78:
+only this gap analysis v0.1 pin, blob
+`366987c357d2d786d76f3fb32bb7e97c563c714e`, mismatched its revised file. That
+was a historical-source reader defect, not a replay disagreement. The scoped
+correction now reads all ten sources from the fixture's unchanged recorded base
+`9169fc0f1017e2b657691a9c5b001ad82dffe981`, verifying the returned bytes against
+the unchanged original pins. No current-source synchronization is claimed.
+
+The report's reproducibility correction records the revised runner fingerprint
+and clean-checkout history requirement. Two focused regressions require altered
+pinned bytes and unavailable historical sources to fail; no assertion is skipped
+and no fallback to current HEAD is permitted. The original 78 tests remain, with
+two added integrity checks. This fixes experiment provenance checking without
+advancing semantic scope, altering specifications, or changing the selected
+next artifact.
+
+The existing Actions workflow runs documentation validation and the 27
+documentation-validator tests only. Its success is integration evidence and
+cannot stand in for the local complete suite or independent-team replication.
+
+### 9.1 Remaining dependencies and limitations
+
+**Lifecycle profile:** still missing. VE-003 v0.1 is Draft and owns the
+transition table; the Event Semantic Field Contract v0.1 is Draft and assigns
+field duties to the selected type. Neither the successful replay nor test
+identifiers such as `ET(A,local,1)` supply a reusable complete authority-scoped
+type allocation and immutable field/dependency closure. The experiment
+supports proceeding to bounded profile specification; it does not finish it.
+
+**Policy references:** remain a scoped dependency. R1–R4 establish the local
+permission/substitution/unavailability behavior of the supplied `P-A` and Rule
+reference. They do not establish Policy artifact identity, version binding,
+equality, resolution, authenticity or portable representation. No Policy owner
+contract closing those matters is supplied by the merged evidence. Existing
+Rule identity cannot silently stand in for Policy identity. A profile using
+Policy references must close that dependency before claiming portability;
+a profile excluding them need not standardize Policy identity first.
+
+**Other evidence:** equal occurrence times, sequence ties, full
+actor/component/payload domains, generalized mixed invalid/unsupported histories,
+and nonexistent/mutable/unauthenticated/cross-Action references remain outside
+the demonstrated scope. Duplicate-member parser behavior is not tested by JSON
+objects. Historical packaging and transport acknowledgements retain their
+implementation/transport ownership; no common registry, packaging protocol or
+consensus mechanism is justified by the report. These are distinct evidence
+limits and deployment obligations, not invented missing Event semantics.
+
+## 10. Exactly one next specification-sized artifact
+
+**Selected: Bounded Lifecycle Event-Type Semantic Profile — Draft.**
+
+This is a subordinate semantic profile under Approved VE-002 v0.2 and the
+explicitly versioned Draft Event contract/VE-003 dependencies. Its proposed
+scope is the seven already modeled transition-trigger kinds:
+`ACTION_CREATED`, `VALIDATION_STARTED`, `VALIDATION_SUCCEEDED`,
+`AUTHORIZATION_GRANTED`, `EXECUTION_STARTED`, `EXECUTION_COMPLETED`, and
+`EXECUTION_FAILED`. It covers their existing success/known-failure paths and
+preserves uncertain observations without manufacturing a terminal Event.
+It does not claim to cover the rest of VE-003's state machine.
+
+The profile should make the reusable meaning of those kinds implementable:
+complete authority-scoped/version-specific type selection, asserted fact,
+admission preconditions, occurrence-time meaning and exact abstract domain,
+optional-field permissions and value rules, transitive semantic bindings,
+existing lifecycle-trigger mapping, and rejection versus unsupported replay.
+These are requirements for the next author to resolve explicitly, not new
+definitions or allocations made by this analysis. In particular, no actual
+type identifiers, clock/precision choices, evidence proof formats or attribution
+domains are chosen here; the scenario's singleton domains and timestamp window
+cannot be promoted silently to normative defaults.
+
+To bound this first profile, Policy/Rule-bearing evidentiary types
+`POLICY_EVALUATED` and `POLICY_RECORDED` are outside its scope, as are portable
+reference collections. The profile should explicitly exclude `references`
+for its selected types; that is a proposed profile restriction under the
+Event contract's existing permission model, not a base Event prohibition or
+a claim that all real histories lack references. It neither removes retained
+Policy Events from histories nor reinterprets them. A mixed history importing
+such a type still needs that type's full reference-owner contract. Required
+authorization evidence remains a Boundary input even when no Policy reference
+is carried in the Event; excluding the field cannot waive evidence admission.
+
+**Dependency order:** the executable comparison was the preceding evidence
+task and is now complete at its stated scope. Next close one reusable type
+profile so that representation can consume explicit meaning. Policy identity
+is deferred because this selected profile does not carry Policy references;
+if a selected type proves unable to express its existing fact without one,
+record that blocker and reconsider scope before claiming profile completeness.
+Do not substitute Rule identity or an opaque local handle to avoid that gate.
+Event representation follows only after this semantic scope and its imported
+domains are closed. A new comparison report or universal Policy framework is
+not selected as a parallel next artifact.
+
+### 10.1 Scope exclusions
+
+No new lifecycle state/transition, Event field, Event content identity, wire
+labels/bytes, digest suite, global type registry, generic reference union,
+universal clock, evidence truth oracle, serialization protocol, or new primitive
+belongs in this artifact. VE-003 retains transition authority; the Boundary
+retains evidence admission/append authority; the protected environment supplies
+unique head/position; the target owns external facts. Adapter observations,
+authorization, execution truth, Receipt derivation and Execution Right
+`(action_id, action_digest)` remain distinct.
+
+### 10.2 Acceptance criteria for the next Draft
+
+1. Publish an explicit seven-kind coverage matrix, binding each complete type
+   identifier to exactly one immutable version-specific semantic definition
+   and every required dependency. State the Draft maturity of the imported
+   Event contract and VE-003; no latest-version or deployment-selected meaning.
+2. For each kind, specify the asserted fact, exact admissible evidence
+   conditions and existing VE-003 transition mapping. Show no new transition,
+   false terminal outcome, or transfer of authority to the Adapter or Receipt.
+   Unresolved evidence requirements remain declared blockers, not assumptions.
+3. Define the exact occurrence-time question, abstract domain, precision,
+   equality/comparison, and unavailable/uncertain-time behavior for each kind.
+   Define presence, domain, cardinality and equality for every permitted
+   actor/component/payload value; explicitly forbid unused known fields and
+   references within the selected profile. Do not invent universal defaults.
+4. Preserve fixed uint64 sequence limits/exhaustion, per-Action order, unique
+   protected assignment before append, multiplicity/identity boundaries,
+   opaque unknown extensions and immutable historical interpretation. Preserve
+   rejection of malformed/null/duplicate known members and retargeting, and
+   distinguish unavailable required material from invalid producer input.
+5. Include source-traceable abstract acceptance/rejection/unsupported examples
+   for every selected kind and its field permissions. Cover success, known
+   failure, uncertain observation, equal times with distinct sequence,
+   illegal/terminal transitions, unavailable transitive material and retargeting.
+   Identify remaining untested §21 pressures without asserting full conformance.
+6. Demonstrate that a second implementer can determine the same meaning from
+   the written profile without consulting fixture-specific aliases, code or
+   hidden deployment policy. Clearly separate specification review, any later
+   same-author execution, and independent-team evidence. Draft completeness is
+   not Approval or general interoperability certification.
+7. Record compatibility and security boundaries and every unresolved dependency.
+   Any required change to Approved VE-002 or an accepted architectural decision
+   blocks ordinary profile completion pending the applicable RFC/ADR process.
+   Missing semantics must remain open rather than be filled by representation.
+
+These are proposed review criteria for a subsequent Draft, not conformance
+rules enacted here. This change creates neither that profile nor new fixtures.
+
+## 11. Current readiness and governance
+
+**Event canonical representation remains blocked for the proposed reusable
+lifecycle scope.** The report removes the absence of bounded executable
+evidence, but does not supply complete reusable type/time/optional-field
+contracts. Policy-reference portability is an additional blocker only for
+types admitting Policy references. Generic encoding research is not prohibited;
+this evidence cannot justify a complete portable Event encoding or allow a
+representation document to decide missing semantic meaning. Draft maturity and
+the broader untested evidence requirements remain separate approval concerns.
+
+**RFC REQUIRED = NO; ADR REQUIRED = NO** for this non-normative reassessment.
+No demonstrated architectural contradiction requires escalation now. The next
+bounded subordinate Draft can be developed under existing owners without
+amending Approved VE-002 or changing a VE-003 transition. This is not advance
+approval: a proposed change to Approved semantics, accepted decisions, authority
+ownership or primitives requires RFC/ADR escalation with the specific conflict
+and affected specification identified. Future normative adoption follows
+Specification Governance; experimental success cannot waive that process.
+
+The six Architectural Decision Tests remain qualitative: the selected profile
+preserves founding authority boundaries; adds no primitive; limits itself to
+non-removable type/field meaning while excluding optional infrastructure;
+requires immutable historical interpretation for durability; has bounded
+same-author evidence but still needs independently implementable written
+contracts; and reduces unresolved choices before encoding. No blanket
+independent-implementability or `6/6` execution proof is inferred.
+
+```text
+BOUNDED EXECUTABLE COMPARISON = COMPLETE (23 CASES; SAME-AUTHOR IMPLEMENTATIONS)
+DELIBERATE MUTANTS = 24/24 DETECTED (12 PER IMPLEMENTATION)
+GENERAL CONFORMANCE / INDEPENDENT-TEAM REPLICATION = NOT ESTABLISHED
+REUSABLE LIFECYCLE PROFILE = OPEN; SELECTED NEXT SPECIFICATION WORK
+PORTABLE POLICY REFERENCE = OPEN FOR TYPES THAT ADMIT IT
+EVENT REPRESENTATION = BLOCKED ON SELECTED SEMANTIC-PROFILE CLOSURE
+DRAFT APPROVAL = NOT GRANTED
+NEXT ARTIFACT = BOUNDED LIFECYCLE EVENT-TYPE SEMANTIC PROFILE (DRAFT)
+RFC / ADR ESCALATION = NOT REQUIRED FOR THIS REASSESSMENT
+```
+
 ## Revision history
 
 | Version | Date | Change |
 |---|---|---|
+| 0.2 | 2026-09-22 | Record the scoped historical-source reader correction and integrity regressions; preserve original pins and the initial 77/78 finding as history. |
+| 0.2 | 2026-09-22 | Preserve v0.1 findings historically; assess merged 23-case/24-mutant same-author evidence, retain unproved dependencies, select one bounded lifecycle Event-type semantic profile, and disclose the unchanged harness's historical source-pin mismatch. |
 | 0.1 | 2026-09-22 | Initial non-normative analysis of six RS-EVENT-001 concerns; preserves modeled-evidence limits and recommends executable comparison before advancing representation readiness. |
