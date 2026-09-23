@@ -1,0 +1,28 @@
+{
+  "derivation": "Manually transcribed from RS-EVENT-001 §§5–6.4 and §8, checked against VE-003 §10 and Event contract §§4–15, before executing either implementation. These are local test outcomes, not VE error codes. Both implementations are denied this file and case IDs.",
+  "cases": [
+    {"id":"B1","order":["E01","E02","E03","E04","E05","E06","E07"],"state":"COMPLETED","rejected":[],"unsupported":[],"source":"RS §5; VE-003 §10 successful transition chain; policy record is non-transitioning"},
+    {"id":"B2","order":["E01","E02","E03","E04","E05","E06","E17"],"state":"FAILED","rejected":[],"unsupported":[],"source":"RS §6.1; VE-003 §10 EXECUTING + EXECUTION_FAILED"},
+    {"id":"B3","order":["E01","E02","E03","E04","E05","E06"],"state":"EXECUTING","rejected":[],"unsupported":[],"source":"RS §6.2; no terminal candidate or admitted terminal evidence; VE-004 §7"},
+    {"id":"T1","order":["E01","E02","E03","E04","E05","E06","E18"],"state":"EXECUTING","rejected":[],"unsupported":[],"source":"RS §4 Authority B has no lifecycle trigger; Event §6 full identifier"},
+    {"id":"T2","order":["E01","E02","E03","E04","E05","E06"],"state":"EXECUTING","rejected":["E07"],"unsupported":[],"source":"RS §8 T2; Event §6 retarget rejected, prefix unchanged"},
+    {"id":"T3","order":["E01","E02","E03","E04","E05","E06","E07"],"state":"EXECUTING","rejected":[],"unsupported":["E07"],"source":"RS §6.4 T3; Event §§6,15; partial supported prefix only"},
+    {"id":"T4","order":["E01","E02","E03","E04","E05","E06","E07"],"state":null,"rejected":[],"unsupported":["E01","E02","E03","E04","E05","E06","E07"],"source":"RS §6.4 T4; TIME-A-1 absent before all replay; NONE marker, not a Lifecycle state"},
+    {"id":"O1","order":["E01","E02","E03","E04","E05","E06"],"state":"EXECUTING","rejected":["E07","E17"],"unsupported":[],"source":"RS §8 O1; Event §8 no external selection, both remain proposals"},
+    {"id":"O2","order":["E01","E02","E03","E04","E05","E06","E07"],"state":"COMPLETED","rejected":["E17"],"unsupported":[],"source":"RS §8 O2; completion evidence admitted and only E07 selected"},
+    {"id":"O3","order":["E01","E02","E03","E04","E05","E06","E17"],"state":"FAILED","rejected":["E07"],"unsupported":[],"source":"RS §8 O3; failure evidence admitted and only E17 selected"},
+    {"id":"D1","order":["E01","E02","E03","E04","E05","E06","E07"],"state":"COMPLETED","rejected":[],"unsupported":[],"source":"RS §8 D1; Event §8 sequence, not delivery, orders known membership"},
+    {"id":"D2","order":["E01","E02","E03","E04","E05","E06","E07"],"state":"COMPLETED","rejected":[],"unsupported":[],"source":"RS §8.1; VE-002 §§4,20 one occurrence despite repeated delivery; no ack comparison"},
+    {"id":"S1","order":["E01","E02","E03","E04","E05","E20","E21"],"state":"COMPLETED","rejected":[],"unsupported":[],"source":"RS §6.3 H; Event §8 maximum allowed, gaps allowed"},
+    {"id":"S2","order":["E01","E02","E03","E04","E05","E20","E21"],"state":"COMPLETED","rejected":["E22"],"unsupported":[],"source":"RS §6.3; Event §8 exhaustion blocks even a non-transition append"},
+    {"id":"S3","order":["E01","E02","E03","E04","E05","E20"],"state":"EXECUTING","rejected":["E21"],"unsupported":[],"source":"RS §6.3; Event §§8,15 rejects 2^64 with no widening"},
+    {"id":"N1","order":["E01","E02","E03","E05","E06","E07"],"state":"COMPLETED","rejected":["E04"],"unsupported":[],"source":"RS §8 N1; Event §4 known null invalid; E05 explicitly assigned after E03"},
+    {"id":"N2","order":["E01","E02","E03","E04","E05","E06","E07"],"state":"COMPLETED","rejected":[],"unsupported":[],"source":"RS §8 N2; Event §§4,13 opaque unknown null has no projection effect"},
+    {"id":"N3","order":["E01","E02","E03","E04","E05","E06","E07"],"state":"COMPLETED","rejected":[],"unsupported":[],"source":"RS §8 N3; Event §13 later unselected field meaning cannot rewrite old history"},
+    {"id":"R1","order":["E01","E02","E03","E04","E05","E06","E07"],"state":"COMPLETED","rejected":[],"unsupported":[],"source":"RS §4.1; Event §12 exact permitted contextual pair has no transition"},
+    {"id":"R2","order":["E01","E02","E03","E04","E05"],"state":"AUTHORIZED","rejected":["E06"],"unsupported":[],"source":"RS §8 R2; Event §§5,12 forbidden references reject candidate"},
+    {"id":"R3","order":["E01","E02","E03"],"state":"READY","rejected":["E19"],"unsupported":[],"source":"RS §8 R3; Event §12 Rule is not Policy; singleton domain violated"},
+    {"id":"R4","order":["E01","E02","E03","E04"],"state":"READY","rejected":[],"unsupported":["E04"],"source":"RS §6.4 R4; Event §§6,15 missing required reference authority; partial READY only"},
+    {"id":"V1","order":["E01","E02","E03","E04","E05","E06"],"state":"EXECUTING","rejected":["E07"],"unsupported":[],"source":"RS §8 V1; VE-004 §§4,11,14 Receipt assertion does not establish own authority"}
+  ]
+}

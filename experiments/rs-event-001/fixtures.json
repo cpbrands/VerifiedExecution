@@ -1,0 +1,81 @@
+{
+  "base": "9169fc0f1017e2b657691a9c5b001ad82dffe981",
+  "sources": {
+    "reference-scenarios/RS-EVENT-001-DETERMINISTIC-EVENT-SEMANTICS.md": "c1190d6ee3a06438c83d61dde57a0ff9ef793b40",
+    "kernel-analysis/GAP-ANALYSIS-RS-EVENT-001-DETERMINISTIC-EVENT-SEMANTICS.md": "366987c357d2d786d76f3fb32bb7e97c563c714e",
+    "specifications/EVENT-SEMANTIC-FIELD-CONTRACT.md": "c5e3075a6108de197287c7d2328977ca8d25a9a6",
+    "specifications/VE-002-event-specification.md": "b7ee2bafd8e2483e506961e5dabfe778939aa38f",
+    "specifications/VE-003-lifecycle.md": "f95c55596dfe6b33f9343cbb8914cadffd4a7073",
+    "specifications/VE-004-receipt-specification.md": "2800f3a13423754dfe4e3ab11fd3fb3f226ee9f1",
+    "SPECIFICATION_GOVERNANCE.md": "cd406061dfcdbaf091e0e9c2d8c5ed65f23aaf05",
+    "specifications/VE-005-adapter-specification.md": "6ecafd9b3fe8156ccaa1770ff94ee3a8348fb8bc",
+    "specifications/VE-006-execution-boundary-specification.md": "2897359cb70ed092e8ca7753552fc950df5bc857",
+    "specifications/VE-CBOR-1-RULE-REPRESENTATION-AND-CONTENT-IDENTITY.md": "3cf661c3205a00962a546c8e7fcb8f60558d889e"
+  },
+  "action": {
+    "action_id": "606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f",
+    "action_digest": "5fa3775f8a288e9762e021ba8fb08302fbb3547bc15d9769c97bbcbbeb330b0c",
+    "schema_digest": "e1bd2f7849a9d08108c620e30dede09045df6049e0909e7abaf22e6d9d372554"
+  },
+  "authorities": {"A": "rs-event-001.example/authority-A", "B": "rs-event-001.example/authority-B"},
+  "references": {
+    "P-A": {"policyHandle": "P-A"},
+    "R1": {"ruleDigest": "86ec5cc99b17d49f00e0f3f05172164787e39ff28d59ee4575f661273120b247"}
+  },
+  "timeDomains": {
+    "TIME-A-1": {"date": "2026-11-17", "hourMinute": "15:00", "scale": "UTC", "minimumSecond": 0, "maximumSecond": 59, "precision": "whole-second", "unknownTime": "no-conforming-candidate"},
+    "TIME-B-1": {"date": "2026-11-17", "hourMinute": "15:00", "scale": "UTC", "minimumSecond": 0, "maximumSecond": 59, "precision": "whole-second", "unknownTime": "no-conforming-candidate"}
+  },
+  "contracts": [
+    {"type": ["A","ACTION_CREATED",1], "material": "A-created", "trigger": "ACTION_CREATED", "time": "TIME-A-1", "dependencies": ["TIME-A-1","VE-003"], "references": null, "actor": false, "fact": "Action became authoritative"},
+    {"type": ["A","VALIDATION_STARTED",1], "material": "A-validating", "trigger": "VALIDATION_STARTED", "time": "TIME-A-1", "dependencies": ["TIME-A-1","VE-003"], "references": null, "actor": false, "fact": "validation began"},
+    {"type": ["A","VALIDATION_SUCCEEDED",1], "material": "A-ready", "trigger": "VALIDATION_SUCCEEDED", "time": "TIME-A-1", "dependencies": ["TIME-A-1","VE-003"], "references": null, "actor": false, "fact": "validation succeeded"},
+    {"type": ["A","POLICY_EVALUATED",1], "material": "A-policy", "trigger": null, "time": "TIME-A-1", "dependencies": ["TIME-A-1","VE-003","RULE-CONTRACT"], "references": ["P-A","R1"], "actor": true, "fact": "selected policy evaluation completed"},
+    {"type": ["A","POLICY_RECORDED",1], "material": "A-recorded", "trigger": null, "time": "TIME-A-1", "dependencies": ["TIME-A-1"], "references": ["P-A"], "actor": false, "fact": "Policy recorded for traceability"},
+    {"type": ["A","AUTHORIZATION_GRANTED",1], "material": "A-authorized", "trigger": "AUTHORIZATION_GRANTED", "time": "TIME-A-1", "dependencies": ["TIME-A-1","VE-003"], "references": null, "actor": false, "fact": "execution authorization established"},
+    {"type": ["A","EXECUTION_STARTED",1], "material": "A-started", "trigger": "EXECUTION_STARTED", "time": "TIME-A-1", "dependencies": ["TIME-A-1","VE-003"], "references": null, "actor": false, "fact": "material execution began"},
+    {"type": ["A","EXECUTION_COMPLETED",1], "material": "A-completed", "trigger": "EXECUTION_COMPLETED", "time": "TIME-A-1", "dependencies": ["TIME-A-1","VE-003"], "references": null, "actor": false, "fact": "target-owned commitment established"},
+    {"type": ["A","EXECUTION_FAILED",1], "material": "A-failed", "trigger": "EXECUTION_FAILED", "time": "TIME-A-1", "dependencies": ["TIME-A-1","VE-003"], "references": null, "actor": false, "fact": "execution resolved as known failure"},
+    {"type": ["B","EXECUTION_COMPLETED",1], "material": "B-completed", "trigger": null, "time": "TIME-B-1", "dependencies": ["TIME-B-1"], "references": null, "actor": false, "fact": "isolated simulation finished"}
+  ],
+  "records": {
+    "E01": {"number": 1, "type": ["A","ACTION_CREATED",1], "sequence": "10", "second": "00"},
+    "E02": {"number": 2, "type": ["A","VALIDATION_STARTED",1], "sequence": "20", "second": "01"},
+    "E03": {"number": 3, "type": ["A","VALIDATION_SUCCEEDED",1], "sequence": "30", "second": "02"},
+    "E04": {"number": 4, "type": ["A","POLICY_EVALUATED",1], "sequence": "40", "second": "03", "references": ["P-A","R1"]},
+    "E05": {"number": 5, "type": ["A","AUTHORIZATION_GRANTED",1], "sequence": "50", "second": "04"},
+    "E06": {"number": 6, "type": ["A","EXECUTION_STARTED",1], "sequence": "60", "second": "05"},
+    "E07": {"number": 7, "type": ["A","EXECUTION_COMPLETED",1], "sequence": "70", "second": "06"},
+    "E17": {"number": 17, "type": ["A","EXECUTION_FAILED",1], "sequence": "70", "second": "07"},
+    "E18": {"number": 18, "type": ["B","EXECUTION_COMPLETED",1], "sequence": "70", "second": "06"},
+    "E19": {"number": 19, "type": ["A","POLICY_RECORDED",1], "sequence": "40", "second": "03", "references": ["P-A"]},
+    "E20": {"number": 20, "type": ["A","EXECUTION_STARTED",1], "sequence": "18446744073709551614", "second": "05"},
+    "E21": {"number": 21, "type": ["A","EXECUTION_COMPLETED",1], "sequence": "18446744073709551615", "second": "06"},
+    "E22": {"number": 22, "type": ["A","POLICY_RECORDED",1], "second": "08", "references": ["P-A"]}
+  },
+  "cases": [
+    {"id":"B1","history":[],"proposals":[["E01",null,true],["E02","E01",true],["E03","E02",true],["E04","E03",true],["E05","E04",true],["E06","E05",true],["E07","E06",true]],"missing":[]},
+    {"id":"B2","history":["E01","E02","E03","E04","E05","E06"],"proposals":[["E17","E06",true]],"missing":[]},
+    {"id":"B3","history":["E01","E02","E03","E04","E05","E06"],"proposals":[],"missing":[],"observation":{"transmitted":true,"responseAvailable":false,"settlement":"unknown"}},
+    {"id":"T1","history":["E01","E02","E03","E04","E05","E06"],"proposals":[["E18","E06",true]],"missing":[]},
+    {"id":"T2","history":["E01","E02","E03","E04","E05","E06"],"proposals":[["E07","E06",true]],"missing":[],"presentedContractChanges":{"A-completed":{"trigger":"EXECUTION_FAILED","fact":"execution resolved as known failure"}}},
+    {"id":"T3","history":["E01","E02","E03","E04","E05","E06","E07"],"proposals":[],"missing":["A-completed"],"timeline":"all dependencies available at original admission; completion contract missing throughout fresh replay; no checkpoint"},
+    {"id":"T4","history":["E01","E02","E03","E04","E05","E06","E07"],"proposals":[],"missing":["TIME-A-1"],"timeline":"all dependencies available at original admission; TIME-A-1 missing before E01 and throughout fresh replay; no checkpoint"},
+    {"id":"O1","history":["E01","E02","E03","E04","E05","E06"],"proposals":[["E07","E06",false],["E17","E06",false]],"missing":[],"unselected":["E07","E17"]},
+    {"id":"O2","history":["E01","E02","E03","E04","E05","E06"],"proposals":[["E07","E06",true],["E17","E06",false]],"missing":[],"unselected":["E17"]},
+    {"id":"O3","history":["E01","E02","E03","E04","E05","E06"],"proposals":[["E07","E06",false],["E17","E06",true]],"missing":[],"unselected":["E07"]},
+    {"id":"D1","history":["E01","E02","E03","E04","E05","E06","E07"],"delivery":["E07","E03","E01","E06","E02","E05","E04"],"proposals":[],"missing":[]},
+    {"id":"D2","history":["E01","E02","E03","E04","E05","E06","E07"],"delivery":["E01","E02","E03","E04","E04","E05","E06","E07"],"proposals":[],"missing":[]},
+    {"id":"S1","history":["E01","E02","E03","E04","E05"],"proposals":[["E20","E05",true],["E21","E20",true]],"missing":[]},
+    {"id":"S2","history":["E01","E02","E03","E04","E05","E20","E21"],"proposals":[["E22","E21",true]],"missing":[],"unselected":["E22"]},
+    {"id":"S3","history":["E01","E02","E03","E04","E05","E20"],"proposals":[["E21","E20",true]],"missing":[],"recordChanges":{"E21":{"sequence":"18446744073709551616"}}},
+    {"id":"N1","history":[],"proposals":[["E01",null,true],["E02","E01",true],["E03","E02",true],["E04","E03",true],["E05","E03",true],["E06","E05",true],["E07","E06",true]],"missing":[],"recordChanges":{"E04":{"actor":null}}},
+    {"id":"N2","history":[],"proposals":[["E01",null,true],["E02","E01",true],["E03","E02",true],["E04","E03",true],["E05","E04",true],["E06","E05",true],["E07","E06",true]],"missing":[],"recordChanges":{"E04":{"future_code":null}}},
+    {"id":"N3","history":["E01","E02","E03","E04","E05","E06","E07"],"proposals":[],"missing":[],"recordChanges":{"E04":{"future_code":null}},"unselectedLaterDefinition":{"authority":"later-unselected-authority","field":"future_code","nullAllowed":false}},
+    {"id":"R1","history":["E01","E02","E03","E04","E05","E06","E07"],"proposals":[],"missing":[]},
+    {"id":"R2","history":["E01","E02","E03","E04","E05"],"proposals":[["E06","E05",true]],"missing":[],"recordChanges":{"E06":{"references":["P-A"]}}},
+    {"id":"R3","history":["E01","E02","E03"],"proposals":[["E19","E03",true]],"missing":[],"recordChanges":{"E19":{"references":["R1"]}}},
+    {"id":"R4","history":["E01","E02","E03","E04"],"proposals":[],"missing":["RULE-CONTRACT"],"timeline":"all dependencies available at original admission; imported Rule authority missing throughout fresh replay; no checkpoint"},
+    {"id":"V1","history":["E01","E02","E03","E04","E05","E06"],"proposals":[["E07","E06",false]],"missing":[],"offeredReceipt":{"completionAsserted":true,"authorityEstablished":false}}
+  ]
+}
