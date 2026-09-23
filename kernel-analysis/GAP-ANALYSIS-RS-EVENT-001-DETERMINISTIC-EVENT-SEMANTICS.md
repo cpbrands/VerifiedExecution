@@ -381,11 +381,13 @@ tests validate this document's integration, not any Event scenario execution.
 ## 9. Disposition of the merged executable evidence
 
 The [Executable Comparison Report](RS-EVENT-001-EXECUTABLE-COMPARISON.md)
-is Draft v0.1, non-normative validation. Its implementation commit is
+records the original Draft v0.1 experiment as non-normative validation;
+report v0.2 documents its historical-source reader correction. Its original implementation commit is
 `83ff96fb301c317f0502827b275bc7f0d7e95b50`; PR #93 merged it at the revision
 above. The report pins the fixture, oracle, both implementations and runner by
-SHA-256, and the fixture pins ten historical source blobs. Those pins and all
-executable material remain unchanged by this reassessment.
+SHA-256, and the fixture pins ten historical source blobs. Those pins, semantic
+fixtures, oracle and both implementations remain unchanged. The supporting
+runner correction below changes provenance verification only.
 
 | Historical question | New evidence and bounded closure | What remains unproved |
 |---|---|---|
@@ -400,17 +402,22 @@ supplemental groups and 24 mutants), 10/10 source anchors, and 78/78 complete
 repository tests at its pinned revision. Those are historical measured results,
 not an assertion that this revised document has the old source bytes.
 
-The unchanged runner hashes the current working files against its historical
-source pins, including this gap analysis v0.1, blob
-`366987c357d2d786d76f3fb32bb7e97c563c714e`. Consequently this v0.2 editorial
-follow-up necessarily fails that one integrity assertion when the complete
-suite is run on the new checkout; the other nine pinned source files remain
-unchanged, and the pinned v0.1 blob remains available in Git history. This is
-source-version mismatch, not a replay disagreement or permission to refresh
-the experiment's pins. It must be disclosed separately from case/mutant
-results. No passing complete-suite claim is made for the edited checkout.
-Any future harness change to read historical sources requires its own scoped
-review; it is not part of the selected semantic artifact or this PR.
+At follow-up head `56f755cc73421f472dc176e4f14194d6c7a54b88`, the original
+runner compared current working files with historical pins, producing 77/78:
+only this gap analysis v0.1 pin, blob
+`366987c357d2d786d76f3fb32bb7e97c563c714e`, mismatched its revised file. That
+was a historical-source reader defect, not a replay disagreement. The scoped
+correction now reads all ten sources from the fixture's unchanged recorded base
+`9169fc0f1017e2b657691a9c5b001ad82dffe981`, verifying the returned bytes against
+the unchanged original pins. No current-source synchronization is claimed.
+
+The report's reproducibility correction records the revised runner fingerprint
+and clean-checkout history requirement. Two focused regressions require altered
+pinned bytes and unavailable historical sources to fail; no assertion is skipped
+and no fallback to current HEAD is permitted. The original 78 tests remain, with
+two added integrity checks. This fixes experiment provenance checking without
+advancing semantic scope, altering specifications, or changing the selected
+next artifact.
 
 The existing Actions workflow runs documentation validation and the 27
 documentation-validator tests only. Its success is integration evidence and
@@ -582,5 +589,6 @@ RFC / ADR ESCALATION = NOT REQUIRED FOR THIS REASSESSMENT
 
 | Version | Date | Change |
 |---|---|---|
+| 0.2 | 2026-09-22 | Record the scoped historical-source reader correction and integrity regressions; preserve original pins and the initial 77/78 finding as history. |
 | 0.2 | 2026-09-22 | Preserve v0.1 findings historically; assess merged 23-case/24-mutant same-author evidence, retain unproved dependencies, select one bounded lifecycle Event-type semantic profile, and disclose the unchanged harness's historical source-pin mismatch. |
 | 0.1 | 2026-09-22 | Initial non-normative analysis of six RS-EVENT-001 concerns; preserves modeled-evidence limits and recommends executable comparison before advancing representation readiness. |

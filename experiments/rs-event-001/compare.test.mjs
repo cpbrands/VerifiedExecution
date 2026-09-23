@@ -8,7 +8,8 @@ import {createHash} from "node:crypto";
 
 const directory = new URL("./", import.meta.url);
 const root = new URL("../../", directory);
-const fixtures = JSON.parse(readFileSync(new URL("fixtures.json", directory)));
+const fixtureBytes = readFileSync(new URL("fixtures.json", directory));
+const fixtures = JSON.parse(fixtureBytes);
 const expectedBytes = readFileSync(new URL("expected.json", directory));
 const oracle = JSON.parse(expectedBytes);
 const python = readFileSync(new URL("append-first.py", directory), "utf8");
@@ -75,17 +76,55 @@ function append(input, code = python) {
   return JSON.parse(child.stdout);
 }
 
+// Sources describe the recorded experiment at fixtures.base, not current rules.
+// Read the commit's path (not an arbitrary matching blob or the working tree).
+// Missing history fails closed; shallow checkouts must fetch the recorded base.
+function historicalBytes(path, commit = fixtures.base) {
+  assert.match(commit, /^[0-9a-f]{40}$/);
+  const source = spawnSync("git", ["--no-replace-objects", "cat-file", "blob", `${commit}:${path}`], {
+    cwd: root, env: {...process.env, GIT_NO_LAZY_FETCH: "1"},
+    timeout: 10000, maxBuffer: 1024 * 1024
+  });
+  assert.equal(source.error, undefined, `Git invocation: ${source.error}`);
+  assert.equal(source.status, 0,
+    `Historical source unavailable: ${commit}:${path}. Fetch the recorded base; no HEAD fallback. ${source.stderr}`);
+  return source.stdout;
+}
+
+function verifyPinnedBytes(path, bytes) {
+  assert.equal(createHash("sha1").update(`blob ${bytes.length}\0`).update(bytes).digest("hex"),
+    fixtures.sources[path], `Historical source mismatch: ${path}`);
+}
+
 test("fixture/oracle coverage, immutable sources and pre-execution oracle fingerprint", () => {
+  assert.equal(createHash("sha256").update(fixtureBytes).digest("hex"), "510dcddb1781c674b997a55e4af71be2d49a92bfd2f177df72bb34945aabee83");
+  assert.equal(fixtures.base, "9169fc0f1017e2b657691a9c5b001ad82dffe981");
   assert.equal(createHash("sha256").update(expectedBytes).digest("hex"), "b467cc87b9398625f0fb526906d8ff34f8df2c37f91b12240707d347715f4d88");
   assert.equal(fixtures.cases.length, 23);
   assert.equal(new Set(fixtures.cases.map(c => c.id)).size, 23);
   assert.deepEqual(oracle.cases.map(c => c.id), fixtures.cases.map(c => c.id));
-  for (const [path, hash] of Object.entries(fixtures.sources)) {
-    const bytes = readFileSync(new URL(path, root));
-    assert.equal(createHash("sha1").update(`blob ${bytes.length}\0`).update(bytes).digest("hex"), hash, path);
-  }
+  assert.equal(Object.keys(fixtures.sources).length, 10);
+  for (const path of Object.keys(fixtures.sources)) verifyPinnedBytes(path, historicalBytes(path));
   assert.ok(!python.includes("expected.json") && !javascript.includes("expected.json"));
   assert.ok(!python.includes("fixtures.json") && !javascript.includes("fixtures.json"));
+});
+
+test("historical source integrity rejects a changed byte in every pinned source", () => {
+  for (const path of Object.keys(fixtures.sources)) {
+    const original = historicalBytes(path);
+    verifyPinnedBytes(path, original);
+    const altered = Buffer.from(original);
+    assert.ok(altered.length > 0);
+    altered[altered.length - 1] ^= 1;
+    assert.throws(() => verifyPinnedBytes(path, altered),
+      error => error.code === "ERR_ASSERTION" && error.message.startsWith(`Historical source mismatch: ${path}`));
+  }
+});
+
+test("historical source integrity rejects unavailable commits and paths without HEAD fallback", () => {
+  const path = "kernel-analysis/GAP-ANALYSIS-RS-EVENT-001-DETERMINISTIC-EVENT-SEMANTICS.md";
+  assert.throws(() => historicalBytes(path, "0".repeat(40)), /Historical source unavailable/);
+  assert.throws(() => historicalBytes("experiments/rs-event-001/fixtures.json"), /Historical source unavailable/);
 });
 
 for (const c of fixtures.cases) test(`case ${c.id}: Python / Node / source oracle`, () => {
