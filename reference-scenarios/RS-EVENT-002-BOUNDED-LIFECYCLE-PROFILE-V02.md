@@ -1,7 +1,7 @@
 ---
 id: RS-EVENT-002
 title: Bounded Lifecycle Profile v0.2 Established-Input Scenarios
-version: "0.2"
+version: "0.3"
 status: Draft
 document_type: Reference Scenario
 category: Non-normative Validation
@@ -459,7 +459,7 @@ Execution source x has only timeout and no response after invocation of the boun
 
 FX:
 ```text
-Execution source x has an additional unresolved observation of the bound attempt and cannot establish success from that observation. This unknown result does not deny a separate definite observation.
+Synthetic execution observation reported by source x, acting under its independently established execution grant for this assessment's exact binding: x observed the Adapter actually submit the bound instruction for amount_minor 1000000, source 000100001/0012345 and destination 000200002/VENDOR-0001 to the Action-selected participant-level Lynx settlement domain. The observed Action occurrence is 606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f with content digest 5fa3775f8a288e9762e021ba8fb08302fbb3547bc15d9769c97bbcbbeb330b0c and no additional bound occurrence fields. This observation record closes immediately after that actual submission is observed; it includes no subsequent target-outcome observation. Its established intermediate fact is material invocation, not merely preparation or queueing. Within that bounded observation there is neither authoritative confirmation of settlement entries in both participants' Lynx accounts nor authoritative confirmation of definitive target rejection and termination. The assessed statement is the candidate EXECUTION_COMPLETED fact, with the complete type, Event identifier, prior head, sequence and entire context carried by this assessment's binding; its execution terms require the represented obligation's successful settlement, not submission alone. Result: unknown. Rationale: actual invocation does not establish that terminal settlement fact, and absence of terminal confirmation within this observation does not establish its negation. This is an inconclusive completion assessment from this bounded observation, not an assertion that every other observation at the decision boundary is inconclusive; it does not refute a separate established completion or commit assessment.
 ```
 
 FR:
@@ -469,7 +469,7 @@ Execution source x definitively refutes the asserted successful resolution of th
 
 KN:
 ```text
-Evaluator a returned a definite unsatisfied result for Policy condition version 1 on the exact retained inputs. Its authoritative evaluation denied this condition; this profile consumes that scoped outcome and does not silently replace it with its own evaluation of the apparently permissive numbers.
+Synthetic owner-reported historical explanation from evaluator a, implementation version a-policy-evaluator/1-strict-bound-defect, for condition(2) under this assessment's exact Action, Event, head and whole-context binding. Applicable contract: complete Policy condition version 1, allowing amount_minor at most 1000000, source sort code 000100001 with account 0012345, and destination sort code 000200002 with account VENDOR-0001, with no additional Policy or human-approval condition. Actual evaluated inputs: integer amount_minor 1000000; Text source sort code 000100001 and account 0012345; Text destination sort code 000200002 and account VENDOR-0001. Reported evaluation: all four account Text comparisons were exact and true, but this implementation incorrectly used strict mathematical comparison 1000000 < 1000000 for the inclusive amount limit; that comparison was false. The evaluator combined that false amount check with the four true account checks and returned unsatisfied. Its reported denial rationale was that the amount failed its strict-limit check at the boundary. This fully stated strict-versus-inclusive implementation defect, not a hidden Policy restriction, explains the denial. The governing Policy instead requires 1000000 <= 1000000, which is true, so all recorded inputs satisfy its actual restrictions. The mistaken comparison and denial are retained as the synthetic evaluator's historical report, not endorsed as correct and not added as a Policy condition. Establishment verifies the exact reported assessment and scoped evaluator authority, not the correctness of that comparison; the profile consumes the recorded unsatisfied outcome and does not silently replace it by independently re-evaluating Policy.
 ```
 
 MN:
@@ -605,7 +605,7 @@ All reject and keep EXECUTING; none can be rescued by a matching source name.
 | 29 | P6/H5/E6; SYNC fact source b, role execution, basis FB; its exact establishment result is failed for ungranted role; result otherwise unchanged | Reject / keep EXECUTING; b's independently supplied grant has only boundary role, not target-truth authority. | P §4.1(1); VE-006 §§6, 15 / D |
 | 30 | P6/H5/E6; retain established fact and add verified same-binding x/execution fact refuted with its contrary basis | Reject / keep EXECUTING; **compound defense**: established cannot override independently disqualifying refuted. This is not an isolated generic-contradiction test (85 is). | P §4.1 / D |
 | 31 | P3/H2/E3; remove condition(0) from S and payload | No accept—unestablished / keep VALIDATING; a positive generic fact does not replace all required validation results. | P §4.1(3) / D |
-| 32 | P4/H3/E4; SYNC condition(2) result unsatisfied, literal basis KN; exact final sets in §4.8 | Reject / keep READY; recognized origin is not satisfaction. Even an apparently mistaken denial cannot be silently re-evaluated to success by this profile. | P §4.1(3); VE-006 §11 / D |
+| 32 | P4/H3/E4; SYNC condition(2) result unsatisfied, literal basis KN; exact final sets in §4.8 | Reject / keep READY; recognized origin is not satisfaction. KN records the explicit strict-versus-inclusive evaluator defect; its required-condition denial cannot be silently re-evaluated to success by this profile. | P §4.1(3); VE-006 §11 / D |
 | 33 | P4/H3/E4; retain satisfied condition(2), add verified same-evaluator unsatisfied condition(2) with denial basis | Reject / keep READY; **compound defense**: satisfied cannot override the independently disqualifying required-condition denial. Generic contradiction is isolated in 85. | P §4.1 / D |
 | 34 | P6/H5/E6; SYNC add fact unknown with literal FX, retaining established fact and commit; exact final sets in §4.8 | Accept / COMPLETED; unknown is retained but does not refute the definite fact. | P §4.1 / D |
 | 35 | P6/H5/E6; remove commit assessment | No accept—unestablished / keep EXECUTING; this A requires target commit, not terminal-state inference. | P §4.1(4); VE-004 §§7–8 / D |
@@ -760,9 +760,9 @@ definitions, not a validation rule that returns verified from a copy.
 | 29 | SYNC | {F29,T,M} | {F29,T,M} | F29 establishment failed: b has only boundary grant; C,T,M verified. |
 | 30 | SYNC | {F,F[refuted,FR],T,M} | {F,F[refuted,FR],T,M} | Both contrary fact records individually verified. |
 | 31 | SYNC | {F,T} | {F,T} | No V establishment entry. |
-| 32 | SYNC | {F,T,U,W[unsatisfied,KN]} | {F,T,U,W[unsatisfied,KN]} | Verified negative condition. |
-| 33 | SYNC | {F,T,U,W,W[unsatisfied,KN]} | {F,T,U,W,W[unsatisfied,KN]} | Both contrary condition records individually verified. |
-| 34 | SYNC | {F,F[unknown,FX],T,M} | {F,F[unknown,FX],T,M} | Definite and unknown observations independently verified. |
+| 32 | SYNC | {F,T,U,W[unsatisfied,KN]} | {F,T,U,W[unsatisfied,KN]} | Verified exact negative condition including the complete KN strict-bound-defect report, not a verification of correct Policy evaluation. |
+| 33 | SYNC | {F,T,U,W,W[unsatisfied,KN]} | {F,T,U,W,W[unsatisfied,KN]} | Both contrary condition records individually verified, including K2 for W and the complete KN report for the negative record. |
+| 34 | SYNC | {F,F[unknown,FX],T,M} | {F,F[unknown,FX],T,M} | Definite F6 and bounded FX observations independently verified as exact separate records; FX's cutoff does not truncate S or M. |
 | 35 | SYNC | {F,T} | {F,T} | No M establishment entry. |
 | 36 | SYNC | {F,T,M[not_committed,MN]} | {F,T,M[not_committed,MN]} | Verified negative commit. |
 | 37 | SYNC | {F,T,M,M[not_committed,MN]} | {F,T,M,M[not_committed,MN]} | Both commit records individually verified. |
@@ -782,7 +782,7 @@ definitions, not a validation rule that returns verified from a copy.
 | 60 | COPY | {F,T,M} | {F,T,M} | Only payload.context.commit_required=integer 1; C and every binding.context retain Boolean true. |
 | 75 | SYNC | {F75,T75} | {F75,T75} | Exact M75 bundle below; C and both record establishment results unavailable; none failed. |
 | 76 | SYNC | {F[refuted,FR],T,M} | {F[refuted,FR],T,M} | T establishment unavailable; C, new negative F and M verified. |
-| 77 | SYNC | {F[unknown,FX],T,M} | {F[unknown,FX],T,M} | T establishment unavailable; C, new unknown F and M verified. |
+| 77 | SYNC | {F[unknown,FX],T,M} | {F[unknown,FX],T,M} | T establishment unavailable; C, the exact unknown record with completed FX observation, and M verified. M does not replace the missing established fact record. |
 
 For each i=54,55,56, define Ci as C with **only**
 conditions[2].contract replaced by PN, PD, PU respectively. T-PI is unchanged:
@@ -829,6 +829,30 @@ payload were left at S0, each would reject for mismatch. Row 25 intentionally
 keeps that mismatch and changes outcome. This distinction is part of the
 inputs, not consumer discretion.
 
+FX and KN are complete **synthetic scenario inputs**, not reports obtained from
+a real observer or evaluator. The FX record's observation cutoff is the stated
+material-invocation observation boundary, not a clock reading, transport event,
+new Event or cutoff on the complete decision snapshot S. Its candidate binding
+in both 34 and 77 is exactly B(E6): A's occurrence/content and empty additional
+fields, L(EXECUTION_COMPLETED), I(6), prior head I(5), sequence 60 and the entire
+unchanged C. Where present in the ledger, F6 and MC retain their exact baseline
+terminal observations in the same decision snapshot, outside FX's bounded
+observation record. FX does not deny those observations or treat submission
+as settlement. No time interval is inferred from its observation cutoff.
+
+KN names a synthetic implementation version and states its entire relevant
+evaluation defect inline; that version is not a missing executable dependency,
+new field or additional Policy. In 32/33 the negative record has B(E4),
+source a, role authorization, statement condition(2), result unsatisfied and
+the exact complete KN basis. In 85/87 it has B(E2) instead; the Action and C
+remain the same, but the Event/type/head/sequence binding is that of E2.
+Every occurrence of KN or FX in these authoritative sets and their payload
+copies means the entire revised literal above, without substitution. Each
+independent establishment entry is keyed to that exact resulting six-member
+assessment, including the entire revised basis. No former short-basis record
+or its establishment result is retained as an alternative or reused. This is
+explicit establishment input, not authenticity inferred from either Text.
+
 ### 4.9 Additional distinguishing classes
 
 The following are appended, not renumbered. Bracketed intervals are semantic
@@ -861,6 +885,26 @@ that boundary. The matrix fixes source scopes, whole context, assessment sets,
 Action/fact/Event/head bindings, interval equality, explicit absence and
 dependency availability rather than leaving an implementation to choose them.
 The same inputs therefore do not permit different accepted Lifecycle states.
+
+The two previously incomplete explanation values are now fully specified.
+Re-derivation from the materialized sets closes the following six cases without
+changing any expected outcome or adding a case:
+
+| Case | Outcome and projection | Derivation from the completed inputs |
+|---|---|---|
+| 32 | Reject; keep READY | The sole condition(2) result is unsatisfied with the actual reported KN defect. This required denial is independently sufficient; no contrary condition result or missing explanation is needed. |
+| 33 | Reject; keep READY | Complete K2 and KN records report contrary definite results. The required denial is already disqualifying, so this remains a compound defense, not the contradiction isolate. |
+| 34 | Accept; COMPLETED | The exact FX observation explains unknown completion from observed invocation only. It does not refute the separate established F6 fact; required time and committed MC remain established. |
+| 77 | Unsupported; keep EXECUTING | FX is a complete unknown fact assessment and MC remains committed, but no established fact record exists and required time verification is unavailable. Unsupported takes precedence over unestablished; missing verification creates no terminal fact. |
+| 85 | Reject; keep CREATED | K2 and KN are complete, independently established contrary definite condition(2) results for E2. That condition is optional for validation commencement; only the same-statement contradiction disqualifies this otherwise valid input. |
+| 87 | Accept; VALIDATING | Complete KN alone reports a negative optional condition, with no contrary condition result. Actual validation commencement and its time remain established; the recorded evaluator defect adds no Policy-satisfaction requirement to this kind. |
+
+In §5.2 the previously unconfirmed four written-rule obligations are now
+supported: required-condition unsatisfied (32), unknown-extra invariance (34),
+optional definite contradiction (85), and negative optional control (87).
+The 70-obligation map is retained after checking each mapped rule against its
+explicit input; completing these four explanations does not add four new
+obligations. This is written-contract derivation, not experimental confirmation.
 
 Three limits must not be silently completed by executable fixtures:
 
@@ -969,7 +1013,11 @@ matrix does not need those rules invented to give its own bounded outcomes.
 
 **Yes for direct transcription of these bounded semantic inputs and outcomes**,
 using the delimited literal Text, named immutable semantic dependency bundle,
-complete final assessment sets and exact independent establishment maps. Do
+complete final assessment sets and exact independent establishment maps. No
+uncompleted FX/KN observation or rationale is left to the transcriber: their
+whole literal values, candidate bindings, payload copies and establishment
+entries are fixed, including the six-case derivation in §5.1. This bounded
+readiness has no outstanding explanation-completion condition. Do
 not extract fixture Text from source documents or generate a rationale from
 a result label. The document's direct-transcription claim concerns these
 conditional established-input cases, not a raw verifier or arbitrary schema
@@ -1007,5 +1055,6 @@ and representation design are separate decisions.
 
 | Version | Date | Change |
 |---|---|---|
+| 0.3 | 2026-09-23 | Complete synthetic FX invocation-observation cutoff and KN owner-reported evaluator-defect rationale; bind all six affected cases and establishment maps to those exact literals. Re-derive unchanged outcomes; confirm the existing 87-case partition and 70 written-rule obligations without claiming executable conformance. |
 | 0.2 | 2026-09-23 | Explicit AUTH/SYNC/COPY materialization and establishment maps; literal explanation values; isolated negative branches; ten appended cases; honest coverage taxonomy. Case 25 now rejects its frozen payload mismatch; 58 uses empty history to isolate the lower domain; no profile or implementation changes. |
 | 0.1 | 2026-09-23 | Initial non-normative 77-case established-input matrix for the exact pinned lifecycle profile Draft v0.2; no profile, experiment, fixture or workflow changes. |
