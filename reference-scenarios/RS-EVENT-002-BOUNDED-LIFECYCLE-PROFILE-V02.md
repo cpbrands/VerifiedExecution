@@ -1,7 +1,7 @@
 ---
 id: RS-EVENT-002
 title: Bounded Lifecycle Profile v0.2 Established-Input Scenarios
-version: "0.1"
+version: "0.2"
 status: Draft
 document_type: Reference Scenario
 category: Non-normative Validation
@@ -43,7 +43,8 @@ their independent establishment results. It is not whether source authentication
 arbitrary Policy evaluation, real settlement or clock measurement has been
 implemented. Nothing here is an Event serialization or an authentication scheme.
 
-There are **77 separately numbered cases** below. Shared complete values and
+There are **87 separately numbered cases** below; §5.2 separates row counts
+from semantic branch obligations and identifies the one intentional duplicate. Shared complete values and
 explicit substitutions keep the matrix bounded; no unlisted variations count
 as additional cases. These are selected distinguishing pressures, not an
 exhaustive state-space enumeration or a mathematically minimal test set.
@@ -109,20 +110,57 @@ are expanded before comparison; they are not runtime identifiers or resolvers.
 Tables of named members denote records; lists and sets have P §5.3 meanings.
 Quoted Text is literal, with no surrounding quotation marks in its value.
 
-Every case starts from its named baseline and changes **only** the listed
-inputs. All other values, absence, dependencies, membership, scope grants and
-establishment results are exactly the baseline. There are no implementation
-defaults. A row saying `rebuild` explicitly regenerates all derived bindings,
-assessment text substitutions and payload copies from the changed inputs;
-otherwise those values remain unchanged. Cases are separate counterfactual
-worlds: incompatible terminal Events are never simultaneously asserted as valid
-history. No later case inherits a mutation from an earlier one.
+Each case is a separate counterfactual, not a mutation of the previous case.
+Its baseline supplies the complete history, candidate and established inputs.
+The final-value ledger in §4.8 is authoritative for assessment mutations:
+
+- **AUTH**: authoritative assessment set changes; payload assessment set is
+  deliberately the original set. This tests copy mismatch, not uncertainty alone.
+- **SYNC**: authoritative and payload assessment sets are explicitly the same
+  specified resulting set. This does not authenticate either copy.
+- **COPY**: payload corruption only; authoritative context, assessments and
+  their establishment results remain the specified originals.
+- **NONE**: no assessment-set mutation. Envelope, history or establishment
+  changes are individually specified instead.
+
+These classes have no implicit propagation. The ledger supplies both final
+sets even when equal. Record replacement means exactly the listed members;
+all remaining members are the named original value. Set removal/addition means
+the exact listed records, with no omitted assessments. No textual interpolation
+or inferred basis update is permitted.
+
+`rebuild` is restricted to envelope/history edits in 08–13, 15, 57–59,
+70 and 72: construct the selected candidate/head/sequence stated in that row,
+then replace **each** assessment's complete binding by B for those values,
+and set both authoritative S and payload.assessments to that resulting set.
+Payload.action=A and payload.context=C; all literal basis Text is unchanged.
+Each resulting exact assessment has its own independent verified establishment
+result under §3.4. This does not repair the deliberately wrong binding in
+16–23 or 47. No other row uses this operation.
+
+### 3.1.1 Literal Text convention
+
+Every Text constant below is the exact content of its delimited `text` block:
+exclude the fence lines and the one line ending immediately before the closing
+fence; retain every interior character and line ending (LF). Each block is one
+line. Identifiers such as T-VC are document abbreviations for those values,
+not Text obtained from Markdown rendering, a table cell or an external range.
+Quoted short field names/source names remain literal Text as specified.
+
+A member replacement with a Text constant replaces its whole prior value.
+Deletion removes the named member, not an arbitrarily selected substring.
+There are no implicit substitutions, whitespace normalization, concatenations
+or formatter-dependent expansions. Structured A, B, C and intervals remain
+semantic records, never Text serializations. Their values are included inline
+where the profile requires them. Source pins select immutable semantic
+dependencies; they are not an instruction to extract explanation Text.
 
 ### 3.2 The exact Action and its immutable material
 
 `A` is the existing Lynx P1 semantic Action used in RS-LYNX-001 §2, with the
-schema's complete descriptor and definitions supplied inline in the input
-bundle by exact incorporation of its §§3–8 at the source snapshot. This is a
+schema's complete semantic descriptor and owner definitions supplied as the
+immutable dependency bundle selected in §2 (not as fixture Text extracted
+from document sections). This is a
 test-only conditional external Action, not a live payment. Its values are:
 
 | Member | Exact semantic value |
@@ -157,31 +195,67 @@ The exact context `C` has the following members, and no others:
   {time}. The names are literal local Text, not public identities.
 - `conditions`: the following ordered three records, numbered only for the
   profile's zero-based `condition(i)` selector.
-- `not_applicable`, in order: delegation, reason “The independently recognized
-  principal acts directly for its own authorized scope for this Action; no
-  delegation is invoked.”; approval, reason “The complete applicable Policy
-  below requires no separate human approval for this exact Action.”
-- `execution_terms`: the complete Text in the next paragraph.
+- `not_applicable`, in order: delegation with reason T-ND, then approval
+  with reason T-NA.
+- `execution_terms`: T-EXEC.
 - `commit_required`: Boolean true.
 
-| Position/category/evaluator | Complete `contract` Text | Complete `inputs` Text |
+| Position/category/evaluator | Exact contract Text value | Exact inputs Text value |
 |---|---|---|
-| 0 / validation / `v` | “Validation contract version 1: apply every admission and binding rule of the exact supplied Action schema and Action owners to the complete supplied A; satisfied means all those rules pass, unsatisfied means at least one fails, unknown means completion cannot be established.” | The literal text of §3.2's complete Action values, followed by the exact incorporated schema/Action-owner semantic material. This is textual expansion, not a locator or digest-only substitute. |
-| 1 / identity / `a` | “Identity condition version 1: the independently authenticated principal is the direct principal authorized by the resource for exactly this Action occurrence and content; satisfied means that recognition and exact scope hold, unsatisfied means they do not, unknown means they are not established.” | “The independently established principal is test-principal-1. The resource recognizes test-principal-1 directly for exactly A, not another occurrence, content, account or target. No delegated principal is used.” Expand A's exact values from §3.2 in place of A. |
-| 2 / policy / `a` | “Policy condition version 1: for the exact supplied Lynx Action, permit only amount_minor at most 1000000, source sort code 000100001 with account 0012345, and destination sort code 000200002 with account VENDOR-0001. All comparisons are the exact schema-owned comparisons. This Policy requires no additional human approval; no other Policy condition applies in this test context. Satisfied means all three restrictions hold, unsatisfied means one fails, unknown means evaluation is not established.” | “amount_minor is integer 1000000; source sort code is Text 000100001 and account is Text 0012345; destination sort code is Text 000200002 and account is Text VENDOR-0001. The applicable Policy is exactly the preceding version-1 text, not a lookup by its name.” |
+| 0 / validation / v | T-VC | T-VI |
+| 1 / identity / a | T-IC | T-II |
+| 2 / policy / a | T-PC | T-PI |
 
-`execution_terms` is: “The target is the Lynx participant-level settlement
-domain of the supplied UG2026 Action schema. Material invocation means the
-Adapter actually submitted this exact settlement instruction to that domain,
-not scheduling it. Completion means that the represented CAD 10000.00 Payment
-Obligation settled through entries in the sending and receiving participants'
-Lynx accounts under the supplied schema. It does not mean customer-account
-debit or credit, beneficiary net receipt, message acceptance or queueing.
-Completion here requires independently established target commit. A known
-failure means that the materially invoked attempt resolved unsuccessfully under
-that same target scope; neither timeout nor absent response establishes it.
-The failure fixture supplies the target's definitive rejection and termination
-of that attempt. A FAILED projection alone supplies no commit classification.”
+T-VC:
+```text
+Validation condition version 1, evaluated by v: validate the supplied exact Action occurrence, content and schema binding using the independently established Action-owner result, and check its semantic fields under the complete supplied Lynx UG2026 schema. The semantic record has exactly amount_minor, source_account and destination_account; each account has exactly servicing_agent_canadian_sort_code and account_id. All five leaf values are required and non-null; unknown members are forbidden. amount_minor is an integer from 1 through 99999999999999 inclusive, measured in Canadian cents, one unit CAD 0.01. Each sort code is exactly nine ASCII digits matching 0[0-9]{8}, with the leading zero retained and no spaces, hyphens, padding or transformations. Each account_id has 1 through 34 Unicode scalar values, each in XML 1.0 Fifth Edition's Char repertoire (U+0009, U+000A, U+000D, U+0020..U+D7FF, U+E000..U+FFFD, U+10000..U+10FFFF) and assigned in Unicode 6.2.0 (General_Category not Cn in that edition's UnicodeData, under UAX #44). It is already NFC on that repertoire; no normalization, trimming, padding, case folding, punctuation rewriting, numeric conversion, aliasing or leading-zero removal occurs. Equality is exact scalar-sequence equality. Both independent account pairs must be supplied, using domestic CACPA sort-code identification and Other/Id account identification, not IBAN, proxy, BICFI, LEI, name-address, SchemeName, Issuer or account-currency alternatives. The schema fixes CAD, DEBT charges, absent ChargesInformation, equal instructed and interbank-settlement amounts, and absent exchange rate; no additional currency, charge, exchange or routing field is admitted. The underlying Action owner has independently established the exact occurrence/content/schema binding and availability of all its immutable definitions. A satisfied result requires that binding result and every listed semantic admission check to succeed; unsatisfied records a definite failed check; unknown records incomplete establishment. This is a condition over supplied owner results and semantic values, not a new implementation of Action hashing or encoding.
+```
+
+T-VI:
+```text
+Validation inputs version 1: action_id is the ordered octets 606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f; action_digest is 5fa3775f8a288e9762e021ba8fb08302fbb3547bc15d9769c97bbcbbeb330b0c; schema_digest is e1bd2f7849a9d08108c620e30dede09045df6049e0909e7abaf22e6d9d372554. There are no additional bound occurrence fields. amount_minor is integer 1000000; source servicing_agent_canadian_sort_code is Text 000100001 and account_id is Text 0012345; destination servicing_agent_canadian_sort_code is Text 000200002 and account_id is Text VENDOR-0001. The independent Action-owner binding result is verified for these exact values and the complete immutable schema/owner definitions supplied with the Action. All three semantic fields and both members of both account records are present, with no null or extra member. The integer is in range, both sort codes contain nine ASCII digits, and both account identifiers are admitted already-NFC ASCII within the stated length range. No conversion or normalization is performed.
+```
+
+T-IC:
+```text
+Identity condition version 1, evaluated by a: the independently authenticated principal must be directly recognized by the resource for the exact Action occurrence, content, accounts and target recorded in this condition's inputs. No delegation is used. Satisfied means both direct recognition and that exact scope are independently established; unsatisfied means a definite failure; unknown means establishment is incomplete.
+```
+
+T-II:
+```text
+Identity inputs version 1: the independently established principal is test-principal-1. The resource recognizes test-principal-1 directly for action_id 606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f, action_digest 5fa3775f8a288e9762e021ba8fb08302fbb3547bc15d9769c97bbcbbeb330b0c, schema_digest e1bd2f7849a9d08108c620e30dede09045df6049e0909e7abaf22e6d9d372554, integer amount_minor 1000000, source Text sort code 000100001/account 0012345, destination Text sort code 000200002/account VENDOR-0001, in the Lynx participant-level settlement target. Recognition is for this occurrence and content only; it grants nothing for another occurrence, account or target.
+```
+
+T-PC:
+```text
+Policy condition version 1, evaluated by a: for the supplied Lynx Action, permit only amount_minor at most 1000000, source sort code 000100001 with account 0012345, and destination sort code 000200002 with account VENDOR-0001. Integers compare mathematically; these already-valid Text values compare exactly without transformations. Satisfied means every restriction holds, unsatisfied means at least one fails, and unknown means evaluation is not established. This is the complete applicable Policy; no additional Policy or human-approval condition applies in this test context.
+```
+
+T-PI:
+```text
+Policy inputs version 1: amount_minor is integer 1000000; source sort code is Text 000100001 and account is Text 0012345; destination sort code is Text 000200002 and account is Text VENDOR-0001.
+```
+
+T-ND:
+```text
+The independently recognized principal acts directly for its own authorized scope for this Action; no delegation is invoked.
+```
+
+T-NA:
+```text
+The complete applicable Policy requires no separate human approval for this exact Action.
+```
+
+T-EXEC:
+```text
+Execution terms version 1: the target is the Lynx participant-level settlement domain for the supplied UG2026 Action. Material invocation means the Adapter actually submitted this exact instruction to that domain, not scheduling it. Completion means that the represented CAD 10000.00 Payment Obligation settled through entries in the sending and receiving participants' Lynx accounts. It does not mean customer-account debit or credit, beneficiary net receipt, message acceptance or queueing. Completion requires independently established target commit. Known failure means the materially invoked attempt was definitively rejected and terminated by that target; timeout or absent response does not establish failure. FAILED alone supplies no commit classification.
+```
+
+These literal conditions define this scenario's proposed test context, not a
+replacement normative schema. The full structured owner material remains part
+of A's supplied semantic dependency bundle; the explicit independent owner
+binding result is consumed, not recomputed. The historical import of that
+bundle is not an extraction rule for any of the Text constants above.
 
 These are **scenario-specific complete authoritative inputs**, not new
 normative identity/Policy/target rules. In each baseline the independently
@@ -238,36 +312,12 @@ For candidate `E`, `B(E)` contains A's exact occurrence/content and empty
 additional bound fields; E's full type and Event ID; exact prior head (NONE
 or the last listed Event ID), E's selected sequence, and the entire exact C.
 
-Every assessment has exactly six members: that binding, source, role,
-statement, result, and basis. Unless a case explicitly changes it, its basis
-is literal Text constructed as follows, expanding bracketed document symbols
-to the exact semantic values/text, not retaining symbolic pointers:
-
-| Statement | Exact basis template |
-|---|---|
-| fact | “Source [source] in role [role] establishes [the exact fact sentence in the seven-kind table below] for the exact binding record carried by this assessment. The observed facts are [observation in that row]. This is the fact itself, not intent, absence of an error, a Receipt assertion or a different Action.” |
-| condition(i) | “Evaluator [source] evaluated [complete condition contract] against [complete condition inputs] for the exact binding record carried by this assessment. Result satisfied: [condition rationale below]. This evaluation is attributed to that scoped evaluator, not to the copied assessment.” |
-| time | “Source [source] establishes that the bound fact [exact row fact] occurred within the exact interval carried by this assessment's result, inclusively, on UTC with proleptic Gregorian labels. These are the fact owner's established occurrence observations and bounds, including uncertainty, for the exact binding record carried by this assessment, not arrival, signing or append time; no tighter bound is asserted.” |
-| commit | “Source x establishes participant-level target commit for the exact binding record carried by this assessment under [complete execution_terms]. The represented obligation has settled in the participants' Lynx accounts; this is not inferred from a Receipt or Lifecycle name.” |
-
-Condition rationales are respectively: “All schema admission and Action binding
-checks on the supplied exact A completed successfully”; “test-principal-1 is
-independently recognized directly for precisely this Action/resource scope”;
-and “1000000 is at most 1000000 and both exact account pairs match; this exact
-Policy calls for no human approval.” Each assessment retains these inputs and
-terms, including their version-1 meaning. No expression asks an implementation
-to invent the explanation or fetch mutable Policy content.
-
-Templates substitute only the specified literal Text, never an implementation's
-serialization of B, C or an interval. Binding and interval records remain exact
-inline semantic values alongside the basis. For condition 0, textual source
-incorporation means the exact UTF-8-decoded text of the selected source sections
-(including headings), in their document order, separated by one line feed;
-this is fixture Text content, not a portable Event encoding. The Action values
-prefix is the exact value-column text of §3.2 in row order with one line feed
-between entries. The owner material order is schema §§3–8, VE-001, then its
-Action representation profile; recursively needed owner definitions are supplied
-as semantic dependencies under §2, not replaced by a local interpretation.
+Every assessment has exactly six members: binding, source, role, statement,
+result and basis. The baseline basis values are the literal constants in
+§3.7: fact F1–F7 for E1–E7 respectively, condition(0)=K0,
+condition(1)=K1, condition(2)=K2, time=TT and commit=MC.
+No record's basis is generated from Markdown, another field's display form or
+a generic instruction to describe a contrary observation.
 
 The seven Events have exactly these fields: event_id I(n), action_id A's
 identifier, event_type L(K), occurred_at Q, sequence 10n, spec_version the pair
@@ -278,7 +328,7 @@ role time, result Q; and only the additional assessments listed below.
 All condition assessments come from their exact evaluator with the appropriate
 validation/authorization role. The completion commit comes from x/execution.
 
-| n / K | Exact fact and observation substituted in basis | Additional S(E) |
+| n / K | Semantic fact explained by the corresponding literal basis | Additional S(E) |
 |---|---|---|
 | 1 / ACTION_CREATED | Fact: this exact Action occurrence became authoritative. Observation: b admitted the complete immutable A into authoritative history. | None |
 | 2 / VALIDATION_STARTED | Fact: validation of this exact Action began. Observation: b observed the applicable structural/semantic validation actually commence, not enter a queue. | None |
@@ -330,12 +380,167 @@ Matrix results use:
   phrase describes the reason, not a new profile enum.
 
 Known invalidity takes precedence over unsupported, then unestablished
-(P §4.1). Where a mutation changes an assessment's result, its independent
-verification still establishes the exact supplied, possibly negative result;
-it never converts it to positive. Its basis is replaced with the complete
-original inputs/attribution followed by the row's stated contrary/uncertain
-observation and reason, rather than retaining a false positive rationale.
-Where the row deliberately omits or corrupts explanation, do not repair it.
+(P §4.1). A verified negative assessment stays negative. Every changed basis
+and every post-mutation establishment result is specified in §4.8; no favorable
+rationale is implicitly rewritten and no copied value authenticates itself.
+
+### 3.7 Literal assessment and negative-explanation Text
+
+The binding record and inline context accompany each basis; statements such as
+“bound Action” refer to that actual record, not an external locator. Condition
+contracts, exact inputs and evaluator identities are retained in each binding's
+whole context; the basis supplies the observation/rationale, not another
+unspecified copy of those texts.
+
+F1:
+```text
+Boundary b observed and established actual admission of the complete bound Action occurrence into authoritative history. This is admission itself, not a request or intent to admit.
+```
+
+F2:
+```text
+Boundary b observed applicable structural and semantic validation of the bound Action actually commence. The work began; this is not merely placement in a validation queue.
+```
+
+F3:
+```text
+Validator v completed every applicable Action/schema admission and binding check on the exact bound Action successfully. The independent owner-binding result and all semantic checks in validation condition version 1 are satisfied.
+```
+
+F4:
+```text
+Boundary b established execution authorization for the exact bound Action and context. Evaluator a supplied satisfied identity and Policy conditions; independently established direct-principal and no-approval facts justify the context's two inapplicability entries.
+```
+
+F5:
+```text
+Execution source x established that the Adapter actually invoked the bound Lynx settlement instruction in the participant-level target domain. This is material invocation, not preparation, intent, scheduling or queueing.
+```
+
+F6:
+```text
+Execution source x established successful resolution after actual invocation of the bound instruction: the represented obligation settled through entries in the sending and receiving participants' Lynx accounts under the inline execution terms. No customer-account-credit or Receipt-only conclusion is asserted.
+```
+
+F7:
+```text
+Execution source x established that the materially invoked bound attempt was definitively rejected and terminated by the target. This is a known post-invocation failure, not timeout, silence, pre-execution denial or a commit-status inference.
+```
+
+K0:
+```text
+Validator v applied validation condition version 1 to the exact values retained in the binding context. The independent Action-owner binding check succeeded; integer 1000000 is in range, sort codes 000100001 and 000200002 satisfy the leading-zero nine-ASCII-digit rule, accounts 0012345 and VENDOR-0001 satisfy the admitted already-NFC repertoire and lengths, and every required closed-record check passed.
+```
+
+K1:
+```text
+Evaluator a applied identity condition version 1 to its retained inputs: test-principal-1 is independently recognized directly for this exact occurrence, content, accounts and Lynx resource scope. No delegated principal or inferred global identity is used.
+```
+
+K2:
+```text
+Evaluator a applied the complete Policy condition version 1 to its retained inputs: integer 1000000 is at most 1000000, source 000100001/0012345 and destination 000200002/VENDOR-0001 exactly match. All restrictions hold; this Policy requires no separate human approval.
+```
+
+TT:
+```text
+The named time source independently establishes the bound fact's occurrence within exactly the closed UTC interval in this assessment's result. The fact owner's observations establish both inclusive proleptic-Gregorian endpoints, including the complete rational uncertainty bounds; no tighter bound is asserted. These are occurrence bounds, not arrival, response, signing or append time.
+```
+
+MC:
+```text
+Execution source x independently establishes target commit for the bound instruction: the represented obligation settled in the participants' Lynx accounts under the complete inline execution terms. Commit is not inferred from a Receipt or a Lifecycle state name.
+```
+
+FU:
+```text
+Execution source x has only timeout and no response after invocation of the bound attempt. A definitive target outcome cannot be established; neither known failure nor non-commit is asserted.
+```
+
+FX:
+```text
+Execution source x has an additional unresolved observation of the bound attempt and cannot establish success from that observation. This unknown result does not deny a separate definite observation.
+```
+
+FR:
+```text
+Execution source x definitively refutes the asserted successful resolution of the bound attempt. The target's established outcome is not the claimed participant-level successful settlement.
+```
+
+KN:
+```text
+Evaluator a returned a definite unsatisfied result for Policy condition version 1 on the exact retained inputs. Its authoritative evaluation denied this condition; this profile consumes that scoped outcome and does not silently replace it with its own evaluation of the apparently permissive numbers.
+```
+
+MN:
+```text
+Execution source x independently established that the bound target attempt did not commit under the inline execution terms. This is an authoritative non-commit observation, not an inference from timeout, a Receipt or a FAILED name.
+```
+
+TU:
+```text
+The named time source cannot establish a finite authoritative UTC interval for the bound fact. No producer, arrival or append-time reading is offered as a substitute.
+```
+
+TB:
+```text
+The named time source supplied the exact endpoint values recorded in this assessment's result as its purported UTC occurrence bound for the bound fact. Independent origin establishment does not validate their calendar or rational domains.
+```
+
+FB:
+```text
+Boundary source b asserts successful settlement of the bound attempt while claiming the execution role. Its independently recognized grant remains boundary-only and does not authorize that target-fact assertion.
+```
+
+FQ:
+```text
+Boundary b established that the bound Action was placed in a validation queue but that validation work had not actually commenced. The claimed validation-start fact is refuted.
+```
+
+XQ:
+```text
+Execution source x established preparation and queueing of the bound instruction but no actual Adapter invocation in the target domain. The claimed execution-start fact is refuted.
+```
+
+PN:
+```text
+P-A
+```
+
+PD:
+```text
+digest:0123456789abcdef
+```
+
+PU:
+```text
+https://policy.example/current
+```
+
+PB:
+```text
+Evaluator a reports a favorable Policy result for the exact recorded inputs, but the recorded condition supplies only a name, digest or mutable locator instead of the applicable contract. No actual Policy terms or edition are retained in this basis.
+```
+
+MS:
+```text
+Required Action schema semantic material is unavailable.
+```
+
+ME:
+```text
+The Action-selected execution meaning cannot be interpreted because the required schema material is unavailable.
+```
+
+MF:
+```text
+Boundary b reports admission of the bound occurrence, but the underlying Action schema meaning is unavailable in this interpretation input.
+```
+
+MT:
+```text
+The time source supplied the recorded UTC interval for the claimed admission; missing Action schema material prevents complete interpretation of that fact.
+```
 
 ## 4. Conformance matrix
 
@@ -361,15 +566,20 @@ case. No case promotes VE-003/004/006 to Approved.
 | 10 | H5; both full P6 and P7 assessment bundles supplied as distinct proposals; no unique successor selected | Neither accepted / keep EXECUTING; both bind I(5), but time or sequence magnitude cannot elect one. No extra authoritative history. | P §6; EC §8 / D |
 | 11 | P6, candidate and selection sequence 50; rebuild B, all else unchanged | Reject / keep EXECUTING; sequence collides with E5, even though time/fact are established. | P §6; EC §8 / D |
 | 12 | P5, unique selected sequence 18446744073709551615; rebuild B | Accept / EXECUTING; exact uint64 maximum is legal and gaps are allowed. Call this full resulting history Hmax. | P §§5.1, 6; EC §8 / D |
-| 13 | Hmax; P6 rebuilt for its exact head with proposed sequence 18446744073709551616 | Reject / keep EXECUTING; exhaustion, no widening or wrap. | P §6; EC §8 / D |
+| 13 | Hmax; P6 rebuilt for its exact head with proposed sequence 18446744073709551616 | Reject / keep EXECUTING; above-domain ordinal following exhaustion. **Intentionally redundant** with 59's uint64 upper-bound rejection; not a second demonstrated overflow branch. | P §6; EC §8 / D |
 | 14 | Replay H6, no new candidate; independently established membership unchanged; delivery E6,E2,E5,E1,E4,E3 | Accept recorded history / COMPLETED; all bounds equal Q yet authoritative sequence uniquely orders it. Transport and time do not select order. | P §6; EC §§7–8; VE-002 §7 / A+D |
 | 15 | P6, change candidate ID to I(5), rebuild B | Reject / keep EXECUTING; distinct completion occurrence reuses E5's immutable occurrence ID, not harmless duplicate delivery. | P §6; VE-002 §§4–5 / A+D |
 
 ### 4.2 Exact bindings: authenticated wrong input is still wrong
 
-In 16–23 use P6/H5/E6 and change **only the fact assessment's binding** as
-specified. The independently supplied result verifies that altered assessment
-and scope, not a forged unchanged one. Time, commit, candidate and C stay exact.
+In 16–23 use P6/H5/E6 and the **SYNC** class: replace the fact
+assessment's binding member specified in the row in both authoritative S and
+payload.assessments (the exact final sets are in §4.8). The independently
+supplied result verifies that altered assessment and scope, not a forged
+unchanged one. Time and commit assessments, the candidate envelope,
+authoritative C and payload.context stay exact. The fact basis remains F6
+except in 19, which explicitly uses F7 so that its rationale describes the
+different asserted failure fact rather than introducing a second defect.
 All reject and keep EXECUTING; none can be rescued by a matching source name.
 
 | Case | Exact altered binding member | Exact rejection reason | Source / class |
@@ -377,7 +587,7 @@ All reject and keep EXECUTING; none can be rescued by a matching source name.
 | 16 | action_id = I(250) | Another occurrence is not A, even with its content digest. | P §4.1; VE-001 §12 / A+D |
 | 17 | action_digest = 32 zero octets | Same occurrence label does not bind different content. | P §4.1; VE-001 §12 / A+D |
 | 18 | bound_instance_fields additionally contains `foreign_instance` with Text `x` | Not the owner's exact empty additional-field set; producer cannot enlarge occurrence binding. | P §4.1; VE-001 ownership / A+D |
-| 19 | full event_type = L(EXECUTION_FAILED) | Evidence concerns a different fact, not completion. | P §§3–4.1 / D |
+| 19 | full event_type = L(EXECUTION_FAILED); fact basis=F7 | Evidence concerns a different fact, not completion. The failure assessment is internally explained, but is not evidence for this candidate's completion. | P §§3–4.1 / D |
 | 20 | candidate event_id = I(250) | Another Event occurrence, even for the same Action/fact. | P §4.1 / D |
 | 21 | prior_head = I(4) | Assessment was not for selected authoritative head I(5). | P §§4.1, 6 / D |
 | 22 | sequence = 61 | Assessment was not for selected append position 60. | P §§4.1, 6 / D |
@@ -388,30 +598,32 @@ All reject and keep EXECUTING; none can be rescued by a matching source name.
 | Case | Complete baseline / explicit change | Expected result and projection; exact reason | Source / class |
 |---|---|---|---|
 | 24 | P6/H5/E6; remove fact from authoritative S and payload S | No accept—unestablished / keep EXECUTING; time plus commit alone cannot replace the required fact assessment. | P §4.1(2) / D |
-| 25 | P7/H5/E7; fact result unknown, basis records only timeout/no response after invocation | No accept—unestablished / keep EXECUTING; uncertainty is not a known execution failure or terminal Receipt. | P §§4.1, 6; VE-004 §§7–8 / D |
-| 26 | P6/H5/E6; fact refuted, basis records that claimed successful resolution is false | Reject / keep EXECUTING; authentic negative evidence does not establish completion. | P §4.1 / D |
+| 25 | P7/H5/E7; **AUTH**: authoritative fact becomes unknown with FU; payload deliberately retains original established fact/F7 | **Reject / keep EXECUTING**; exact supplied S differs from payload S. The unknown fact is secondary. This preserves the original frozen-copy reading rather than changing inputs to rescue its former expected result; 86 isolates the synchronized uncertainty case. | P §§4.1, 6; VE-004 §§7–8 / D |
+| 26 | P6/H5/E6; SYNC fact refuted with FR | Reject / keep EXECUTING; authentic negative evidence does not establish completion. | P §4.1 / D |
 | 27 | P6/H5/E6; payload and C/S copies unchanged, but no independent establishment results for C or assessments; material unavailable | No accept—unsupported / keep EXECUTING; copies do not establish scoped authority. Valid-looking fields cannot authenticate themselves. | P §§4.1, 5.3; VE-001 §§12–16 / A+D |
 | 28 | P6/H5/E6; independent verification result for time is failed | Reject / keep EXECUTING; untrusted time is a definite authentication failure, not an established bound or mere missing material. | P §§4.1, 5.2 / D |
-| 29 | P6/H5/E6; fact source b, role execution; result otherwise unchanged | Reject / keep EXECUTING; b's independently supplied grant has only boundary role, not target-truth authority. | P §4.1(1); VE-006 §§6, 15 / D |
-| 30 | P6/H5/E6; retain established fact and add verified same-binding x/execution fact refuted with its contrary basis | Reject / keep EXECUTING; contradictory definite statements, no newest/majority/source-priority choice. | P §4.1 / D |
+| 29 | P6/H5/E6; SYNC fact source b, role execution, basis FB; its exact establishment result is failed for ungranted role; result otherwise unchanged | Reject / keep EXECUTING; b's independently supplied grant has only boundary role, not target-truth authority. | P §4.1(1); VE-006 §§6, 15 / D |
+| 30 | P6/H5/E6; retain established fact and add verified same-binding x/execution fact refuted with its contrary basis | Reject / keep EXECUTING; **compound defense**: established cannot override independently disqualifying refuted. This is not an isolated generic-contradiction test (85 is). | P §4.1 / D |
 | 31 | P3/H2/E3; remove condition(0) from S and payload | No accept—unestablished / keep VALIDATING; a positive generic fact does not replace all required validation results. | P §4.1(3) / D |
-| 32 | P4/H3/E4; condition(2) result unsatisfied; basis records evaluator's definite denial of this exact condition/input evaluation | Reject / keep READY; recognized origin is not satisfaction. Even an apparently mistaken denial cannot be silently re-evaluated to success by this profile. | P §4.1(3); VE-006 §11 / D |
-| 33 | P4/H3/E4; retain satisfied condition(2), add verified same-evaluator unsatisfied condition(2) with denial basis | Reject / keep READY; exact condition has conflicting definite results. | P §4.1 / D |
-| 34 | P6/H5/E6; add verified fact unknown, basis records an additional unresolved observation, retaining established fact and commit | Accept / COMPLETED; unknown is retained but does not refute the definite fact. | P §4.1 / D |
+| 32 | P4/H3/E4; SYNC condition(2) result unsatisfied, literal basis KN; exact final sets in §4.8 | Reject / keep READY; recognized origin is not satisfaction. Even an apparently mistaken denial cannot be silently re-evaluated to success by this profile. | P §4.1(3); VE-006 §11 / D |
+| 33 | P4/H3/E4; retain satisfied condition(2), add verified same-evaluator unsatisfied condition(2) with denial basis | Reject / keep READY; **compound defense**: satisfied cannot override the independently disqualifying required-condition denial. Generic contradiction is isolated in 85. | P §4.1 / D |
+| 34 | P6/H5/E6; SYNC add fact unknown with literal FX, retaining established fact and commit; exact final sets in §4.8 | Accept / COMPLETED; unknown is retained but does not refute the definite fact. | P §4.1 / D |
 | 35 | P6/H5/E6; remove commit assessment | No accept—unestablished / keep EXECUTING; this A requires target commit, not terminal-state inference. | P §4.1(4); VE-004 §§7–8 / D |
-| 36 | P6/H5/E6; commit result not_committed, basis records authoritative non-commit | Reject / keep EXECUTING; definite result conflicts with required committed completion. | P §4.1(4) / D |
-| 37 | P6/H5/E6; retain committed and add verified not_committed with its non-commit basis | Reject / keep EXECUTING; contradictory commit assertions cannot be selected or averaged. | P §4.1 / D |
+| 36 | P6/H5/E6; SYNC commit result not_committed with literal MN; exact final sets in §4.8 | Reject / keep EXECUTING; definite result conflicts with required committed completion. | P §4.1(4) / D |
+| 37 | P6/H5/E6; retain committed and add verified not_committed with its non-commit basis | Reject / keep EXECUTING; **compound defense**: committed cannot override independently disqualifying not_committed. Generic contradiction is isolated in 85. | P §4.1 / D |
 
 ### 4.4 UTC bounds: exact, fact-bound and not an ordering authority
 
-All use P6/H5/E6. When a row changes the established interval, candidate
-occurred_at and the time basis change to that exact interval too, unless
-explicitly stated otherwise. Other assessments keep their unchanged B; B does
-not contain occurred_at. `q` is fully defined in §3.5.
+All use P6/H5/E6. The ledger explicitly gives each final assessment set,
+basis and payload copy. In 43–46 and 48 the candidate occurred_at equals the
+malformed interval written in the row, and the time basis is TB. In 38–40 the
+candidate remains Q. In 41–42 it also remains Q. In 47 only the time binding
+changes, with basis TT referring to that changed bound fact. No other basis
+or binding changes; B does not contain occurred_at. `q` is defined in §3.5.
 
 | Case | Exact time input change | Expected result and projection; exact reason | Source / class |
 |---|---|---|---|
-| 38 | Add u/time assessment with identical Q and its fully expanded time basis, verified for exact B | Accept / COMPLETED; both independent established bounds are identical, no selection needed. | P §4.1(5) / D |
+| 38 | SYNC add u/time assessment with identical Q and literal TT, verified for exact B; exact final sets in §4.8 | Accept / COMPLETED; both independent established bounds are identical, no selection needed. | P §4.1(5) / D |
 | 39 | Keep t's Q; add verified u bound earliest q(1), latest q(2); candidate remains Q | Reject / keep EXECUTING; touching/overlapping inclusive bounds are unequal. No intersection even though one instant is shared. | P §§4.1(5), 5.2 / D |
 | 40 | Keep t's Q; add verified u bound earliest q(2), latest q(3); candidate remains Q | Reject / keep EXECUTING; disjoint bounds conflict too; later source time cannot override. | P §§4.1(5), 5.2 / D |
 | 41 | Only time assessment result unknown; candidate still Q; basis says owner cannot establish a finite bound | No accept—unestablished / keep EXECUTING; producer's proposed Q is not evidence. | P §§4.1, 5.2 / D |
@@ -420,7 +632,7 @@ not contain occurred_at. `q` is fully defined in §3.5.
 | 44 | Candidate/time result both point (2026,11,17,15,0,0,0,0) | Reject / keep EXECUTING; denominator zero. | P §5.2 / D |
 | 45 | Candidate/time result both point (2026,11,17,15,0,0,2,4) | Reject / keep EXECUTING; unreduced fraction is not normalized by the consumer. | P §5.2 / D |
 | 46 | Candidate/time result earliest q(2), latest q(1) | Reject / keep EXECUTING; reversed endpoints. | P §5.2 / D |
-| 47 | Time B.event_type changed to L(EXECUTION_STARTED); time basis describes invocation rather than completion | Reject / keep EXECUTING; authentic time for another fact cannot substitute for completion time. | P §§4.1, 5.2 / D |
+| 47 | SYNC time B.event_type changed to L(EXECUTION_STARTED); basis TT retains its literal wording about the bound fact | Reject / keep EXECUTING; authentic time for another fact cannot substitute for completion time. | P §§4.1, 5.2 / D |
 | 48 | Candidate/time result both point (2026,11,17,15,0,60,0,1) | Reject / keep EXECUTING; leap endpoint label outside this bounded domain. No rounding or clock conversion. | P §5.2 / D |
 | 49 | Only candidate occurred_at becomes point q(0); authoritative time remains Q | Reject / keep EXECUTING; narrowing to a contained point is not exact interval equality. | P §4.1(5) / D |
 
@@ -432,10 +644,14 @@ same-fact contradiction. No duration or leap-table inference is involved.
 
 ### 4.5 Historical explanation is material, not a favorable label
 
-For 50–56 use P4/H3/E4. A payload-only deletion leaves independent C/S intact
-and therefore has both a structural/content mismatch and the stated loss.
-A change to authoritative C explicitly rebuilds B and all copies; it does
-not receive an implicit new completeness verification.
+For 50–56 use P4/H3/E4. Cases 50–52 are explicitly **COPY compound-defense**
+tests: deletion loses both a required explanation member and exact-copy
+agreement. The resulting payload is the original closed record minus exactly
+the specified member; all other Text is unchanged. No substring edit occurs.
+Cases 54–56 instead use equal authoritative/payload contexts and the exact
+synchronized materialization in §4.8: there is no copy mismatch. Their context
+establishment result is failed because the retained Policy contract is
+demonstrably only the specified indirect substitute, not complete terms.
 
 | Case | Exact missing/substituted material | Expected result and projection; exact reason | Source / class |
 |---|---|---|---|
@@ -443,9 +659,9 @@ not receive an implicit new completeness verification.
 | 51 | Delete evaluator member from payload.context.conditions[2] only | Reject / keep READY; required evaluator and exact C lost. | P §§4.1, 5.3; VE-002 §3 / A+D |
 | 52 | Delete inputs member from payload.context.conditions[2] only | Reject / keep READY; historical input material and exact C lost, not recoverable from result satisfied. | P §§4.1, 5.3; VE-002 §3 / A+D |
 | 53 | Candidate's complete version-1 explanation remains, but the independent historical material establishing which Policy edition applied to this A/H is unavailable; C establishment is unavailable | No accept—unsupported / keep READY; the copied version-1 terms cannot prove they are the applicable historical edition. No local/latest edition may fill the missing establishment dependency. | P §§2, 4.1, 7 / D |
-| 54 | Payload condition(2).contract alone replaced by Text “P-A” | Reject / keep READY; bare Policy name is neither exact C nor self-contained terms. | P §§4.1, 5.3, 7; VE-002 §3 / A+D |
-| 55 | Payload condition(2).contract alone replaced by Text “digest:0123456789abcdef” | Reject / keep READY; a digest is not the required historical Policy material or authority. | P §§4.1, 5.3, 7; VE-002 §3 / A+D |
-| 56 | Payload condition(2).contract alone replaced by Text “https://policy.example/current” | Reject / keep READY; a mutable locator cannot replace the immutable inline explanation. No network resolution is attempted. | P §§4.1, 5.3, 7; VE-002 §3 / A+D |
+| 54 | SYNC context C54: condition(2).contract=PN; its assessment basis=PB; every embedded C copy equals C54 | Reject / keep READY; bare name is not complete historical Policy terms. Independent context-completeness establishment failed; not a C-copy mismatch. | P §§4.1, 5.3, 7; VE-002 §3 / A+D |
+| 55 | SYNC context C55: condition(2).contract=PD; its assessment basis=PB; every embedded C copy equals C55 | Reject / keep READY; digest-only contract omits actual historical terms. Independent context-completeness establishment failed; no hidden full contract survives in basis. | P §§4.1, 5.3, 7; VE-002 §3 / A+D |
+| 56 | SYNC context C56: condition(2).contract=PU; its assessment basis=PB; every embedded C copy equals C56 | Reject / keep READY; mutable locator omits retained terms. Independent context-completeness establishment failed; no network resolution or payload mismatch. | P §§4.1, 5.3, 7; VE-002 §3 / A+D |
 
 Case 53 is specifically missing **semantic edition/material**, not the absence
 of an invented `evaluator_version` member. P defines evaluator as a scoped
@@ -458,18 +674,18 @@ independently established material is not automatically the case-53 failure.
 
 ### 4.6 Closed field domains and permissive opaque top-level context
 
-All use P6/H5/E6 except 70 as specified. A row changes only the candidate
+All use P6/H5/E6 except 58 and 70 as specified. A row changes only the candidate
 unless it says otherwise; independent inputs remain exact. For invalid member
 collections these are semantic producer proposals, not parser/wire tests.
 
 | Case | Exact input alteration | Expected result and projection; exact reason | Source / class |
 |---|---|---|---|
-| 57 | event_id is 31 zero octets | Reject / keep EXECUTING; not an Event OccurrenceId. | P §5.1; VE-002 §4.1 / A+D |
-| 58 | sequence is integer −1; selected position/B also −1 | Reject / keep EXECUTING; below uint64 domain. | P §5.1; EC §8 / D |
-| 59 | sequence is integer 18446744073709551616; selected position/B also that value | Reject / keep EXECUTING; above uint64 domain even without preceding exhaustion. | P §5.1; EC §8 / D |
+| 57 | event_id is 31 zero octets; rebuild all B/copies for that exact proposed ID | Reject / keep EXECUTING; not an Event OccurrenceId. | P §5.1; VE-002 §4.1 / A+D |
+| 58 | P1/H0/E1; sequence is integer −1; selected position/B also −1; rebuild | Reject / no Lifecycle state; below uint64 domain, with no predecessor and thus no earlier ordering collision. | P §5.1; EC §8 / D |
+| 59 | sequence is integer 18446744073709551616; selected position/B also that value; rebuild | Reject / keep EXECUTING; above uint64 domain even without preceding exhaustion. | P §5.1; EC §8 / D |
 | 60 | payload.context.commit_required is integer 1, not Boolean true | Reject / keep EXECUTING; no integer-to-Boolean coercion and not exact C. | P §5.3 / D |
 | 61 | Add actor with Text b | Reject / keep EXECUTING; forbidden field even when the name is a recognized source. | P §5.1 / D |
-| 62 | Add component with null | Reject / keep EXECUTING; forbidden presence and null is not absence. | P §5.1; EC §4 / D |
+| 62 | Add component with non-null Text b | Reject / keep EXECUTING; forbidden component presence alone; no unrelated known-field-null defect. | P §5.1; EC §4 / D |
 | 63 | Add references with empty list | Reject / keep EXECUTING; forbidden collection is present even when empty. | P §§5.1, 7 / D |
 | 64 | payload is null | Reject / keep EXECUTING; required non-null explanation. | P §5.1; EC §4 / D |
 | 65 | Add payload member extension with null | Reject / keep EXECUTING; nested payload is closed, unlike unknown top-level context. | P §5.3 / D |
@@ -487,9 +703,9 @@ collections these are semantic producer proposals, not parser/wire tests.
 | 72 | Recorded membership H3 followed by foreign Event J: event_id I(80), Action A, sequence 35, time Q, spec_version (VE-002,0.2), full type (authority Text rs-event-002.example, profile Text imported-policy, revision Text 1, kind Text POLICY_RECORDED), payload Text retained-policy-record, other known optionals absent. J's exact governing type/reference contract unavailable. Proposed E4 rebuilt for J as prior head, sequence 40, with its complete independent input bundle. | No accept—unsupported; retain J; **no complete projection**. H3 establishes only a partial READY prefix. J cannot be assumed harmless/non-transition-causing from its local name. This scenario does not allocate or finish that foreign type. | P §§2, 6–7; EC §6 / D |
 | 73 | Replay H6 with authoritative membership intact, no new candidate; independent historical verification material/results for E4 now unavailable. All inline copies and other historical inputs retained. | Unsupported E4; **no complete projection**. H3 is only a supported READY prefix; E5/E6 cannot prove a complete successor state across the gap. No deletion, re-admission or today's Policy substitution. | P §§4.1, 5.3, 6 / D |
 | 74 | P6/H5/E6; candidate resolver supplies a different profile text under the same L identifier, claiming EXECUTION_COMPLETED maps to FAILED. The pinned publication is available and contradicts it. | Reject / keep EXECUTING; demonstrated retargeting, not a profile update or local choice. | P §§2–3, 6; EC §6 / D |
-| 75 | P1/H0/E1; exact Action schema semantic material unavailable in the authoritative input bundle and candidate explanation; its identifier/digest and all other available inputs retained | No accept—unsupported / no Lifecycle state; candidate cannot use an Action digest or remembered schema name as its missing semantic closure. No existing interpreted history supplies the missing material. | P §§2, 6 / D |
+| 75 | P1/H0/E1; use exact missing-schema materialization M75 in §4.8, including every embedded context and basis; digests retained | No accept—unsupported / no Lifecycle state; candidate cannot use an Action digest or remembered schema name as its missing semantic closure. No existing interpreted history supplies the missing material. | P §§2, 6 / D |
 | 76 | P6/H5/E6; time assessment independent verification unavailable, and fact result refuted with its contrary basis | Reject / keep EXECUTING; known invalidity takes precedence over missing time verification. | P §4.1 / D |
-| 77 | P6/H5/E6; fact unknown and its basis records insufficient success evidence; time assessment independent verification unavailable | No accept—unsupported / keep EXECUTING; unsupported precedes unestablished. Never turn missing evidence into failure or success. | P §4.1 / D |
+| 77 | P6/H5/E6; SYNC fact unknown with literal FX; time assessment independent verification unavailable; exact final sets in §4.8 | No accept—unsupported / keep EXECUTING; unsupported precedes unestablished. Never turn missing evidence into failure or success. | P §4.1 / D |
 
 The foreign J in case 72 is a fully specified **retained unsupported input**,
 not a conforming eighth type. Its payload need not be interpreted to derive
@@ -498,11 +714,147 @@ type would require its complete owner contract; this scenario deliberately
 does not invent one. Case 71 is the positive mixed imported/local history of
 known types; case 72 tests the additional foreign-type dependency boundary.
 
+### 4.8 Exact final assessment and copy ledger
+
+This ledger, together with the literal blocks, materializes each affected
+input. It is a finite value definition, not an implementation or propagation
+default. For its named baseline:
+
+- F = the exact baseline fact record; T = its t/time record; M = its commit
+  record (P6 only); V = its condition(0) record (P3); U = its condition(1)
+  record and W = its condition(2) record (P4).
+- S0 denotes the complete unchanged assessment set of that named baseline.
+- F[r,b] replaces exactly F.result and F.basis by r and literal b.
+  W[r,b] and M[r,b] have the same precise two-member meaning.
+- T[r,b] replaces exactly T.result and T.basis. Tu(r) is T with source u,
+  result r and basis TT; all other members remain T's exact values.
+- F16..F23 replace exactly the binding member in cases 16..23; basis=F6
+  except F19 additionally sets basis=F7 as specified by that row.
+  F29 replaces source=b, role=execution, basis=FB. T47 changes only the
+  binding.event_type to L(EXECUTION_STARTED); basis remains TT.
+- Z43..Z46 and Z48 are exactly the malformed intervals specified by those
+  rows; a point repeats the complete written endpoint as earliest and latest.
+- A set written in braces lists **every** final member. All candidate envelopes,
+  histories and C values stay their named baseline unless expressly changed.
+  Payload.action remains A except M75. There are no unnamed additional records.
+
+For every SYNC/AUTH row the independent establishment map contains an entry
+for **each exact record in the authoritative-set column**, including its
+post-mutation binding, source, result and literal basis. Unless the last column
+specifies a failure/unavailability, each listed record has a separate verified
+result with recognized scope for that exact record; C is independently verified
+for the row's exact A/H. In 16–23 and 47 that establishes the *different*
+asserted binding/fact, never its equality with the candidate. Payload-only
+records have no new establishment entry. Unlisted records have no entry and
+cannot borrow an original record's verification. These are explicit input-map
+definitions, not a validation rule that returns verified from a copy.
+
+| Case | Class | Complete authoritative S after mutation | Complete payload.assessments after mutation | Other exact input/establishment change |
+|---|---|---|---|---|
+| 16–23 | SYNC | {F16,T,M} through {F23,T,M}, respectively | The same respective three-record set | Each altered fact is verified for its own exact asserted binding; it mismatches candidate B. |
+| 24 | SYNC | {T,M} | {T,M} | No F establishment entry. |
+| 25 | AUTH | {F[unknown,FU],T} | {F,T} | Only the new unknown record has authoritative fact establishment; old payload F has none for this decision. |
+| 26 | SYNC | {F[refuted,FR],T,M} | {F[refuted,FR],T,M} | Verified negative fact. |
+| 27 | NONE | {F,T,M} | {F,T,M} | C and all three exact record establishment results unavailable. |
+| 28 | NONE | {F,T,M} | {F,T,M} | T establishment failed; C,F,M verified. |
+| 29 | SYNC | {F29,T,M} | {F29,T,M} | F29 establishment failed: b has only boundary grant; C,T,M verified. |
+| 30 | SYNC | {F,F[refuted,FR],T,M} | {F,F[refuted,FR],T,M} | Both contrary fact records individually verified. |
+| 31 | SYNC | {F,T} | {F,T} | No V establishment entry. |
+| 32 | SYNC | {F,T,U,W[unsatisfied,KN]} | {F,T,U,W[unsatisfied,KN]} | Verified negative condition. |
+| 33 | SYNC | {F,T,U,W,W[unsatisfied,KN]} | {F,T,U,W,W[unsatisfied,KN]} | Both contrary condition records individually verified. |
+| 34 | SYNC | {F,F[unknown,FX],T,M} | {F,F[unknown,FX],T,M} | Definite and unknown observations independently verified. |
+| 35 | SYNC | {F,T} | {F,T} | No M establishment entry. |
+| 36 | SYNC | {F,T,M[not_committed,MN]} | {F,T,M[not_committed,MN]} | Verified negative commit. |
+| 37 | SYNC | {F,T,M,M[not_committed,MN]} | {F,T,M,M[not_committed,MN]} | Both commit records individually verified. |
+| 38 | SYNC | {F,T,Tu(Q),M} | {F,T,Tu(Q),M} | u independently recognized for this exact completion's time, not inferred from t. |
+| 39 | SYNC | {F,T,Tu([q(1),q(2)]),M} | {F,T,Tu([q(1),q(2)]),M} | All verified; candidate occurred_at=Q. |
+| 40 | SYNC | {F,T,Tu([q(2),q(3)]),M} | {F,T,Tu([q(2),q(3)]),M} | All verified; candidate occurred_at=Q. |
+| 41 | SYNC | {F,T[unknown,TU],M} | {F,T[unknown,TU],M} | Verified uncertain time; candidate occurred_at=Q. |
+| 42 | SYNC | {F,M} | {F,M} | No T establishment entry; candidate occurred_at=Q. |
+| 43–46,48 | SYNC | {F,T[Zi,TB],M}, i is the exact case number | The same respective three-record set | Candidate occurred_at=Zi; verification establishes origin, not domain validity. |
+| 47 | SYNC | {F,T47,M} | {F,T47,M} | Time established for invocation, not the candidate's completion. |
+| 49 | NONE | {F,T,M} | {F,T,M} | Only candidate occurred_at=[q(0),q(0)]. |
+| 50 | COPY | {F,T,U,W} | {F,T,U,W without basis member} | Authoritative W still has literal K2; no payload-only record is established. |
+| 51 | COPY | {F,T,U,W} | {F,T,U,W} | Only payload.context.conditions[2].evaluator absent; every binding.context still C. |
+| 52 | COPY | {F,T,U,W} | {F,T,U,W} | Only payload.context.conditions[2].inputs absent; every binding.context still C with T-PI. |
+| 53 | NONE | {F,T,U,W} | {F,T,U,W} | C establishment unavailable; exact assessment establishments retained. |
+| 54–56 | SYNC | Si defined immediately below | Si | C=Ci and payload.context=Ci; C establishment failed for missing actual Policy contract; each exact Si record independently authentic and scoped. |
+| 60 | COPY | {F,T,M} | {F,T,M} | Only payload.context.commit_required=integer 1; C and every binding.context retain Boolean true. |
+| 75 | SYNC | {F75,T75} | {F75,T75} | Exact M75 bundle below; C and both record establishment results unavailable; none failed. |
+| 76 | SYNC | {F[refuted,FR],T,M} | {F[refuted,FR],T,M} | T establishment unavailable; C, new negative F and M verified. |
+| 77 | SYNC | {F[unknown,FX],T,M} | {F[unknown,FX],T,M} | T establishment unavailable; C, new unknown F and M verified. |
+
+For each i=54,55,56, define Ci as C with **only**
+conditions[2].contract replaced by PN, PD, PU respectively. T-PI is unchanged:
+it contains input values, not a hidden copy of the Policy contract. Define
+Fi,Ti,Ui,Wi by replacing the whole binding.context of F,T,U,W respectively
+with Ci; Wi additionally replaces basis K2 with PB. Si is exactly
+{Fi,Ti,Ui,Wi}. Final payload is {action=A, context=Ci, assessments=Si}.
+Thus all five embedded contexts (outer plus four assessment bindings) and the
+independent context agree; the Policy rationale copy is explicitly replaced.
+No favorable basis elsewhere embeds the missing Policy restrictions.
+The failed independent context result records the single completeness fault:
+actual applicable contract/edition unavailable in a known name/digest/locator
+substitution. It is not a failed raw-authentication test or automatic parsing
+of arbitrary Policy Text.
+
+M75 is the following exact unavailable-material experiment, not deletion of an
+Action field or insertion of a null:
+
+1. Keep A's occurrence, digest, schema digest, semantic fields and empty bound
+   fields, but make the selected schema definition/descriptor dependency
+   unavailable in both the independently supplied A material and payload.action
+   material. Keep Action-owner contracts available. No history exists in H0.
+2. Define C75 as C with conditions[0].contract=MS, conditions[0].inputs=MS
+   and execution_terms=ME. The other members retain their exact baseline
+   values. They retain identity/Policy inputs, not the missing schema definition.
+3. F75 is F with binding.context=C75 and basis=MF; T75 is T with
+   binding.context=C75 and basis=MT. These are the complete two-record sets
+   shown in the ledger; there is no condition(0) assessment in P1.
+4. Independent C=C75; payload.context=C75; payload.assessments={F75,T75}.
+   This replaces all three candidate copies of the context (outer plus two
+   bindings), including every T-VC/T-VI/T-EXEC copy. The admission and time
+   bases are replaced by the complete literals MF/MT, not partially redacted.
+   No original schema-derived explanation is retained as an alternative
+   resolution source. Recorded digests/identifiers do not restore that material.
+5. The independent Action-owner material check, C establishment and both exact
+   record establishments are unavailable because the schema cannot be
+   interpreted. There is no known false binding or failed verification.
+   Missing closure therefore yields unsupported, not a synthetic null-field
+   rejection. No fixture may assert complete C establishment for this input.
+
+Rows 34,35,38,41,42 and 77 retain their stated outcomes **only for the explicitly
+synchronized sets above**, not for a frozen baseline payload. If instead their
+payload were left at S0, each would reject for mismatch. Row 25 intentionally
+keeps that mismatch and changes outcome. This distinction is part of the
+inputs, not consumer discretion.
+
+### 4.9 Additional distinguishing classes
+
+The following are appended, not renumbered. Bracketed intervals are semantic
+earliest/latest records, not a time serialization. In 82–83 the unchanged
+literal TT describes exactly the new structured interval; it contains no
+embedded copy of Q. All new exact assessment establishments are independently
+verified except the explicit scope failure in 84.
+
+| Case | Complete baseline / final authoritative and payload inputs | Expected result and projection; exact reason | Source / class |
+|---|---|---|---|
+| 78 | P2/H1/E2; SYNC S={F[refuted,FQ],T}; payload S={F[refuted,FQ],T}; C unchanged | Reject / keep CREATED; queue placement without actual validation commencement does not establish validation start. | P §4, §4.1(2); VE-003 §10 / D |
+| 79 | P5/H4/E5; SYNC S={F[refuted,XQ],T}; payload S={F[refuted,XQ],T}; C unchanged | Reject / keep AUTHORIZED; preparation/queueing without material invocation does not establish execution start. | P §4, §4.1(2); VE-005 §§7–10 / D |
+| 80 | P6/H5/E6; NONE, mathematical S={F,T,M} and payload S={F,T,M}; enumerate authoritative members M,F,T and payload members T,M,F; establishments for exact F,T,M unchanged | Accept / COMPLETED; enumeration order cannot change set equality or projection. The enumerations are not ordered semantic lists. | P §§4.1, 5.3 / D |
+| 81 | P6/H5/E6; NONE, supply authoritative enumeration F,T,F,M and payload enumeration M,T,F,F; both denote exactly S={F,T,M}; one unchanged establishment per exact record | Accept / COMPLETED; identical duplicate assessments collapse, unlike distinct Event reuse or duplicate record member names. No assessment or contrary result is discarded. | P §§4.1, 5.3 / D |
+| 82 | P6/H5/E6; R=[q(0),q(0)]; SYNC S={F,T[R,TT],M}, payload S={F,T[R,TT],M}; candidate occurred_at=R | Accept / COMPLETED; a point bound is valid when independently established, not merely producer narrowing as in 49. | P §§4.1(5), 5.2 / D |
+| 83 | P6/H5/E6; R=[(2026,11,17,15,0,0,1,3),(2026,11,17,15,0,0,2,3)]; SYNC S={F,T[R,TT],Tu(R),M}, payload S={F,T[R,TT],Tu(R),M}; candidate occurred_at=R | Accept / COMPLETED; equal inclusive nonzero reduced-rational uncertainty bounds agree exactly. Both time sources independently establish that exact completion interval. | P §§4.1(5), 5.2 / D |
+| 84 | P6/H5/E6; NONE S={F,T,M}, payload S={F,T,M}, C unchanged. Independent x/execution fact grant recognizes only EXECUTION_STARTED, not EXECUTION_COMPLETED; F establishment failed for exact fact scope. C,T,M remain verified, including x's separately retained commit grant | Reject / keep EXECUTING; matching source/role and exact B do not supply the missing recognized completion-fact scope. No copied grant can expand it. | P §4.1(1) / D |
+| 85 | P2/H1/E2; let W2 be the six-member condition(2) record with B(E2), source a, role authorization, result satisfied, basis K2; W2n differs only by result unsatisfied and basis KN. SYNC S={F,T,W2,W2n}, payload S={F,T,W2,W2n}; all exact records independently verified for E2 | Reject / keep CREATED; generic conflicting definite results for the same optional statement. This kind does not require Policy satisfaction, so neither an unsatisfied required condition nor refuted fact independently masks contradiction. | P §4.1(3) and same-statement conflict rule / D |
+| 86 | P7/H5/E7; SYNC S={F[unknown,FU],T}, payload S={F[unknown,FU],T}; C unchanged; both exact records verified | No accept—unestablished / keep EXECUTING; timeout/no response cannot establish known failure. Unlike 25, no payload mismatch exists. | P §§4.1, 6; VE-004 §§7–8 / D |
+| 87 | P2/H1/E2; W2n exactly as in 85; SYNC S={F,T,W2n}, payload S={F,T,W2n}; all exact records verified | Accept / VALIDATING; a single negative optional Policy condition neither contradicts another result nor triggers a success/authorization requirement for validation commencement. Positive control for 85. | P §4.1(3) and conflict rule / D |
+
 ## 5. Pressure-test disposition and remaining decisions
 
 ### 5.1 What can be determined without local defaults
 
-For cases 01–77 the profile supplies enough rules to derive the displayed
+For cases 01–87 the profile supplies enough rules to derive the displayed
 **acceptance/non-acceptance and complete-projection boundary** from the
 specified established inputs. No new semantic ambiguity is identified within
 that boundary. The matrix fixes source scopes, whole context, assessment sets,
@@ -524,22 +876,106 @@ of J, or a standardized full partial-state trace cannot be completed from this
 profile alone. That would be an expanded task, not a passing instance of the
 matrix. No conflict requiring an Approved semantic change is demonstrated here.
 
-### 5.2 Acceptance-criteria accounting
+### 5.2 Coverage accounting: rows are not evidence
+
+The 87 rows are classified disjointly as follows. These counts describe
+**documented tests**, not executed or independently demonstrated results.
+
+| Classification | Cases | Count |
+|---|---|---|
+| Positive transition mapping | 01–07 | 7 |
+| Positive boundary/control | 12,70,82,83,87 | 5 |
+| Isolated negative/non-acceptance | 08,09,10,11,15,16,17,18,19,20,21,22,23,24,26,27,28,29,31,32,35,36,39,40,41,42,43,44,45,46,47,48,49,53,54,55,56,57,58,59,61,62,63,64,65,67,68,69,72,73,74,75,78,79,84,85,86 | 57 |
+| Compound defense | 25,30,33,37,50–52,60,76–77 | 10 |
+| Equivalence/invariance | 14,34,38,66,71,80–81 | 7 |
+| Intentionally redundant illustration | 13 (same upper-domain defect as 59, following exhaustion) | 1 |
+| **Total** | **01–87** | **87** |
+
+A negative row outside the compound/redundant classes is specified with its
+stated fault as an independently sufficient non-acceptance reason and without
+a separate deliberately introduced invalidity. This is not a claim that an
+implementation must run checks in a particular order or choose a standard
+diagnostic spelling. Compound cases explicitly exercise simultaneous defects
+or precedence and do not count as isolating their second condition. In
+particular 30/33/37 cannot alone prove generic contradiction handling;
+85, with control 87, covers that branch. Cases 39/40 and 54–56 are distinct
+boundary/substitute equivalence classes of one respective rule, not inflated
+claims of different normative algorithms.
+
+The following map counts **70 documented, independently isolated semantic
+branch obligations** under its explicitly stated taxonomy. “Isolated” means
+the example separates that written rule, not that independent software has
+demonstrated it. The number of empirically or independently demonstrated
+profile-conformance branches remains **zero**. Compound-only assertions
+(copy-corruption defense in 25/50–52/60, favorable-result defenses in
+30/33/37, and precedence in 76/77) are supplementary and are not added to
+this isolated-branch count.
+
+| Claimed branch or family | Isolating/control case(s) | Count and interpretation |
+|---|---|---|
+| Seven distinct positive transition mappings | 01–07 | 7: Seven obligations, one per kind; not seven generic acceptance duplicates. |
+| Illegal shortcut / post-terminal transition | 08; 09 | 2: Two transition-legality branches. |
+| Unique authoritative successor selection | 10 | 1: No selection by proposed ordinal or time. |
+| Strictly increasing append ordinal | 11 | 1: In-range equality with predecessor fails. |
+| Sequence domain upper/lower bounds | 59; 58 | 2: Two isolated domain failures; 13 is redundant with 59. |
+| Sequence boundary and gaps accepted | 12; 70 | 2: Maximum-with-gap and zero initial ordinal are two positive boundaries. |
+| Authoritative sequence, not delivery or equal time | 14 | 1: Permutation of one established history; one invariance. |
+| Occurrence ID non-reuse / width | 15; 57 | 2: Two distinct checks: valid-width reuse versus malformed width. |
+| Exact binding components | 16–23 | 8: Eight independently mutated components: occurrence, content, bound fields, type, Event ID, head, ordinal, whole context. |
+| Required fact missing / known refuted / uncertain | 24; 26; 86 | 3: Three result branches; 25 is not the uncertainty isolate. |
+| Independent establishment missing / failed | 27; 28 | 2: Two branches, not assertions inferred from copies. |
+| Granted role / recognized exact fact scope | 29; 84 | 2: Two scopes; correct role alone does not close fact authority. |
+| Required condition missing / unsatisfied | 31; 32 | 2: Two required-condition branches. |
+| Optional definite contradiction / negative optional control | 85; 87 | 2: Two branches; no required-condition denial masks 85. |
+| Unknown extra assessment does not refute definite fact | 34 | 1: One positive invariance. |
+| Required commit missing / definite non-commit | 35; 36 | 2: Two completion-specific branches. |
+| Time identical corroboration / unequal corroboration | 38; 39,40 | 2: Two branches; touching and disjoint bounds are documented sub-boundaries of the same unequal-bounds branch, not two independent algorithms. |
+| Time unknown / missing | 41; 42 | 2: Two required-time branches. |
+| Time endpoint and interval domains | 43; 44; 45; 46; 48 | 5: Five separate checks: calendar, nonzero denominator, reduced rational, non-reversed interval, leap-label exclusion. |
+| Time fact binding / exact Event interval equality | 47; 49 | 1: Exact Event interval equality is additional. Case 47 applies the already-counted type-binding check to time evidence; it is not another branch of that generic check. |
+| Valid point / valid rational uncertainty | 82; 83 | 2: Two positive time-domain boundaries. |
+| Applicable historical edition cannot be inferred from copy | 53 | 1: One independent material-availability branch. |
+| Indirect Policy explanation is incomplete | 54–56 | 1: One completeness branch with three distinct substitute classes; no current-context mismatch. |
+| Forbidden actor / component / references | 61; 62; 63 | 3: Three empty-domain field checks; 62 uses non-null Text. |
+| Required non-null payload / occurrence time | 64; 69 | 2: Two required-field null checks. |
+| Closed nested explanation / opaque top-level extension | 65; 66 | 2: Two branches: nested rejection and top-level invariance. |
+| Duplicate member name | 67 | 1: Not assessment-set duplicate collapse. |
+| Required payload cannot be supplied via unknown field | 68 | 1: One absence branch, separate from payload=null. |
+| Lossless imported/local known history | 71 | 1: One provenance-preserving invariance. |
+| Unsupported retained type / historical establishment | 72; 73 | 2: Two missing-dependency branches; neither claims generalized partial replay. |
+| Immutable type retargeting / missing Action closure | 74; 75 | 2: Two dependency integrity/availability branches. |
+| Assessment-set order / exact duplicates | 80; 81 | 2: Two independent set invariances. |
+| Actual commencement / invocation rather than queueing | 78; 79 | 0 additional: Two required type-specific adversarial examples of the already-counted fact meanings and refuted-result branch, not new generic rejection algorithms. |
+
+This is bounded coverage, not an assertion that every legal combination,
+base-field domain or arbitrary Action/Policy contract has been enumerated.
+For example the seven selected kinds are not all Lifecycle kinds; foreign
+positive-type replay and real source authentication remain excluded. The
+matrix does not need those rules invented to give its own bounded outcomes.
+
+### 5.3 Acceptance-criteria accounting
 
 | Gap-analysis §10.2 criterion | Coverage and honest disposition |
 |---|---|
 | 1: seven kinds and immutable dependencies | §2 pins exact publication and transitive source selection; 01–07 cover every type; 19, 72, 74–75 prevent name-based substitution and missing-material completion. Source Draft maturity remains explicit. |
-| 2: exact facts/evidence and existing transitions | 01–10, 16–37, 76–77 exercise evidence scope, source recognition, contradiction/uncertainty and existing transitions. A fixture's verified input is not evidence that a production verifier is correct. |
-| 3: time and field domains | 14, 38–49 and 57–70 cover identical/different intervals, malformed domains, exact fact time, presence, nulls and extensions. No new timestamp or explanation format is defined. |
+| 2: exact facts/evidence and existing transitions | 01–10, 16–37, 76–87 exercise evidence scope, source recognition, contradiction/uncertainty and existing transitions. A fixture's verified input is not evidence that a production verifier is correct. |
+| 3: time and field domains | 14, 38–49, 57–70 and 80–83 cover identical/different intervals, malformed domains, exact fact time, presence, nulls and extensions. No new timestamp or explanation format is defined. |
 | 4: history/identity/order/failure | 10–15, 21–22, 58–59, 70–77 preserve protected selection, uint64 bounds, immutable IDs and retained unsupported history. |
-| 5: traceable examples | All 77 have explicit sources, complete baselines/deltas and projected outcomes. They are prose cases, not execution or exhaustive §21 coverage. |
+| 5: traceable examples | All 87 have explicit sources, literal Text and final-value ledgers; the coverage taxonomy distinguishes 76 nonredundant non-compound rows from 10 compound defenses and one redundant row. They are prose cases, not execution or exhaustive §21 coverage. |
 | 6: independent meaning | Written-case derivability is supported at the established-input boundary; independent implementations and independent-team results are still absent. No parser, cryptography, concurrency or production clock claim follows. |
 | 7: compatibility/governance | Approved ownership remains unchanged. The new profile's identifiers/input interface/inline-only explanation/UTC interval choices still require human acceptance; no approval is granted here. |
 
-### 5.3 Can executable fixtures now be created?
+### 5.4 Can executable fixtures now be created?
 
-**Yes for these bounded semantic cases**, by expanding the explicit values and
-comparing acceptance, retained membership and the stated projection boundary.
+**Yes for direct transcription of these bounded semantic inputs and outcomes**,
+using the delimited literal Text, named immutable semantic dependency bundle,
+complete final assessment sets and exact independent establishment maps. Do
+not extract fixture Text from source documents or generate a rationale from
+a result label. The document's direct-transcription claim concerns these
+conditional established-input cases, not a raw verifier or arbitrary schema
+interpreter. Reproduction must preserve the pinned owner's exact material;
+a missing local copy is not permission to invent it. Compare
+acceptance, retained membership and the stated projection boundary.
 That does not require new semantics, wire encoding, real authentication or a
 clock service. It must preserve separate independent establishment inputs and
 must not read producer copies as authentication. Missing-material cases must
@@ -571,4 +1007,5 @@ and representation design are separate decisions.
 
 | Version | Date | Change |
 |---|---|---|
+| 0.2 | 2026-09-23 | Explicit AUTH/SYNC/COPY materialization and establishment maps; literal explanation values; isolated negative branches; ten appended cases; honest coverage taxonomy. Case 25 now rejects its frozen payload mismatch; 58 uses empty history to isolate the lower domain; no profile or implementation changes. |
 | 0.1 | 2026-09-23 | Initial non-normative 77-case established-input matrix for the exact pinned lifecycle profile Draft v0.2; no profile, experiment, fixture or workflow changes. |
