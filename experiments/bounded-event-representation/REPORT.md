@@ -249,8 +249,8 @@ review remain separate from successful byte recovery.
 
 ## 8. Validation record
 
-The complete suite passed **503/503**, with zero skipped, cancelled or failed
-tests: the pre-existing 302 tests plus the following 201 new tests.
+The complete suite passed **505/505**, with zero skipped, cancelled or failed
+tests: the pre-existing 302 tests plus the following 203 new tests.
 
 | New test category | Count | Result |
 |---|---:|---|
@@ -260,6 +260,7 @@ tests: the pre-existing 302 tests plus the following 201 new tests.
 | Valid Text substitution binding | 1 | Both directions and both decoders; successful decoding, exact intended-Text mismatch |
 | Runner/fixture controls | 20 | Five manifest, eight process/output, two fixture/semantic and five injected comparison-failure groups |
 | Provenance regressions | 2 | Exact historical body/blob/pin enforcement and missing-history/no-HEAD-fallback |
+| Focused correction regressions | 2 | Process-limit-independent arbitrary-integer parsing/rendering and a valid Context whose sole defect is the extra `"x"` member |
 | Additional boundary/invariance checks | 4 | Opaque owner-set boundary, unknown owner, history delivery invariance and establishment normalization versus decoder rejection |
 
 Of the 67 negative vectors, 62 are representation/domain/binding/provenance
@@ -271,14 +272,23 @@ deliberately shared witnesses across languages; this is disclosed rather than
 inflating the number of independent semantic branches.
 
 Validation used a fresh, non-shallow, non-hardlinked full-history clone,
-Node 24.19.0 and Python 3.9.6. All six external materials were acquired afresh and their exact
+Node 24.19.0, Python 3.9.6 and Python 3.12.14 with its default 4,300-digit
+conversion limit enabled. The focused large-integer regression demonstrates
+that the former direct decimal conversions fail in that modern runtime, while
+the corrected codec parses and renders the committed 9,865-digit negative
+integer, cross-decodes A's 4,104-byte encoding and re-encodes identical bytes
+without changing process-global configuration. The corrected Context negative
+vector decodes successfully after removing only `"x"` and rejects after adding
+only `"x": 0`. All six external materials were acquired afresh and their exact
 fingerprints verified. The tree was clean before and after the run, aside from
-ignored verified source caches. Only this report's result record was completed
-after that run; executable code, vectors, controls and pins were unchanged.
+ignored verified source caches. This focused correction changes only codec B's
+decimal conversion, its direct regressions/mutation plumbing, the isolated
+Context negative vector and this report. Other executable evidence, artifacts,
+controls and every historical pin remain unchanged.
 
 The tested 18-file inventory (all tracked files in this experiment except
 REPORT.md) has diagnostic SHA-256
-`ca657000b7a290791d3aeebd3e404f1fa9490d59c23b3e19dfa18e52c9c5f86a`.
+`52d2278706c1d6699de2a5d22556b15f26178fac76cdf025964cdf8ec2b51c76`.
 To reproduce it, sort repository-relative paths in ascending ASCII order,
 form `[path, lowercase SHA-256 of exact file bytes]` for each, serialize the
 array with `JSON.stringify` (no whitespace or trailing newline), then SHA-256

@@ -146,7 +146,34 @@ def test_integer(x):
     require(type(x) is dict and list(x) == ['$integer'] and type(x['$integer']) is str, 'domain/integer')
     s = x['$integer']
     require(s == '0' or (s.lstrip('-').isascii() and s.lstrip('-').isdigit() and not s.lstrip('-').startswith('0') and s.count('-') <= 1 and '-' not in s[1:]), 'domain/integer')
-    return int(s)
+    return decimal_to_integer(s)
+
+
+def decimal_to_integer(text):
+    """Parse canonical decimal without Python's process-global digit limit."""
+    negative = text.startswith('-')
+    value = 0
+    for character in text[1:] if negative else text:
+        value = value * 10 + ord(character) - ord('0')
+    return -value if negative else value
+
+
+def integer_to_decimal(value):
+    """Render an arbitrary integer without Python's process-global digit limit."""
+    require(type(value) is int, 'domain/native-integer')
+    if value == 0:
+        return '0'
+    negative = value < 0
+    magnitude = -value if negative else value
+    base = 10**9
+    parts = []
+    while magnitude:
+        magnitude, remainder = divmod(magnitude, base)
+        parts.append(remainder)
+    result = str(parts.pop())
+    while parts:
+        result += '%09d' % parts.pop()
+    return '-' + result if negative else result
 
 
 def unpack_octets(tree):
@@ -420,7 +447,7 @@ def convert(kind, value, reading=False):
         if kind == 'pos':
             require(n > 0, 'domain/positive')
         if reading:
-            return {'$integer':str(n)}
+            return {'$integer':integer_to_decimal(n)}
         magnitude = abs(n)
         return [n < 0, pack_octets(magnitude.to_bytes((magnitude.bit_length()+7)//8, 'big'))]
     if kind == 'u64':

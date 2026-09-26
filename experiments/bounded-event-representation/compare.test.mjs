@@ -7,7 +7,7 @@ import {spawnSync} from 'node:child_process';
 import {fixtures,validateCases,governingContext,expand,invoke,positive,exactSemantics,checkedOutput} from './compare.mjs';
 import {dir,pins,historical,verify,profileBinding} from './source-loader.mjs';
 import {patched} from './negative-plumbing.mjs';
-import {mutations,once} from './mutants.mjs';
+import {mutations,once,sourceFor} from './mutants.mjs';
 import {cbor,parse} from './codec-a.mjs';
 
 const literals=JSON.parse(readFileSync(new URL('negative-vectors.json',dir))).literal;
@@ -29,6 +29,35 @@ for(const c of fixtures.positive)test(`representation positive ${c.id}`,()=>{bas
 for(const c of [...literals,...packageVectors.patches])test(`representation negative ${c.id}`,()=>{
   const v=negative(c.id);
   for(const language of ['A','B'])assert.deepEqual(invoke(language,{op:'decode',type:v.type,hex:v.hex},authority),{ok:false,error:v.error},`${language}/${c.id}`);
+});
+test('representation Python arbitrary integers ignore the interpreter decimal-digit limit',()=>{
+  const c=fixtures.positive.find(c=>c.id==='integer-chunked-magnitude'),value=expand(c.value,authority);
+  assert.equal(value.$integer.slice(1).length,9865);assert.equal(value.$integer[0],'-');
+  const encodedA=invoke('A',{op:'encode',type:'integer',value},authority);assert.equal(encodedA.ok,true);assert.equal(encodedA.value.length/2,4104);
+  const decodedB=invoke('B',{op:'decode',type:'integer',hex:encodedA.value},authority);assert.deepEqual(decodedB,{ok:true,value});
+  const encodedB=invoke('B',{op:'encode',type:'integer',value:decodedB.value},authority);assert.deepEqual(encodedB,encodedA);
+  for(const boundary of ['0','-1']){
+    const semantic={$integer:boundary},a=invoke('A',{op:'encode',type:'integer',value:semantic},authority),b=invoke('B',{op:'encode',type:'integer',value:semantic},authority);
+    assert.deepEqual(b,a);assert.deepEqual(invoke('B',{op:'decode',type:'integer',hex:a.value},authority),{ok:true,value:semantic});
+  }
+  const invalid={$integer:'1'.repeat(5000)+'x'};
+  assert.deepEqual(invoke('B',{op:'encode',type:'integer',value:invalid},authority),{ok:false,error:'domain/integer'});
+  const runtime=spawnSync(process.env.PYTHON??'python3',['-c','import json,sys; print(json.dumps({"version":list(sys.version_info[:3]),"limit":sys.get_int_max_str_digits() if hasattr(sys,"get_int_max_str_digits") else None}))'],{encoding:'utf8'});
+  assert.equal(runtime.status,0);const info=JSON.parse(runtime.stdout);
+  if(info.limit!==null&&info.limit>0&&value.$integer.length>info.limit){
+    const legacyParse=once(sourceFor('B'),'return decimal_to_integer(s)','return int(s)');
+    const legacyRender=once(sourceFor('B'),"return {'$integer':integer_to_decimal(n)}","return {'$integer':str(n)}");
+    assert.throws(()=>invoke('B',{op:'encode',type:'integer',value},authority,legacyParse),/runner\/subprocess/);
+    assert.throws(()=>invoke('B',{op:'decode',type:'integer',hex:encodedA.value},authority,legacyRender),/runner\/subprocess/);
+  }
+});
+test('representation extra Context member is the only defect',()=>{
+  const vector=literals.find(c=>c.id==='extra-context-field');assert.ok(vector?.without_extra_hex);
+  for(const language of ['A','B']){
+    const valid=invoke(language,{op:'decode',type:'context',hex:vector.without_extra_hex},authority);assert.equal(valid.ok,true,`${language}: ${valid.error}`);
+    assert.deepEqual(invoke(language,{op:'encode',type:'context',value:valid.value},authority),{ok:true,value:vector.without_extra_hex});
+    assert.deepEqual(invoke(language,{op:'decode',type:'context',hex:vector.hex},authority),{ok:false,error:'structure/record-fields'});
+  }
 });
 test('representation Text substitution decodes but fails independent intended-value binding',()=>{
   const d=baseline('text-decomposed'),c=baseline('text-composed');assert.notEqual(d,c);
