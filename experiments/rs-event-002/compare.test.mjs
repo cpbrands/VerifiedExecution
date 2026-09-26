@@ -5,6 +5,7 @@ import {spawnSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
 import {fixtures,oracle,python,javascript,digest,directory,provenance,historical,verifyBytes,expand,validateSuite,inputFor,invoke,outputShape,compareResult,comparePair} from './compare.mjs';
 import {evaluate} from './rule-graph.mjs';
+import {profilePin,alternateSelector,runComparison} from './compare.mjs';
 const catalog=provenance();
 const samples=new Map(fixtures.cases.map(c=>[c.id,inputFor(c,catalog)]));
 const I=n=>n===null?null:n.toString(16).padStart(64,'0');
@@ -52,6 +53,48 @@ for(const [index,c]of fixtures.cases.entries())test(`RS-EVENT-002 ${c.id}: two e
 });
 
 // Runner controls fail through the actual comparison/validation functions.
+const validationFailure=(phase,code)=>error=>{
+  assert.equal(error.name,'ExperimentValidationError');assert.equal(error.phase,phase);assert.equal(error.code,code);
+  assert.equal(typeof error.message,'string');assert.ok(error.message.length>0);return true;
+};
+const selectorControls=[
+  ['missing fixed',i=>delete i.fixed_profile,'SELECTOR_SYNTAX'],
+  ['null fixed',i=>i.fixed_profile=null,'SELECTOR_SYNTAX'],
+  ['malformed fixed',i=>i.fixed_profile={},'SELECTOR_SYNTAX'],
+  ['undeclared fixed',i=>i.fixed_profile='arbitrary-selector','SELECTOR_UNDECLARED'],
+  ['unbound fixed',i=>i.fixed_profile=alternateSelector,'FIXED_PROFILE_BINDING'],
+  ['null presented',i=>i.presented_profile=null,'SELECTOR_SYNTAX'],
+  ['malformed presented',i=>i.presented_profile='bad selector!','SELECTOR_SYNTAX'],
+  ['undeclared presented',i=>i.presented_profile='arbitrary-selector','SELECTOR_UNDECLARED'],
+  ['identical arbitrary pair',i=>{i.fixed_profile='arbitrary-selector';i.presented_profile='arbitrary-selector';},'SELECTOR_UNDECLARED'],
+  ['swapped selectors',i=>{i.fixed_profile=alternateSelector;i.presented_profile=profilePin.blob;},'FIXED_PROFILE_BINDING']
+];
+for(const [name,change,code]of selectorControls)test(`selector control: ${name}`,async()=>{
+  const f=structuredClone(fixtures);f.cases[0].input=expand(f.cases[0].input,f.definitions);change(f.cases[0].input);
+  // Exercise the comparison entry point, not merely a disconnected helper.
+  // An evaluator crash or oracle disagreement has a different error shape.
+  await assert.rejects(()=>runComparison(f),validationFailure('fixture',code));
+});
+test('profile control: altered pin fails before comparison',async()=>{
+  for(const key of ['commit','blob','sha256']){
+    const f=structuredClone(fixtures);f.sources.find(p=>p.path===profilePin.path)[key]='0'.repeat(key==='sha256'?64:40);
+    await assert.rejects(()=>runComparison(f),validationFailure('provenance','PROFILE_PIN'));
+  }
+});
+test('profile control: altered historical bytes cannot establish a selector',()=>{
+  assert.throws(()=>provenance(fixtures.sources,p=>{
+    const bytes=historical(p);if(p.path===profilePin.path)bytes[bytes.length-1]^=1;return bytes;
+  }),validationFailure('provenance','PROFILE_BYTES'));
+});
+test('profile control: an unverified catalog cannot supply evaluator input',()=>{
+  assert.throws(()=>inputFor(fixtures.cases[0],{...catalog}),validationFailure('provenance','UNVERIFIED_PROFILE'));
+});
+test('selector positive control: declared alternate reaches both semantic evaluators in case 74',async()=>{
+  const input=inputFor(fixtures.cases[73],catalog);
+  assert.equal(input.fixed_profile,profilePin.blob);assert.equal(input.presented_profile,alternateSelector);
+  const p=await invoke(input),j=evaluate(structuredClone(input));comparePair(p,j,oracle.rows[73]);
+  assert.equal(p.classification,'reject');assert.equal(p.state,'EXECUTING');assert.ok(p.obligations.includes('retargeting'));
+});
 const controls=[
   ['missing case',f=>f.cases.pop()],
   ['duplicate case',f=>f.cases[1]=f.cases[0]],
@@ -126,6 +169,7 @@ fault('time-disagreement',[accept('39'),accept('40')],[["if any(not eq(r, times[
 fault('time-event',[accept('49')],[["if any(not eq(r, e['occurred_at']) for r in times):","if False:"]],[["require(bounds.every(t=>equal(t,e.occurred_at)),'time-event');","require(true,'time-event');"]]);
 fault('time-domain',['43','44','45','46','48'].map(id=>accept(id)),[["if not interval(e['occurred_at']):","if False:"],["if any(not interval(r) for r in times):","if False:"]],[["require(boundDomain(e.occurred_at),'time-domain');","require(true,'time-domain');"],["require(bounds.every(boundDomain),'time-domain');","require(true,'time-domain');"]]);
 fault('time-equal-corroboration',[witness('38','reject','EXECUTING','time-conflict'),witness('83','reject','EXECUTING','time-conflict')],[["if any(not eq(r, times[0]) for r in times[1:]):","if len(times) > 1:"]],[["require(new Set(bounds.map(v=>signature(v))).size<=1,'time-conflict');","require(bounds.length<=1,'time-conflict');"]]);
+fault('nonzero-rational-domain',[witness('83','reject','EXECUTING','time-domain')],[["0 <= n < den","0 == n < den"]],[["n>=0n && n<den","n===0n && n<den"]]);
 fault('point-time',[witness('82','reject','EXECUTING','time-domain')],[["a[6]*b[7] <= b[6]*a[7]","a[6]*b[7] < b[6]*a[7]"]],[["v.earliest[6]*v.latest[7] <= v.latest[6]*v.earliest[7]","v.earliest[6]*v.latest[7] < v.latest[6]*v.earliest[7]"]]);
 fault('sequence-domain',['58','59','13'].map(id=>accept(id,id==='58'?'CREATED':'COMPLETED')),[["if type(e['sequence']) is not int or not 0 <= e['sequence'] <= 18446744073709551615:","if False:"]],[["require(typeof e.sequence==='bigint'&&e.sequence>=0n&&e.sequence<=18446744073709551615n,'sequence-domain');","require(true,'sequence-domain');"]]);
 fault('integer-narrowing',[witness('12','reject','AUTHORIZED','sequence-domain')],[["return int(s)","return int(float(s))"]],[["return BigInt(v.integer);","return BigInt(Number(v.integer));"]]);

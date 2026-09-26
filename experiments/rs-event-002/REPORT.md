@@ -1,13 +1,13 @@
 ---
 id: RS-EVENT-002-EXECUTABLE-COMPARISON
 title: RS-EVENT-002 Bounded Established-Input Comparison
-version: "0.1"
+version: "0.2"
 status: Draft
 document_type: Experimental Comparison Report
 category: Non-normative Validation
 author: Verified Execution Editorial Board
 created: 2026-09-25
-updated: 2026-09-25
+updated: 2026-09-26
 depends_on:
   - RS-EVENT-002
   - BOUNDED-LIFECYCLE-EVENT-TYPE-SEMANTIC-PROFILE
@@ -137,11 +137,11 @@ The scenario partition remains: 7 mappings, 5 positive controls, 57 isolated
 non-acceptance rows, 10 compound defenses, 7 invariances and 1 intentionally
 redundant row. This is 87 rows, not 87 independent semantic algorithms.
 
-There are **51 named mutation/witness families**, each exercised in both
-evaluators: **102 semantic-mutant tests**. Set-order and duplicate-collapse
+There are **52 named mutation/witness families**, each exercised in both
+evaluators: **104 semantic-mutant tests**. Set-order and duplicate-collapse
 tests use the same faulty ordered-list comparison with different witnesses.
-Therefore there are **50 distinct source mutations per evaluator (100 total)**,
-not 102 distinct implementations. Each test requires the intended classification,
+Therefore there are **51 distinct source mutations per evaluator (102 total)**,
+not 104 distinct implementations. Each test requires the intended classification,
 state, completeness and obligation, valid output shape, and disagreement with
 the unchanged oracle. Crashes, unchanged results and malformed output do not
 count as detected semantic faults.
@@ -172,7 +172,7 @@ explicit; these are bounded detections, not proof of arbitrary-input coverage.
 | Unknown/missing time / 2 | 41,42 | Same missing-established-bound gate, both inputs |
 | Five time domains / 5 | 43–46,48 | Disable endpoint/interval validation; all five witnesses |
 | Exact Event time / 1 | 49 | Ignore Event/bound inequality; 47 also witnesses generic binding |
-| Point/rational time / 2 | 82,83 | Reject zero-width; reject equal rational corroboration |
+| Point/rational time / 2 | 82,83 | Reject zero-width; restrict the rational domain to zero numerator |
 | Applicable edition / 1 | 53 | Ignore unavailable context establishment |
 | Indirect Policy explanation / 1 | 54–56 | Ignore failed context establishment for all three substitute classes |
 | Forbidden fields / 3 | 61–63 | Ignore prohibition, one witness per field |
@@ -198,6 +198,39 @@ inputs, oracle cardinality, wrong outcomes/reasons, evaluator disagreement,
 and subprocess failures/malformed or skipped output. Two provenance regression
 groups alter every pinned source byte and SHA-256, mismatch source paths, and
 request missing commits/paths despite available current checkout files.
+
+The correction adds **13 negative-control groups** and **one positive selector
+control**. Ten selector groups cover absent/null/malformed/undeclared fixed
+selectors, an unbound declared fixed selector, null/malformed/undeclared
+presented selectors, identical arbitrary selectors, and selector swapping.
+Three provenance groups reject altered profile pins, altered historical profile
+bytes, and an unverified catalog. Errors have name `ExperimentValidationError`,
+phase `fixture` or `provenance`, and a specific asserted code:
+`SELECTOR_SYNTAX`, `SELECTOR_UNDECLARED`, `FIXED_PROFILE_BINDING`,
+`PROFILE_PIN`, `PROFILE_BYTES`, or `UNVERIFIED_PROFILE`. Selector and pin
+controls exercise the comparison entry point; validation precedes either
+semantic evaluator. Crashes and oracle disagreements cannot satisfy them.
+
+The runner first verifies the recorded profile commit/path and both fingerprints
+against its immutable experiment binding, then derives the fixed selector from
+the verified Git blob. Local-test selectors are strings matching
+`^[a-z0-9]+(?:-[a-z0-9]+)*$`, with the closed domain consisting only of
+`a8a88e94be403be9ffc0efd01986a5db9446757e` and
+`retargeted-completion-to-failure`. Every `fixed_profile` must equal the former;
+every `presented_profile` must independently satisfy syntax and closed-domain
+membership. Equality between arbitrary tokens is insufficient. This is test
+syntax only, not a VE registry, wire rule or representation-profile allocation.
+The positive control proves case 74's declared alternate reaches both evaluators
+and remains `reject`, retaining `EXECUTING`, with obligation `retargeting`;
+it is not the separate `unselected` outcome of case 10.
+
+The new `nonzero-rational-domain` family changes each evaluator's semantic
+endpoint domain from nonnegative proper rational fractions to zero numerator
+only. Case 83 consequently produces `reject` / `EXECUTING` / `time-domain`
+instead of acceptance. Neither parser nor fixture nor floating-point handling
+changes. The existing equal-corroboration mutant still shares case 83 as a
+witness, but is a distinct fault; witness reuse is not a new scenario case.
+Fixture and oracle bytes, source pins and both baseline evaluators are unchanged.
 
 ## 5. Discrepancies and limits
 
@@ -271,18 +304,20 @@ branch update. An offline full clone of the committed repository reproduces
 the same experiment; no checkout of the historical source tree is required.
 The experiment creates no fixture files or Python bytecode. It needs no stashes.
 
-Validation results: 206 new experimental tests (87 comparisons, 102 mutant
-tests, 12 runner controls, 4 fixture/literal/provenance tests, 1 CLI regression); **286 total
+Validation results: 222 experimental tests (87 comparisons, 104 mutant
+tests, 25 negative runner controls, 1 positive selector control,
+4 fixture/literal/provenance tests, 1 CLI regression); **302 total
 repository tests**, preserving all 80 existing tests; **149 Markdown documents**.
 The clean full-history clone reproduces the same counts and 87 outcomes, with
 a clean working tree. Diff/UTF-8/text-hygiene checks pass. Existing workflows
 remain unchanged: GitHub's Documentation integrity job validates documentation
 and runs only the **27 documentation-validator tests**, **not** these experiments
-or the complete 286-test suite. Exact-head Actions must be checked separately
+or the complete 302-test suite. Exact-head Actions must be checked separately
 on the published PR; green documentation CI is not experimental execution.
 
 ## Revision history
 
 | Version | Date | Change |
 |---|---|---|
+| 0.2 | 2026-09-26 | Bind closed test selectors to verified historical profile provenance; add selector/provenance controls and nonzero-rational-domain mutants. Fixture/oracle bytes and bounded limitations unchanged. |
 | 0.1 | 2026-09-25 | Historical-pinned, same-author two-language comparison of all 87 established-input cases, with separate oracle, semantic mutants and reproduction controls; no source or authority changes. |
