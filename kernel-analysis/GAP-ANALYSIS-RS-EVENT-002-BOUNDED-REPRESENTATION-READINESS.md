@@ -1,7 +1,7 @@
 ---
 id: GAP-ANALYSIS-RS-EVENT-002-BOUNDED-REPRESENTATION-READINESS
 title: Gap Analysis for RS-EVENT-002 Bounded Representation Readiness
-version: "0.1"
+version: "0.2"
 status: Draft
 document_type: Gap Analysis
 category: Non-normative Analysis
@@ -21,6 +21,7 @@ related_documents:
   - VE-004
   - VE-005
   - VE-006
+  - ADR-ENC-001
   - SPECIFICATION-GOVERNANCE
 supersedes: null
 superseded_by: null
@@ -69,6 +70,7 @@ remain its exact historical snapshot, not whichever Draft is newest.
 | [VE-003](../specifications/VE-003-lifecycle.md) | Draft v0.1, §§8–11, 15–19, 29–32: existing transition legality and derived Lifecycle; not a new authorization authority. |
 | [VE-004](../specifications/VE-004-receipt-specification.md) | Draft v0.2, §§2–4, 7–8, 11–14: Receipt derives from history; terminality, execution and external commit remain distinct. |
 | [VE-006](../specifications/VE-006-execution-boundary-specification.md) | Draft v0.1, §§5–18: Boundary owns applicability, authorization, observation interpretation and append; Policy outcomes must remain inspectable. |
+| [ADR-ENC-001 / VE-CBOR-1](../adrs/ADR-ENC-001-VE-CBOR-1.md) | Accepted v0.1 at the inspected main commit. Its narrow byte-sensitive Kernel Protocol v0.1 scope, Decision rules 1–12 and future numeric/tag-profile authority constrain representation choices; see §5.1. Its normative serialization foundation is [RFC 8949](https://www.rfc-editor.org/rfc/rfc8949.html), especially §§3.1, 3.4.3–3.4.4 and 4.2.1–4.2.2, not the dCBOR Internet-Draft. |
 | [Governance](../SPECIFICATION_GOVERNANCE.md) | Active v1.0, §§2, 6–7A, 8, 16–21: authority hierarchy, explicit promotion, evidence before stability and no implementation-defined architecture. |
 
 The profile/scenario fingerprints were rechecked at inspected main. The
@@ -146,7 +148,7 @@ as a new universal promotion requirement.
 
 | Remaining item: exact missing contract/evidence | Current owner | Profile maturity impact | Bounded representation impact | RFC/ADR escalation |
 |---|---|---|---|---|
-| Lossless encoding of full identifiers, exact Text/integer/time/set domains, Action embedding, version/import binding and opaque extensions; decoding/round-trip evidence | Future representation profile; existing semantic owners retain meaning | Required for a portability claim, not for asserting the current semantic rules | Blocks completion today; this is the selected work. No machine-width restriction, NFC rewrite, test alias or unsupported Action coercion may fill it | Not for a faithful subordinate Draft; escalate any required Approved-semantic change |
+| Lossless encoding of full identifiers, exact Text/integer/time/set domains, Action embedding, version/import binding and opaque extensions; full-domain compatibility argument and bidirectional cross-implementation evidence | Future representation profile; existing semantic owners retain meaning | Required for a portability claim, not for asserting the current semantic rules | Blocks completion today; §5.1 gates and §6.2 evidence are required. No machine-width restriction, NFC rewrite, test alias or unsupported Action coercion may fill it | Not for a faithful subordinate Draft within existing profile authority; escalate conflicts with Accepted decisions, existing canonicalization or Approved semantics |
 | Independently reproduced interpretation and broader adversarial combinations | Separate implementers and specification reviewers | Still unproved; review must assess independent implementability and security, not infer it from same-author results | Does not prevent a pinned Draft; blocks claiming demonstrated independent interoperability | No, unless a discovered conflict needs an architectural decision |
 | Review/acceptance of established-result boundary, inline-only explanation and interval-time choices; maturity of imported Event contract/VE-003/004/005/006 Drafts | Profile editors and governance reviewers | Explicit unresolved approval decision; experiment does not promote dependencies | Draft may consume exact immutable Draft revisions; no stable compatibility or normative adoption claim | No new conflict demonstrated; subsequent approval/change must follow applicable governance, including RFC/ADR for Approved changes |
 | Domain-specific observation-to-assessment adapter, context completeness/applicability, actual fact-time measurement/conversion and protected successor establishment | Boundary, recognized condition/target/time owners and protected environment | Operational suitability unproved; actual claimed deployments must supply the specified inputs | Not a prerequisite for lossless carriage of externally established values; absence produces existing failure outcomes | No for implementing owners; yes if proposal changes ownership, truth conditions or Approved obligations |
@@ -162,6 +164,61 @@ completion blocker for that scope; it cannot be hidden in a generic byte string
 or untyped explanation. Arbitrary Action portability is not inferred from one
 Lynx example. Likewise opaque extensions need an explicit lossless carrier and
 unsupported-carrier boundary; unsupported transport is not semantic invalidity.
+
+### 5.1 ADR-ENC-001 applicability and compatibility gates
+
+**Authority, not a new carrier selection.** Accepted ADR-ENC-001 v0.1 expressly
+limits itself to canonical encoding of byte-sensitive VE Kernel Protocol v0.1
+objects; it does not itself define every future VE representation. Within that
+scope its Decision covers reproducibility as well as identity, digests and
+signatures. Excluding Event digests therefore does not exempt a byte-reproducible
+proposal from assessing the decision. A proposed VE-CBOR-1 mapping must retain
+shortest definite-length encodings, encoded-key bytewise ordering, text map
+keys, duplicate rejection, valid UTF-8/NFC text strings, no floating point and
+rejection of noncanonical inputs rather than repair-and-accept. Those are
+carrier restrictions, not authority to change the semantic profile's domains.
+
+RFC 8949 §3.1 directly represents integers from `-2^64` through `2^64-1`.
+Sections 3.4.3–3.4.4 describe bignums and decimal/binary fractions, but their
+availability in CBOR does not automatically admit their tags under VE-CBOR-1.
+Sections 4.2.1–4.2.2 distinguish deterministic carrier encoding from additional
+application choices needed for unique numeric representations. A library's
+generic CBOR or “canonical” mode alone is insufficient evidence of compatibility.
+
+The following are mandatory **completion gates for the selected Draft**, not
+new semantic rules enacted here:
+
+| Gate | Exact domain/compatibility issue | Required demonstration |
+|---|---|---|
+| Text | Profile §5.3 permits nonempty finite Unicode-scalar Text with exact code-point equality and no normalization restriction. For example, `U+00E9` and `U+0065 U+0301` are distinct valid Text values. Direct NFC-restricted text-string carriage cannot preserve both: normalization collides; rejecting the latter narrows the domain. | Define an injective, lossless mapping over the full semantic Text domain, including inline explanation and semantic names, with exact recovery of code points. Do not silently normalize, reject or narrow valid Text to satisfy the carrier. Keep actual VE-CBOR-1 text items NFC; a profile-local mapping must account for the difference between a semantic Text value and a carrier text item. |
+| Arbitrary integers | Profile §5.2 permits any positive mathematical year and unbounded reduced-fraction numerators/positive denominators. Section 5.3 mathematical integers and §4.1 condition indices have no host-word ceiling; an index is constrained by its finite list, not by uint64. These domains exceed direct integer carriage. Only `sequence` has the explicit uint64 bound. Other Action-selected integer restrictions remain their owner's. | Specify a lossless, canonical integer mapping for the complete admitted domains, including sign where negatives are admitted. Preserve each field's actual range: a general signed mapping does not legalize negative years, indices or fractions. Do not impose machine/implementation limits, truncate, wrap or conflate a resource failure with semantic invalidity. |
+| Rational time endpoints | Profile §5.2 requires integer components with `0 <= numerator < denominator`, positive denominator, coprime numerator/denominator and zero exactly `0/1`. Endpoint equality/order and inclusive earliest/latest bounds are exact; no fixed precision or finite scale suffices for all denominators. | Map numerator, denominator and permitted sign exactly; preserve the profile-required reduced form and reject malformed components rather than silently repair them. Define equality/comparison without floating-point conversion, rounding or lossy normalization. Preserve equal-endpoint point time, proper intervals, unavailable/unknown authoritative time and malformed time as distinct cases; do not encode absence or uncertainty as a fabricated interval. Sequence remains the ordering authority. |
+
+ADR rules 9–10 and its Consequences leave schema-defined exact integer
+quantities and later explicitly standardized numeric/tag profiles as extension
+work. A subordinate profile may propose a lossless application mapping using
+already permitted items (for example, byte or integer-component containers),
+or justify an explicitly standardized later numeric/tag profile within that
+authority. It must define all interpretation, scale/unit, sign and uniqueness
+rules and demonstrate compatibility; arbitrary CBOR tags are not automatically
+authorized. These are possible design directions, **not a selected Text,
+integer or rational carrier**. Multiple faithful mappings may remain permissible;
+choosing and evaluating one belongs to the selected Draft representation profile.
+
+This extension authority does not permit relaxing VE-CBOR-1's existing NFC,
+floating-point, duplicate, ordering or noncanonical-rejection rules; silently
+retargeting existing Action/Predicate Schema canonical bytes or identities; or
+narrowing Approved semantic domains. A choice requiring such a change must stop
+and enter RFC/ADR and applicable specification change control. A new profile
+under explicit extension authority is not, merely by being new, a revision of
+the accepted decision; it still needs ordinary review and any governance
+required before authoritative adoption. No exception is allocated here.
+
+No prerequisite contradiction is demonstrated: direct naive mappings fail,
+but the ADR does not require those mappings for semantic Text or unbounded
+numeric components. **Bounded drafting remains justified only with these gates
+explicit.** Full-domain preservation is still an unproved completion obligation,
+not an achievement of RS-EVENT-002 or a reason to change dependency order.
 
 ## 6. Exactly one next artifact and dependency order
 
@@ -188,11 +245,12 @@ schema and its actual representation/binding contracts, not the harness's
 material slots. Additional Action owners require explicit closure, not a default.
 This bounds representation applicability without redefining the semantic profile.
 
-This analysis chooses no serialization, numeric labels, field bytes, canonical
-ordering algorithm, new code allocation or transport. Those are proposed
-representation decisions to justify in the selected artifact. A deterministic
-canonical form, if proposed, must preserve the exact owner equality; it is not
-an Event content identity. Independent establishment remains external to the
+This analysis chooses no final carrier mapping, numeric labels, field bytes,
+new code allocation or transport. Proposed representation choices must be
+justified within ADR-ENC-001's scope and extension authority and pass §5.1;
+existing canonical-ordering obligations are not open for silent replacement.
+A deterministic canonical form, if proposed, must preserve the exact owner
+equality; it is not an Event content identity. Independent establishment remains external to the
 Event body; copying an assessment, source grant or test verification result into
 bytes cannot confer authority.
 
@@ -207,9 +265,10 @@ Do not silently add full-history or Receipt conformance to seven-type carriage.
 
 Use the exact profile publication/fingerprints and historical imports in §2;
 the Event contract's field/type/extension rules; VE-002 identity/explanation;
-VE-001 and the explicitly supported Action owner closure. VE-003/004/006 retain
-projection, derived-outcome and authority ownership. Scenario/report are
-non-normative test evidence, not normative encoding sources.
+VE-001 and the explicitly supported Action owner closure; Accepted ADR-ENC-001
+v0.1 and its RFC 8949 serialization foundation, as assessed in §5.1.
+VE-003/004/006 retain projection, derived-outcome and authority ownership.
+Scenario/report are non-normative test evidence, not normative encoding sources.
 
 The following are proposed acceptance criteria for that **next Draft**, not new
 requirements enacted by this analysis:
@@ -221,8 +280,10 @@ requirements enacted by this analysis:
    domain and a precise unsupported-input boundary. Preserve arbitrary positive
    years, reduced rational endpoints, exact Text, mathematical integers versus
    uint64 sequence, list order, set equality/duplicate collapse and record
-   equality. Resource limits must not silently change valid semantics. Stop if
-   the chosen carrier cannot express a required domain without semantic change.
+   equality. Discharge all three §5.1 compatibility gates with a full-domain
+   mapping argument, not just examples within machine limits. Resource limits
+   must not silently change valid semantics. Stop if the chosen carrier cannot
+   express a required domain without semantic change.
 3. Carry the full semantic type identifier and bind its exact publication and
    transitive closure without retargeting, mutable latest selection or the test
    blob token becoming a VE field. Permit offline exact material; specify
@@ -234,13 +295,29 @@ requirements enacted by this analysis:
 5. Preserve opaque unknown top-level material where lossless carriage is claimed;
    reject duplicate members before semantic decoding. Do not allow extensions
    to supply missing required fields or reinterpret an old unknown member.
-6. Provide independently checkable round-trip and malformed-carrier examples,
-   tied to immutable sources and expected decoded values. Show all seven positive
-   mappings, point/nonzero-rational time, set/list distinctions, exact Text,
-   domain boundaries, missing material and attempted retargeting. Demonstrate
-   preservation of the RS-EVENT-002 outcomes where applicable, not invention of
-   a serialized proof system. New byte fixtures require separate provenance;
-   existing semantic fixtures/oracle remain untouched.
+6. Require at least two independently structured implementations, A and B:
+   A encodes and B decodes; B encodes and A decodes. Both directions must recover
+   identical semantic values under the source owners' equality across the full
+   bounded domain, not just each implementation's private representation. If
+   canonical encoding is claimed, A and B must also independently produce
+   identical bytes. Publish source-pinned vectors and expected values covering
+   all seven kinds; distinct NFC/non-NFC Text; large positive and negative
+   integers; exact nonzero rationals; point/interval and field boundaries;
+   set/list distinctions; complete explanation material; unknown extensions;
+   and full dependency identities, missing material and attempted retargeting.
+   Use large negatives as positive cases only in domains that admit them;
+   negative years/indices/fractions remain domain-invalid negative cases.
+   Define precise rejection expectations for malformed, noncanonical, truncated,
+   ambiguous and domain-invalid inputs. Demonstrate that normalization collisions,
+   integer truncation, rational precision loss, duplicate fields and unknown
+   critical material fail as explicitly specified, without confusing failure
+   to recover required semantics with permission to discard opaque noncritical
+   extensions. Preserve those extensions where carriage is claimed; distinguish
+   unsupported dependencies from invalid carrier/domain inputs. Do not invent
+   a critical-extension flag or alter the semantic failure taxonomy here.
+   Preserve RS-EVENT-002 outcomes where applicable, not a serialized proof
+   system. New byte fixtures require separate provenance; existing semantic
+   fixtures/oracle remain untouched.
 7. Include dependency/status, compatibility and security reviews: confidentiality,
    retention, resource exhaustion, unsupported owners and historical recovery.
    Clearly distinguish representable data from valid/authoritative Events and
@@ -248,18 +325,25 @@ requirements enacted by this analysis:
    affected proposal and is escalated, not settled by encoding convenience.
 
 **Completion evidence:** a reviewed complete mapping and dependency inventory,
-source-pinned examples with exact round-trip/negative expectations, documented
-security/compatibility disposition, and reproducible encoder/decoder results
-against those expectations before claiming executable portability. Separate
-teams are needed before claiming independent-team interoperability; same-author
-results must retain that label. Draft textual completeness and subsequent
-executable validation are distinct milestones, not permission to implement
-anything in this gap-analysis change.
+full-domain preservation argument, source-pinned positive/negative vectors,
+documented security/compatibility disposition, and reproducible results for
+both cross-decoding directions above (plus independent byte equality if
+canonical). One implementation round-tripping its own bytes is insufficient.
+Finite vectors, including boundary/adversarial and generated examples, must
+exercise the mapping but cannot by themselves exhaust the infinite Text and
+integer/rational domains; the written totality/injectivity argument remains
+necessary. Disclose authorship, shared code/libraries, methodology and correlated
+implementation limitations. Same-author cross-implementation evidence is not
+independent-team conformance. Independent teams are not required merely to
+draft the profile; actual independent-team work is required before claiming
+that evidence. Draft textual completeness and executable validation are distinct
+milestones, not permission to implement anything in this gap-analysis change.
 
 ### 6.3 Readiness judgment
 
 The selected artifact **may proceed while the lifecycle profile remains Draft**,
-under immutable version selection and explicit experimental compatibility limits.
+under immutable version selection, explicit experimental compatibility limits
+and the ADR-ENC-001 gates in §5.1.
 Profile §10 forbids representation on the strength of its proposal alone; the
 later fully materialized scenario and merged falsification experiment now add
 bounded evidence. This does not rewrite that historical caution or claim it
@@ -270,7 +354,9 @@ deployment before a subordinate representation Draft can be explored.
 Thus **no new semantic blocker is identified for drafting this bounded scope**.
 Remaining portable identifier carriage, full value-domain mapping, Action-owner
 embedding and historical package availability are explicit representation
-completion gates, not work secretly completed by the test harness. Independent
+completion gates, not work secretly completed by the test harness. Portable
+representation remains unestablished until full-domain compatibility and the
+two-implementation, bidirectional cross-decoding criteria pass. Independent
 teams, operational establishment and maturity review remain separate evidence
 and adoption gates. If actual drafting reveals an unresolved semantic choice,
 stop that portion and return to its owner rather than guess. General Event
@@ -282,9 +368,12 @@ portability remains blocked beyond the declared scope.
 evidence and recommends a subordinate Draft; it changes no Approved meaning,
 accepted decision, primitive or authority owner. Nor does it allocate a portable
 profile identity. No concrete Approved conflict was demonstrated by the
-experiment. Missing deployment infrastructure does not justify a new kernel
-primitive. A later representation proposal still needs review of its actual
-decisions; this is not advance approval of those choices.
+experiment or the compatibility assessment in §5.1. Analysis and faithful
+Draft exploration require no new RFC/ADR now; any chosen mapping conflicting
+with ADR-ENC-001, accepted canonicalization behavior or Approved semantics must
+stop and enter governance. Missing deployment infrastructure does not justify
+a new kernel primitive. A later representation proposal still needs review of
+its actual decisions; this is not advance approval of those choices.
 
 Governance §§2, 9–13, 18–21 continues to require RFC, accepted ADR, versioned
 specification revision/history and changelog for changes to Approved semantics.
@@ -312,7 +401,8 @@ INDEPENDENT-TEAM / GENERAL CONFORMANCE = NOT ESTABLISHED
 PROFILE / IMPORTED DRAFT APPROVAL = NOT GRANTED
 OPERATIONAL ESTABLISHMENT / AUTHENTICATION = EXISTING OWNER RESPONSIBILITIES
 PORTABLE EVENT REPRESENTATION = NOT YET DEFINED OR VALIDATED
-BOUNDED REPRESENTATION DRAFTING = JUSTIFIED WITH EXPLICIT CLOSURE GATES
+BOUNDED REPRESENTATION DRAFTING = JUSTIFIED WITH EXPLICIT ENC-001 / CLOSURE GATES
+REPRESENTATION COMPLETION = FULL-DOMAIN PRESERVATION + BIDIRECTIONAL CROSS-DECODING
 NEXT ARTIFACT = BOUNDED LIFECYCLE EVENT REPRESENTATION PROFILE (DRAFT)
 RFC / ADR NOW = NO; FUTURE APPROVED CHANGES RETAIN FULL GOVERNANCE
 ```
@@ -322,3 +412,4 @@ RFC / ADR NOW = NO; FUTURE APPROVED CHANGES RETAIN FULL GOVERNANCE
 | Version | Date | Change |
 |---|---|---|
 | 0.1 | 2026-09-26 | Classify merged RS-EVENT-002 evidence and remaining owners; preserve historical findings and select one bounded representation Draft without approval, implementation or wire decisions. |
+| 0.2 | 2026-09-26 | Assess Accepted ADR-ENC-001 and Text/integer/rational compatibility gates; require independently structured bidirectional cross-decoding and honest completion evidence without choosing a carrier or changing the selected next artifact. |
