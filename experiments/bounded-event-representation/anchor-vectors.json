@@ -1,0 +1,355 @@
+{
+  "derivation": "Hand-assembled fixed maps: native text key headers, explicit encoded-key order, native fingerprint widths, T byte strings; no codec was consulted. Endpoint assembled from eight prescribed components. See REPORT.md.",
+  "positive": [
+    {
+      "id": "complete-type-anchor",
+      "type": "boundedType",
+      "value": {
+        "authority": "https://github.com/cpbrands/VerifiedExecution",
+        "profile": "BOUNDED-LIFECYCLE-EVENT-TYPE-SEMANTIC-PROFILE",
+        "revision": "0.2-draft.1",
+        "kind": "ACTION_CREATED"
+      },
+      "anchor": "a4646b696e644e414354494f4e5f435245415445446770726f66696c65582d424f554e4445442d4c4946454359434c452d4556454e542d545950452d53454d414e5449432d50524f46494c45687265766973696f6e4b302e322d64726166742e3169617574686f72697479582d68747470733a2f2f6769746875622e636f6d2f63706272616e64732f5665726966696564457865637574696f6e"
+    },
+    {
+      "id": "source-key-anchor",
+      "type": "sourceKey",
+      "value": {
+        "$publication": true
+      },
+      "anchor": "a564626c6f62546893d9caaf10a91b7d5c4ea5c5a7cf1022bbbc736470617468584073706563696669636174696f6e732f424f554e4445442d4c4946454359434c452d4556454e542d524550524553454e544154494f4e2d50524f46494c452e6d6466636f6d6d697454bc080e6037bdd3129d5132d90d9253ed85f59c1b6673686132353658208217fe6e6890dba182ebc8dcc2d4f9deeed824b71b3fddcfc31b0cf7458ce56e6a7265706f7369746f7279782d68747470733a2f2f6769746875622e636f6d2f63706272616e64732f5665726966696564457865637574696f6e"
+    },
+    {
+      "id": "endpoint-anchor",
+      "type": "endpoint",
+      "value": [
+        {
+          "$integer": "1"
+        },
+        {
+          "$integer": "1"
+        },
+        {
+          "$integer": "1"
+        },
+        {
+          "$integer": "0"
+        },
+        {
+          "$integer": "0"
+        },
+        {
+          "$integer": "0"
+        },
+        {
+          "$integer": "0"
+        },
+        {
+          "$integer": "1"
+        }
+      ],
+      "anchor": "8882f44101010100000082f44082f44101"
+    },
+    {
+      "id": "integer-chunked-magnitude",
+      "type": "integer",
+      "value": {
+        "$power_two": {
+          "exponent": 32768,
+          "negative": true
+        }
+      }
+    },
+    {
+      "id": "unknown-noncritical-event-extensions",
+      "type": "event",
+      "value": {
+        "event_id": {
+          "$bytes": "0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        "action_id": {
+          "$bytes": "0000000000000000000000000000000000000000000000000000000000000064"
+        },
+        "event_type": {
+          "authority": "https://github.com/cpbrands/VerifiedExecution",
+          "profile": "BOUNDED-LIFECYCLE-EVENT-TYPE-SEMANTIC-PROFILE",
+          "revision": "0.2-draft.1",
+          "kind": "ACTION_CREATED"
+        },
+        "occurred_at": {
+          "earliest": [
+            {
+              "$integer": "2026"
+            },
+            {
+              "$integer": "9"
+            },
+            {
+              "$integer": "26"
+            },
+            {
+              "$integer": "12"
+            },
+            {
+              "$integer": "0"
+            },
+            {
+              "$integer": "0"
+            },
+            {
+              "$integer": "1"
+            },
+            {
+              "$integer": "3"
+            }
+          ],
+          "latest": [
+            {
+              "$integer": "2026"
+            },
+            {
+              "$integer": "9"
+            },
+            {
+              "$integer": "26"
+            },
+            {
+              "$integer": "12"
+            },
+            {
+              "$integer": "0"
+            },
+            {
+              "$integer": "0"
+            },
+            {
+              "$integer": "1"
+            },
+            {
+              "$integer": "3"
+            }
+          ]
+        },
+        "sequence": {
+          "$integer": "0"
+        },
+        "spec_version": [
+          "VE-002",
+          "0.2"
+        ],
+        "payload": {
+          "action": {
+            "$ref": "action"
+          },
+          "context": {
+            "$ref": "context"
+          },
+          "assessments": [
+            {
+              "binding": {
+                "action_id": {
+                  "$bytes": "0000000000000000000000000000000000000000000000000000000000000064"
+                },
+                "action_digest": {
+                  "$bytes": "5fa3775f8a288e9762e021ba8fb08302fbb3547bc15d9769c97bbcbbeb330b0c"
+                },
+                "bound_instance_fields": {},
+                "event_type": {
+                  "authority": "https://github.com/cpbrands/VerifiedExecution",
+                  "profile": "BOUNDED-LIFECYCLE-EVENT-TYPE-SEMANTIC-PROFILE",
+                  "revision": "0.2-draft.1",
+                  "kind": "ACTION_CREATED"
+                },
+                "event_id": {
+                  "$bytes": "0000000000000000000000000000000000000000000000000000000000000001"
+                },
+                "prior_head": [],
+                "sequence": {
+                  "$integer": "0"
+                },
+                "context": {
+                  "$ref": "context"
+                }
+              },
+              "source": "boundary-one",
+              "role": "boundary",
+              "statement": [
+                "fact"
+              ],
+              "result": "established",
+              "basis": "Boundary-one admission engine version 1 recorded actual authoritative admission of this exact Action occurrence and immutable content at the bound head/context. This is not a proposed request."
+            },
+            {
+              "binding": {
+                "action_id": {
+                  "$bytes": "0000000000000000000000000000000000000000000000000000000000000064"
+                },
+                "action_digest": {
+                  "$bytes": "5fa3775f8a288e9762e021ba8fb08302fbb3547bc15d9769c97bbcbbeb330b0c"
+                },
+                "bound_instance_fields": {},
+                "event_type": {
+                  "authority": "https://github.com/cpbrands/VerifiedExecution",
+                  "profile": "BOUNDED-LIFECYCLE-EVENT-TYPE-SEMANTIC-PROFILE",
+                  "revision": "0.2-draft.1",
+                  "kind": "ACTION_CREATED"
+                },
+                "event_id": {
+                  "$bytes": "0000000000000000000000000000000000000000000000000000000000000001"
+                },
+                "prior_head": [],
+                "sequence": {
+                  "$integer": "0"
+                },
+                "context": {
+                  "$ref": "context"
+                }
+              },
+              "source": "lynx-observer",
+              "role": "time",
+              "statement": [
+                "time"
+              ],
+              "result": [
+                "bound",
+                {
+                  "earliest": [
+                    {
+                      "$integer": "2026"
+                    },
+                    {
+                      "$integer": "9"
+                    },
+                    {
+                      "$integer": "26"
+                    },
+                    {
+                      "$integer": "12"
+                    },
+                    {
+                      "$integer": "0"
+                    },
+                    {
+                      "$integer": "0"
+                    },
+                    {
+                      "$integer": "1"
+                    },
+                    {
+                      "$integer": "3"
+                    }
+                  ],
+                  "latest": [
+                    {
+                      "$integer": "2026"
+                    },
+                    {
+                      "$integer": "9"
+                    },
+                    {
+                      "$integer": "26"
+                    },
+                    {
+                      "$integer": "12"
+                    },
+                    {
+                      "$integer": "0"
+                    },
+                    {
+                      "$integer": "0"
+                    },
+                    {
+                      "$integer": "1"
+                    },
+                    {
+                      "$integer": "3"
+                    }
+                  ]
+                }
+              ],
+              "basis": "Synthetic scoped UTC observation by lynx-observer version 1 for exactly the fact and Action in this Binding. Established occurrence bound: 2026-09-26 12:00:00 plus exactly 1/3 second, identical inclusive earliest/latest endpoints. No receipt or append-time substitution."
+            }
+          ]
+        },
+        "extensions": [
+          [
+            "note",
+            [
+              "text",
+              "é"
+            ]
+          ],
+          [
+            "é",
+            [
+              "text",
+              "composed name"
+            ]
+          ],
+          [
+            "é",
+            [
+              "text",
+              "decomposed name"
+            ]
+          ],
+          [
+            "extensions",
+            [
+              "null"
+            ]
+          ],
+          [
+            "",
+            [
+              "integer",
+              {
+                "$integer": "-18446744073709551617"
+              }
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": "owned-action-byte-retention",
+      "type": "owned",
+      "value": {
+        "owner": [
+          "repository",
+          {
+            "$owner_key": "specifications/VE-001-ACTION-CANONICAL-REPRESENTATION-PROFILE.md"
+          }
+        ],
+        "bytes": {
+          "$bytes": "a368696e7374616e6365a169616374696f6e5f6964582000000000000000000000000000000000000000000000000000000000000000646873656d616e746963a2666669656c6473a36c616d6f756e745f6d696e6f721a000f42406e736f757263655f6163636f756e74a26a6163636f756e745f696467303031323334357822736572766963696e675f6167656e745f63616e616469616e5f736f72745f636f6465693030303130303030317364657374696e6174696f6e5f6163636f756e74a26a6163636f756e745f69646b56454e444f522d303030317822736572766963696e675f6167656e745f63616e616469616e5f736f72745f636f6465693030303230303030326d736368656d615f6469676573745820e1bd2f7849a9d08108c620e30dede09045df6049e0909e7abaf22e6d9d3725546d616374696f6e5f64696765737458205fa3775f8a288e9762e021ba8fb08302fbb3547bc15d9769c97bbcbbeb330b0c"
+        },
+        "definitions": {
+          "$materials": "action"
+        }
+      }
+    },
+    {
+      "id": "owned-extension-byte-retention",
+      "type": "extension",
+      "value": [
+        "owned",
+        {
+          "owner": [
+            "repository",
+            {
+              "$owner_key": "specifications/VE-001-ACTION-CANONICAL-REPRESENTATION-PROFILE.md"
+            }
+          ],
+          "bytes": {
+            "$bytes": "a368696e7374616e6365a169616374696f6e5f6964582000000000000000000000000000000000000000000000000000000000000000646873656d616e746963a2666669656c6473a36c616d6f756e745f6d696e6f721a000f42406e736f757263655f6163636f756e74a26a6163636f756e745f696467303031323334357822736572766963696e675f6167656e745f63616e616469616e5f736f72745f636f6465693030303130303030317364657374696e6174696f6e5f6163636f756e74a26a6163636f756e745f69646b56454e444f522d303030317822736572766963696e675f6167656e745f63616e616469616e5f736f72745f636f6465693030303230303030326d736368656d615f6469676573745820e1bd2f7849a9d08108c620e30dede09045df6049e0909e7abaf22e6d9d3725546d616374696f6e5f64696765737458205fa3775f8a288e9762e021ba8fb08302fbb3547bc15d9769c97bbcbbeb330b0c"
+          },
+          "definitions": {
+            "$materials": "action"
+          }
+        }
+      ]
+    }
+  ]
+}

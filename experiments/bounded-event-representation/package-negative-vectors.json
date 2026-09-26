@@ -1,0 +1,291 @@
+{
+  "format": "bounded-event-representation-negative-patches-1",
+  "base": "event-ACTION_CREATED",
+  "patches": [
+    {
+      "id": "fact-role-matrix",
+      "op": "fact-role",
+      "error": "binding/fact-role"
+    },
+    {
+      "id": "extension-known-field-collision",
+      "op": "put",
+      "path": [
+        "event",
+        "extensions"
+      ],
+      "hex": "8282456163746f7281646e756c6c80",
+      "error": "domain/extension-collision"
+    },
+    {
+      "id": "event-missing-sequence",
+      "op": "delete",
+      "path": [
+        "event",
+        "sequence"
+      ],
+      "error": "structure/record-fields"
+    },
+    {
+      "id": "event-forbidden-actor-null",
+      "op": "put",
+      "path": [
+        "event",
+        "actor"
+      ],
+      "hex": "f6",
+      "error": "structure/record-fields"
+    },
+    {
+      "id": "event-null-sequence",
+      "op": "put",
+      "path": [
+        "event",
+        "sequence"
+      ],
+      "hex": "f6",
+      "error": "domain/native-integer"
+    },
+    {
+      "id": "event-short-id",
+      "op": "put",
+      "path": [
+        "event",
+        "event_id"
+      ],
+      "hex": "4101",
+      "error": "domain/octet-width"
+    },
+    {
+      "id": "event-spec-version",
+      "op": "put",
+      "path": [
+        "event",
+        "spec_version",
+        1
+      ],
+      "hex": "63302e33",
+      "error": "domain/enum"
+    },
+    {
+      "id": "event-unknown-kind",
+      "op": "put",
+      "path": [
+        "event",
+        "event_type",
+        "kind"
+      ],
+      "hex": "43424144",
+      "error": "binding/event-type"
+    },
+    {
+      "id": "selector-unknown",
+      "op": "put",
+      "path": [
+        "profile",
+        "revision"
+      ],
+      "hex": "6b302e392d64726166742e31",
+      "error": "unsupported/representation-selector"
+    },
+    {
+      "id": "selector-null",
+      "op": "put",
+      "path": [
+        "profile",
+        "revision"
+      ],
+      "hex": "f6",
+      "error": "domain/native-text"
+    },
+    {
+      "id": "publication-substitution",
+      "op": "flip",
+      "path": [
+        "publication",
+        "commit"
+      ],
+      "error": "provenance/publication"
+    },
+    {
+      "id": "action-content-digest",
+      "op": "flip",
+      "path": [
+        "event",
+        "payload",
+        "action",
+        "value",
+        "action_digest"
+      ],
+      "error": "binding/action-digest"
+    },
+    {
+      "id": "action-schema-digest",
+      "op": "flip",
+      "path": [
+        "event",
+        "payload",
+        "action",
+        "value",
+        "semantic",
+        "schema_digest"
+      ],
+      "error": "binding/schema-digest"
+    },
+    {
+      "id": "action-occurrence-mismatch",
+      "op": "flip",
+      "path": [
+        "event",
+        "action_id"
+      ],
+      "error": "binding/action-occurrence"
+    },
+    {
+      "id": "action-text-binding",
+      "op": "put",
+      "path": [
+        "event",
+        "payload",
+        "action",
+        "value",
+        "semantic",
+        "fields",
+        "source_account",
+        "account_id"
+      ],
+      "hex": "6730303132333436",
+      "error": "binding/action-digest"
+    },
+    {
+      "id": "action-amount-zero",
+      "op": "put",
+      "path": [
+        "event",
+        "payload",
+        "action",
+        "value",
+        "semantic",
+        "fields",
+        "amount_minor"
+      ],
+      "hex": "00",
+      "error": "domain/amount"
+    },
+    {
+      "id": "action-null-account",
+      "op": "put",
+      "path": [
+        "event",
+        "payload",
+        "action",
+        "value",
+        "semantic",
+        "fields",
+        "source_account"
+      ],
+      "hex": "f6",
+      "error": "structure/record-fields"
+    },
+    {
+      "id": "action-extra-instance",
+      "op": "put",
+      "path": [
+        "event",
+        "payload",
+        "action",
+        "value",
+        "instance",
+        "extra"
+      ],
+      "hex": "00",
+      "error": "structure/record-fields"
+    },
+    {
+      "id": "action-schema-unavailable",
+      "op": "put",
+      "path": [
+        "event",
+        "payload",
+        "action",
+        "schema"
+      ],
+      "hex": "80",
+      "error": "unsupported/schema-material"
+    },
+    {
+      "id": "action-schema-null",
+      "op": "put",
+      "path": [
+        "event",
+        "payload",
+        "action",
+        "schema"
+      ],
+      "hex": "f6",
+      "error": "structure/optional"
+    },
+    {
+      "id": "required-owner-material-unavailable",
+      "op": "source-body-absent",
+      "source": "specifications/BOUNDED-LIFECYCLE-EVENT-REPRESENTATION-PROFILE.md",
+      "error": "unsupported/owner-material"
+    },
+    {
+      "id": "historical-owner-bytes-tampered",
+      "op": "source-body-flip",
+      "source": "specifications/BOUNDED-LIFECYCLE-EVENT-REPRESENTATION-PROFILE.md",
+      "error": "provenance/sha256"
+    },
+    {
+      "id": "assessment-missing-rationale",
+      "op": "put",
+      "path": [
+        "event",
+        "payload",
+        "assessments",
+        0,
+        "basis"
+      ],
+      "hex": "40",
+      "error": "domain/nonempty-text"
+    },
+    {
+      "id": "assessment-wrong-event-binding",
+      "op": "flip",
+      "path": [
+        "event",
+        "payload",
+        "assessments",
+        0,
+        "binding",
+        "event_id"
+      ],
+      "error": "binding/assessment"
+    },
+    {
+      "id": "semantic-type-revision-substitution",
+      "op": "put",
+      "path": [
+        "event",
+        "event_type",
+        "revision"
+      ],
+      "hex": "4b302e322d64726166742e30",
+      "error": "binding/event-type"
+    },
+    {
+      "id": "material-path-substitution",
+      "op": "put",
+      "path": [
+        "materials",
+        "repository",
+        0,
+        "key",
+        "path"
+      ],
+      "hex": "4158",
+      "error": "provenance/key-mismatch"
+    }
+  ]
+}

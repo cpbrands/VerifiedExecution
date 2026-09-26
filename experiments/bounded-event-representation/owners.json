@@ -1,0 +1,11 @@
+{
+  "format": "bounded-event-representation-external-owner-pins-1",
+  "editions": [
+    {"authority":"https://www.rfc-editor.org","edition":"RFC 8949","document":"https://www.rfc-editor.org/rfc/rfc8949.txt","sha256":"f1164a5b31a39350ad46abe29b83575eb933ca6c45366989c118b6b1058a214a","url":"https://www.rfc-editor.org/rfc/rfc8949.txt"},
+    {"authority":"https://www.rfc-editor.org","edition":"RFC 3629","document":"https://www.rfc-editor.org/rfc/rfc3629.txt","sha256":"a2a3a39457d30420c812f87a38cc2b9194832f6982ef17e619de7d816879d6a6","url":"https://www.rfc-editor.org/rfc/rfc3629.txt"},
+    {"authority":"Payments Canada / Canadian Payments Association","edition":"Lynx_Final_CoreMessages_UG2026; 23 March 2026; November 2026","document":"Lynx_FIToFICustomerCreditTransferV08_pacs.008.001.08","sha256":"79845052b61789f29758f0671b0fba5923f4260dd046c738b3c7f5041a3bdb7c","url":"https://www.payments.ca/sites/default/files/lynx_fi_to_fi_customer_credit_transfer_pacs.008.pdf"},
+    {"authority":"Unicode Consortium","edition":"Unicode 6.2.0","document":"UnicodeData.txt","sha256":"8b2cd18247527aa08ec320c3352b6a01b95d63199f20b3b593ea5d5217bdd170","url":"https://www.unicode.org/Public/6.2.0/ucd/UnicodeData.txt"},
+    {"authority":"Unicode Consortium","edition":"Unicode 6.2.0; UAX #44 revision 10","document":"Unicode Character Database","sha256":"34d1d3b74dcc49b2c8e225c4a21c8fc2d2d535f3f377a815e9509377a724b739","url":"https://www.unicode.org/reports/tr44/tr44-10.html"},
+    {"authority":"W3C","edition":"XML 1.0 Fifth Edition; 26 November 2008","document":"Extensible Markup Language (XML) 1.0 (Fifth Edition)","sha256":"f58a4b9e1e5b8bac13fb55c4e5c7c8c5e2c176aa45ee68e2f1ab2498511927ec","url":"https://www.w3.org/TR/2008/REC-xml-20081126/"}
+  ]
+}
