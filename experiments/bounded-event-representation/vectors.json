@@ -1,0 +1,2192 @@
+{
+  "format": "bounded-event-representation-vectors-1",
+  "definitions": {
+    "action": {
+      "value": {
+        "action_digest": {
+          "$bytes": "5fa3775f8a288e9762e021ba8fb08302fbb3547bc15d9769c97bbcbbeb330b0c"
+        },
+        "instance": {
+          "action_id": {
+            "$bytes": "0000000000000000000000000000000000000000000000000000000000000064"
+          }
+        },
+        "semantic": {
+          "fields": {
+            "amount_minor": {
+              "$integer": "1000000"
+            },
+            "source_account": {
+              "servicing_agent_canadian_sort_code": "000100001",
+              "account_id": "0012345"
+            },
+            "destination_account": {
+              "servicing_agent_canadian_sort_code": "000200002",
+              "account_id": "VENDOR-0001"
+            }
+          },
+          "schema_digest": {
+            "$bytes": "e1bd2f7849a9d08108c620e30dede09045df6049e0909e7abaf22e6d9d372554"
+          }
+        }
+      },
+      "schema": [
+        {
+          "$descriptor": true
+        }
+      ],
+      "definitions": {
+        "$materials": "action"
+      }
+    },
+    "context": {
+      "sources": [
+        {
+          "name": "boundary-one",
+          "roles": [
+            "boundary",
+            "validation",
+            "authorization"
+          ]
+        },
+        {
+          "name": "lynx-observer",
+          "roles": [
+            "execution",
+            "time"
+          ]
+        }
+      ],
+      "conditions": [
+        {
+          "category": "validation",
+          "contract": "Lynx UG2026 Action schema, fixed descriptor and owner material retained in full in ActionInline; every field and both content digests must validate.",
+          "inputs": "Exact enclosed Action occurrence and full semantic fields; no omitted validation input.",
+          "evaluator": "boundary-one"
+        },
+        {
+          "category": "identity",
+          "contract": "Synthetic context identity policy version 1: the requesting principal is the exact authorized account owner recorded in this context.",
+          "inputs": "Synthetic established owner result: requesting principal TestCustomer owns source address 000100001 / 0012345; no delegation is required.",
+          "evaluator": "boundary-one"
+        }
+      ],
+      "not_applicable": [
+        {
+          "category": "delegation",
+          "reason": "Synthetic owner-authorized direct instruction, no delegate."
+        },
+        {
+          "category": "policy",
+          "reason": "Synthetic governing context independently establishes that no additional Policy condition applies."
+        },
+        {
+          "category": "approval",
+          "reason": "Synthetic governing context independently establishes that no separate approval applies."
+        }
+      ],
+      "execution_terms": "Exact enclosed Lynx participant-level settlement instruction. Completion requires target commit of the represented payment obligation, not submission or beneficiary credit.",
+      "commit_required": true
+    },
+    "event-ACTION_CREATED": {
+      "event_id": {
+        "$bytes": "0000000000000000000000000000000000000000000000000000000000000001"
+      },
+      "action_id": {
+        "$bytes": "0000000000000000000000000000000000000000000000000000000000000064"
+      },
+      "event_type": {
+        "authority": "https://github.com/cpbrands/VerifiedExecution",
+        "profile": "BOUNDED-LIFECYCLE-EVENT-TYPE-SEMANTIC-PROFILE",
+        "revision": "0.2-draft.1",
+        "kind": "ACTION_CREATED"
+      },
+      "occurred_at": {
+        "earliest": [
+          {
+            "$integer": "2026"
+          },
+          {
+            "$integer": "9"
+          },
+          {
+            "$integer": "26"
+          },
+          {
+            "$integer": "12"
+          },
+          {
+            "$integer": "0"
+          },
+          {
+            "$integer": "0"
+          },
+          {
+            "$integer": "1"
+          },
+          {
+            "$integer": "3"
+          }
+        ],
+        "latest": [
+          {
+            "$integer": "2026"
+          },
+          {
+            "$integer": "9"
+          },
+          {
+            "$integer": "26"
+          },
+          {
+            "$integer": "12"
+          },
+          {
+            "$integer": "0"
+          },
+          {
+            "$integer": "0"
+          },
+          {
+            "$integer": "1"
+          },
+          {
+            "$integer": "3"
+          }
+        ]
+      },
+      "sequence": {
+        "$integer": "0"
+      },
+      "spec_version": [
+        "VE-002",
+        "0.2"
+      ],
+      "payload": {
+        "action": {
+          "$ref": "action"
+        },
+        "context": {
+          "$ref": "context"
+        },
+        "assessments": [
+          {
+            "binding": {
+              "action_id": {
+                "$bytes": "0000000000000000000000000000000000000000000000000000000000000064"
+              },
+              "action_digest": {
+                "$bytes": "5fa3775f8a288e9762e021ba8fb08302fbb3547bc15d9769c97bbcbbeb330b0c"
+              },
+              "bound_instance_fields": {},
+              "event_type": {
+                "authority": "https://github.com/cpbrands/VerifiedExecution",
+                "profile": "BOUNDED-LIFECYCLE-EVENT-TYPE-SEMANTIC-PROFILE",
+                "revision": "0.2-draft.1",
+                "kind": "ACTION_CREATED"
+              },
+              "event_id": {
+                "$bytes": "0000000000000000000000000000000000000000000000000000000000000001"
+              },
+              "prior_head": [],
+              "sequence": {
+                "$integer": "0"
+              },
+              "context": {
+                "$ref": "context"
+              }
+            },
+            "source": "boundary-one",
+            "role": "boundary",
+            "statement": [
+              "fact"
+            ],
+            "result": "established",
+            "basis": "Boundary-one admission engine version 1 recorded actual authoritative admission of this exact Action occurrence and immutable content at the bound head/context. This is not a proposed request."
+          },
+          {
+            "binding": {
+              "action_id": {
+                "$bytes": "0000000000000000000000000000000000000000000000000000000000000064"
+              },
+              "action_digest": {
+                "$bytes": "5fa3775f8a288e9762e021ba8fb08302fbb3547bc15d9769c97bbcbbeb330b0c"
+              },
+              "bound_instance_fields": {},
+              "event_type": {
+                "authority": "https://github.com/cpbrands/VerifiedExecution",
+                "profile": "BOUNDED-LIFECYCLE-EVENT-TYPE-SEMANTIC-PROFILE",
+                "revision": "0.2-draft.1",
+                "kind": "ACTION_CREATED"
+              },
+              "event_id": {
+                "$bytes": "0000000000000000000000000000000000000000000000000000000000000001"
+              },
+              "prior_head": [],
+              "sequence": {
+                "$integer": "0"
+              },
+              "context": {
+                "$ref": "context"
+              }
+            },
+            "source": "lynx-observer",
+            "role": "time",
+            "statement": [
+              "time"
+            ],
+            "result": [
+              "bound",
+              {
+                "earliest": [
+                  {
+                    "$integer": "2026"
+                  },
+                  {
+                    "$integer": "9"
+                  },
+                  {
+                    "$integer": "26"
+                  },
+                  {
+                    "$integer": "12"
+                  },
+                  {
+                    "$integer": "0"
+                  },
+                  {
+                    "$integer": "0"
+                  },
+                  {
+                    "$integer": "1"
+                  },
+                  {
+                    "$integer": "3"
+                  }
+                ],
+                "latest": [
+                  {
+                    "$integer": "2026"
+                  },
+                  {
+                    "$integer": "9"
+                  },
+                  {
+                    "$integer": "26"
+                  },
+                  {
+                    "$integer": "12"
+                  },
+                  {
+                    "$integer": "0"
+                  },
+                  {
+                    "$integer": "0"
+                  },
+                  {
+                    "$integer": "1"
+                  },
+                  {
+                    "$integer": "3"
+                  }
+                ]
+              }
+            ],
+            "basis": "Synthetic scoped UTC observation by lynx-observer version 1 for exactly the fact and Action in this Binding. Established occurrence bound: 2026-09-26 12:00:00 plus exactly 1/3 second, identical inclusive earliest/latest endpoints. No receipt or append-time substitution."
+          }
+        ]
+      },
+      "extensions": []
+    },
+    "event-VALIDATION_STARTED": {
+      "event_id": {
+        "$bytes": "0000000000000000000000000000000000000000000000000000000000000002"
+      },
+      "action_id": {
+        "$bytes": "0000000000000000000000000000000000000000000000000000000000000064"
+      },
+      "event_type": {
+        "authority": "https://github.com/cpbrands/VerifiedExecution",
+        "profile": "BOUNDED-LIFECYCLE-EVENT-TYPE-SEMANTIC-PROFILE",
+        "revision": "0.2-draft.1",
+        "kind": "VALIDATION_STARTED"
+      },
+      "occurred_at": {
+        "earliest": [
+          {
+            "$integer": "2026"
+          },
+          {
+            "$integer": "9"
+          },
+          {
+            "$integer": "26"
+          },
+          {
+            "$integer": "12"
+          },
+          {
+            "$integer": "0"
+          },
+          {
+            "$integer": "0"
+          },
+          {
+            "$integer": "1"
+          },
+          {
+            "$integer": "3"
+          }
+        ],
+        "latest": [
+          {
+            "$integer": "2026"
+          },
+          {
+            "$integer": "9"
+          },
+          {
+            "$integer": "26"
+          },
+          {
+            "$integer": "12"
+          },
+          {
+            "$integer": "0"
+          },
+          {
+            "$integer": "0"
+          },
+          {
+            "$integer": "1"
+          },
+          {
+            "$integer": "3"
+          }
+        ]
+      },
+      "sequence": {
+        "$integer": "1"
+      },
+      "spec_version": [
+        "VE-002",
+        "0.2"
+      ],
+      "payload": {
+        "action": {
+          "$ref": "action"
+        },
+        "context": {
+          "$ref": "context"
+        },
+        "assessments": [
+          {
+            "binding": {
+              "action_id": {
+                "$bytes": "0000000000000000000000000000000000000000000000000000000000000064"
+              },
+              "action_digest": {
+                "$bytes": "5fa3775f8a288e9762e021ba8fb08302fbb3547bc15d9769c97bbcbbeb330b0c"
+              },
+              "bound_instance_fields": {},
+              "event_type": {
+                "authority": "https://github.com/cpbrands/VerifiedExecution",
+                "profile": "BOUNDED-LIFECYCLE-EVENT-TYPE-SEMANTIC-PROFILE",
+                "revision": "0.2-draft.1",
+                "kind": "VALIDATION_STARTED"
+              },
+              "event_id": {
+                "$bytes": "0000000000000000000000000000000000000000000000000000000000000002"
+              },
+              "prior_head": [
+                {
+                  "$bytes": "0000000000000000000000000000000000000000000000000000000000000001"
+                }
+              ],
+              "sequence": {
+                "$integer": "1"
+              },
+              "context": {
+                "$ref": "context"
+              }
+            },
+            "source": "boundary-one",
+            "role": "boundary",
+            "statement": [
+              "fact"
+            ],
+            "result": "established",
+            "basis": "Boundary-one validation engine version 1 began structural and semantic validation of this exact Action at the bound head/context. This records commencement, not queueing."
+          },
+          {
+            "binding": {
+              "action_id": {
+                "$bytes": "0000000000000000000000000000000000000000000000000000000000000064"
+              },
+              "action_digest": {
+                "$bytes": "5fa3775f8a288e9762e021ba8fb08302fbb3547bc15d9769c97bbcbbeb330b0c"
+              },
+              "bound_instance_fields": {},
+              "event_type": {
+                "authority": "https://github.com/cpbrands/VerifiedExecution",
+                "profile": "BOUNDED-LIFECYCLE-EVENT-TYPE-SEMANTIC-PROFILE",
+                "revision": "0.2-draft.1",
+                "kind": "VALIDATION_STARTED"
+              },
+              "event_id": {
+                "$bytes": "0000000000000000000000000000000000000000000000000000000000000002"
+              },
+              "prior_head": [
+                {
+                  "$bytes": "0000000000000000000000000000000000000000000000000000000000000001"
+                }
+              ],
+              "sequence": {
+                "$integer": "1"
+              },
+              "context": {
+                "$ref": "context"
+              }
+            },
+            "source": "lynx-observer",
+            "role": "time",
+            "statement": [
+              "time"
+            ],
+            "result": [
+              "bound",
+              {
+                "earliest": [
+                  {
+                    "$integer": "2026"
+                  },
+                  {
+                    "$integer": "9"
+                  },
+                  {
+                    "$integer": "26"
+                  },
+                  {
+                    "$integer": "12"
+                  },
+                  {
+                    "$integer": "0"
+                  },
+                  {
+                    "$integer": "0"
+                  },
+                  {
+                    "$integer": "1"
+                  },
+                  {
+                    "$integer": "3"
+                  }
+                ],
+                "latest": [
+                  {
+                    "$integer": "2026"
+                  },
+                  {
+                    "$integer": "9"
+                  },
+                  {
+                    "$integer": "26"
+                  },
+                  {
+                    "$integer": "12"
+                  },
+                  {
+                    "$integer": "0"
+                  },
+                  {
+                    "$integer": "0"
+                  },
+                  {
+                    "$integer": "1"
+                  },
+                  {
+                    "$integer": "3"
+                  }
+                ]
+              }
+            ],
+            "basis": "Synthetic scoped UTC observation by lynx-observer version 1 for exactly the fact and Action in this Binding. Established occurrence bound: 2026-09-26 12:00:00 plus exactly 1/3 second, identical inclusive earliest/latest endpoints. No receipt or append-time substitution."
+          }
+        ]
+      },
+      "extensions": []
+    },
+    "event-VALIDATION_SUCCEEDED": {
+      "event_id": {
+        "$bytes": "0000000000000000000000000000000000000000000000000000000000000003"
+      },
+      "action_id": {
+        "$bytes": "0000000000000000000000000000000000000000000000000000000000000064"
+      },
+      "event_type": {
+        "authority": "https://github.com/cpbrands/VerifiedExecution",
+        "profile": "BOUNDED-LIFECYCLE-EVENT-TYPE-SEMANTIC-PROFILE",
+        "revision": "0.2-draft.1",
+        "kind": "VALIDATION_SUCCEEDED"
+      },
+      "occurred_at": {
+        "earliest": [
+          {
+            "$integer": "2026"
+          },
+          {
+            "$integer": "9"
+          },
+          {
+            "$integer": "26"
+          },
+          {
+            "$integer": "12"
+          },
+          {
+            "$integer": "0"
+          },
+          {
+            "$integer": "0"
+          },
+          {
+            "$integer": "1"
+          },
+          {
+            "$integer": "3"
+          }
+        ],
+        "latest": [
+          {
+            "$integer": "2026"
+          },
+          {
+            "$integer": "9"
+          },
+          {
+            "$integer": "26"
+          },
+          {
+            "$integer": "12"
+          },
+          {
+            "$integer": "0"
+          },
+          {
+            "$integer": "0"
+          },
+          {
+            "$integer": "1"
+          },
+          {
+            "$integer": "3"
+          }
+        ]
+      },
+      "sequence": {
+        "$integer": "2"
+      },
+      "spec_version": [
+        "VE-002",
+        "0.2"
+      ],
+      "payload": {
+        "action": {
+          "$ref": "action"
+        },
+        "context": {
+          "$ref": "context"
+        },
+        "assessments": [
+          {
+            "binding": {
+              "action_id": {
+                "$bytes": "0000000000000000000000000000000000000000000000000000000000000064"
+              },
+              "action_digest": {
+                "$bytes": "5fa3775f8a288e9762e021ba8fb08302fbb3547bc15d9769c97bbcbbeb330b0c"
+              },
+              "bound_instance_fields": {},
+              "event_type": {
+                "authority": "https://github.com/cpbrands/VerifiedExecution",
+                "profile": "BOUNDED-LIFECYCLE-EVENT-TYPE-SEMANTIC-PROFILE",
+                "revision": "0.2-draft.1",
+                "kind": "VALIDATION_SUCCEEDED"
+              },
+              "event_id": {
+                "$bytes": "0000000000000000000000000000000000000000000000000000000000000003"
+              },
+              "prior_head": [
+                {
+                  "$bytes": "0000000000000000000000000000000000000000000000000000000000000002"
+                }
+              ],
+              "sequence": {
+                "$integer": "2"
+              },
+              "context": {
+                "$ref": "context"
+              }
+            },
+            "source": "boundary-one",
+            "role": "validation",
+            "statement": [
+              "fact"
+            ],
+            "result": "established",
+            "basis": "Boundary-one validator version 1 checked the retained descriptor, exact fields, schema digest and Action content digest and reported successful validation for this exact Action. All required validation checks completed."
+          },
+          {
+            "binding": {
+              "action_id": {
+                "$bytes": "0000000000000000000000000000000000000000000000000000000000000064"
+              },
+              "action_digest": {
+                "$bytes": "5fa3775f8a288e9762e021ba8fb08302fbb3547bc15d9769c97bbcbbeb330b0c"
+              },
+              "bound_instance_fields": {},
+              "event_type": {
+                "authority": "https://github.com/cpbrands/VerifiedExecution",
+                "profile": "BOUNDED-LIFECYCLE-EVENT-TYPE-SEMANTIC-PROFILE",
+                "revision": "0.2-draft.1",
+                "kind": "VALIDATION_SUCCEEDED"
+              },
+              "event_id": {
+                "$bytes": "0000000000000000000000000000000000000000000000000000000000000003"
+              },
+              "prior_head": [
+                {
+                  "$bytes": "0000000000000000000000000000000000000000000000000000000000000002"
+                }
+              ],
+              "sequence": {
+                "$integer": "2"
+              },
+              "context": {
+                "$ref": "context"
+              }
+            },
+            "source": "lynx-observer",
+            "role": "time",
+            "statement": [
+              "time"
+            ],
+            "result": [
+              "bound",
+              {
+                "earliest": [
+                  {
+                    "$integer": "2026"
+                  },
+                  {
+                    "$integer": "9"
+                  },
+                  {
+                    "$integer": "26"
+                  },
+                  {
+                    "$integer": "12"
+                  },
+                  {
+                    "$integer": "0"
+                  },
+                  {
+                    "$integer": "0"
+                  },
+                  {
+                    "$integer": "1"
+                  },
+                  {
+                    "$integer": "3"
+                  }
+                ],
+                "latest": [
+                  {
+                    "$integer": "2026"
+                  },
+                  {
+                    "$integer": "9"
+                  },
+                  {
+                    "$integer": "26"
+                  },
+                  {
+                    "$integer": "12"
+                  },
+                  {
+                    "$integer": "0"
+                  },
+                  {
+                    "$integer": "0"
+                  },
+                  {
+                    "$integer": "1"
+                  },
+                  {
+                    "$integer": "3"
+                  }
+                ]
+              }
+            ],
+            "basis": "Synthetic scoped UTC observation by lynx-observer version 1 for exactly the fact and Action in this Binding. Established occurrence bound: 2026-09-26 12:00:00 plus exactly 1/3 second, identical inclusive earliest/latest endpoints. No receipt or append-time substitution."
+          },
+          {
+            "binding": {
+              "action_id": {
+                "$bytes": "0000000000000000000000000000000000000000000000000000000000000064"
+              },
+              "action_digest": {
+                "$bytes": "5fa3775f8a288e9762e021ba8fb08302fbb3547bc15d9769c97bbcbbeb330b0c"
+              },
+              "bound_instance_fields": {},
+              "event_type": {
+                "authority": "https://github.com/cpbrands/VerifiedExecution",
+                "profile": "BOUNDED-LIFECYCLE-EVENT-TYPE-SEMANTIC-PROFILE",
+                "revision": "0.2-draft.1",
+                "kind": "VALIDATION_SUCCEEDED"
+              },
+              "event_id": {
+                "$bytes": "0000000000000000000000000000000000000000000000000000000000000003"
+              },
+              "prior_head": [
+                {
+                  "$bytes": "0000000000000000000000000000000000000000000000000000000000000002"
+                }
+              ],
+              "sequence": {
+                "$integer": "2"
+              },
+              "context": {
+                "$ref": "context"
+              }
+            },
+            "source": "boundary-one",
+            "role": "validation",
+            "statement": [
+              "condition",
+              {
+                "$integer": "0"
+              }
+            ],
+            "result": "satisfied",
+            "basis": "Synthetic validator version 1 checked the complete enclosed Lynx fields/descriptor/digests and found every declared validation restriction satisfied. Exact inputs and contract are retained in Binding.context."
+          }
+        ]
+      },
+      "extensions": []
+    },
+    "event-AUTHORIZATION_GRANTED": {
+      "event_id": {
+        "$bytes": "0000000000000000000000000000000000000000000000000000000000000004"
+      },
+      "action_id": {
+        "$bytes": "0000000000000000000000000000000000000000000000000000000000000064"
+      },
+      "event_type": {
+        "authority": "https://github.com/cpbrands/VerifiedExecution",
+        "profile": "BOUNDED-LIFECYCLE-EVENT-TYPE-SEMANTIC-PROFILE",
+        "revision": "0.2-draft.1",
+        "kind": "AUTHORIZATION_GRANTED"
+      },
+      "occurred_at": {
+        "earliest": [
+          {
+            "$integer": "2026"
+          },
+          {
+            "$integer": "9"
+          },
+          {
+            "$integer": "26"
+          },
+          {
+            "$integer": "12"
+          },
+          {
+            "$integer": "0"
+          },
+          {
+            "$integer": "0"
+          },
+          {
+            "$integer": "1"
+          },
+          {
+            "$integer": "3"
+          }
+        ],
+        "latest": [
+          {
+            "$integer": "2026"
+          },
+          {
+            "$integer": "9"
+          },
+          {
+            "$integer": "26"
+          },
+          {
+            "$integer": "12"
+          },
+          {
+            "$integer": "0"
+          },
+          {
+            "$integer": "0"
+          },
+          {
+            "$integer": "1"
+          },
+          {
+            "$integer": "3"
+          }
+        ]
+      },
+      "sequence": {
+        "$integer": "3"
+      },
+      "spec_version": [
+        "VE-002",
+        "0.2"
+      ],
+      "payload": {
+        "action": {
+          "$ref": "action"
+        },
+        "context": {
+          "$ref": "context"
+        },
+        "assessments": [
+          {
+            "binding": {
+              "action_id": {
+                "$bytes": "0000000000000000000000000000000000000000000000000000000000000064"
+              },
+              "action_digest": {
+                "$bytes": "5fa3775f8a288e9762e021ba8fb08302fbb3547bc15d9769c97bbcbbeb330b0c"
+              },
+              "bound_instance_fields": {},
+              "event_type": {
+                "authority": "https://github.com/cpbrands/VerifiedExecution",
+                "profile": "BOUNDED-LIFECYCLE-EVENT-TYPE-SEMANTIC-PROFILE",
+                "revision": "0.2-draft.1",
+                "kind": "AUTHORIZATION_GRANTED"
+              },
+              "event_id": {
+                "$bytes": "0000000000000000000000000000000000000000000000000000000000000004"
+              },
+              "prior_head": [
+                {
+                  "$bytes": "0000000000000000000000000000000000000000000000000000000000000003"
+                }
+              ],
+              "sequence": {
+                "$integer": "3"
+              },
+              "context": {
+                "$ref": "context"
+              }
+            },
+            "source": "boundary-one",
+            "role": "boundary",
+            "statement": [
+              "fact"
+            ],
+            "result": "established",
+            "basis": "Boundary-one authorization engine version 1 established the recorded identity result and applicability of each recorded not-applicable category, for this exact Action/head/context. It reported authorization granted."
+          },
+          {
+            "binding": {
+              "action_id": {
+                "$bytes": "0000000000000000000000000000000000000000000000000000000000000064"
+              },
+              "action_digest": {
+                "$bytes": "5fa3775f8a288e9762e021ba8fb08302fbb3547bc15d9769c97bbcbbeb330b0c"
+              },
+              "bound_instance_fields": {},
+              "event_type": {
+                "authority": "https://github.com/cpbrands/VerifiedExecution",
+                "profile": "BOUNDED-LIFECYCLE-EVENT-TYPE-SEMANTIC-PROFILE",
+                "revision": "0.2-draft.1",
+                "kind": "AUTHORIZATION_GRANTED"
+              },
+              "event_id": {
+                "$bytes": "0000000000000000000000000000000000000000000000000000000000000004"
+              },
+              "prior_head": [
+                {
+                  "$bytes": "0000000000000000000000000000000000000000000000000000000000000003"
+                }
+              ],
+              "sequence": {
+                "$integer": "3"
+              },
+              "context": {
+                "$ref": "context"
+              }
+            },
+            "source": "lynx-observer",
+            "role": "time",
+            "statement": [
+              "time"
+            ],
+            "result": [
+              "bound",
+              {
+                "earliest": [
+                  {
+                    "$integer": "2026"
+                  },
+                  {
+                    "$integer": "9"
+                  },
+                  {
+                    "$integer": "26"
+                  },
+                  {
+                    "$integer": "12"
+                  },
+                  {
+                    "$integer": "0"
+                  },
+                  {
+                    "$integer": "0"
+                  },
+                  {
+                    "$integer": "1"
+                  },
+                  {
+                    "$integer": "3"
+                  }
+                ],
+                "latest": [
+                  {
+                    "$integer": "2026"
+                  },
+                  {
+                    "$integer": "9"
+                  },
+                  {
+                    "$integer": "26"
+                  },
+                  {
+                    "$integer": "12"
+                  },
+                  {
+                    "$integer": "0"
+                  },
+                  {
+                    "$integer": "0"
+                  },
+                  {
+                    "$integer": "1"
+                  },
+                  {
+                    "$integer": "3"
+                  }
+                ]
+              }
+            ],
+            "basis": "Synthetic scoped UTC observation by lynx-observer version 1 for exactly the fact and Action in this Binding. Established occurrence bound: 2026-09-26 12:00:00 plus exactly 1/3 second, identical inclusive earliest/latest endpoints. No receipt or append-time substitution."
+          },
+          {
+            "binding": {
+              "action_id": {
+                "$bytes": "0000000000000000000000000000000000000000000000000000000000000064"
+              },
+              "action_digest": {
+                "$bytes": "5fa3775f8a288e9762e021ba8fb08302fbb3547bc15d9769c97bbcbbeb330b0c"
+              },
+              "bound_instance_fields": {},
+              "event_type": {
+                "authority": "https://github.com/cpbrands/VerifiedExecution",
+                "profile": "BOUNDED-LIFECYCLE-EVENT-TYPE-SEMANTIC-PROFILE",
+                "revision": "0.2-draft.1",
+                "kind": "AUTHORIZATION_GRANTED"
+              },
+              "event_id": {
+                "$bytes": "0000000000000000000000000000000000000000000000000000000000000004"
+              },
+              "prior_head": [
+                {
+                  "$bytes": "0000000000000000000000000000000000000000000000000000000000000003"
+                }
+              ],
+              "sequence": {
+                "$integer": "3"
+              },
+              "context": {
+                "$ref": "context"
+              }
+            },
+            "source": "boundary-one",
+            "role": "authorization",
+            "statement": [
+              "condition",
+              {
+                "$integer": "1"
+              }
+            ],
+            "result": "satisfied",
+            "basis": "Synthetic identity evaluator version 1 compared the requesting TestCustomer with the established source-account owner and found exact equality. Applicable inputs and comparison contract are retained in Binding.context; result satisfied."
+          }
+        ]
+      },
+      "extensions": []
+    },
+    "event-EXECUTION_STARTED": {
+      "event_id": {
+        "$bytes": "0000000000000000000000000000000000000000000000000000000000000005"
+      },
+      "action_id": {
+        "$bytes": "0000000000000000000000000000000000000000000000000000000000000064"
+      },
+      "event_type": {
+        "authority": "https://github.com/cpbrands/VerifiedExecution",
+        "profile": "BOUNDED-LIFECYCLE-EVENT-TYPE-SEMANTIC-PROFILE",
+        "revision": "0.2-draft.1",
+        "kind": "EXECUTION_STARTED"
+      },
+      "occurred_at": {
+        "earliest": [
+          {
+            "$integer": "2026"
+          },
+          {
+            "$integer": "9"
+          },
+          {
+            "$integer": "26"
+          },
+          {
+            "$integer": "12"
+          },
+          {
+            "$integer": "0"
+          },
+          {
+            "$integer": "0"
+          },
+          {
+            "$integer": "1"
+          },
+          {
+            "$integer": "3"
+          }
+        ],
+        "latest": [
+          {
+            "$integer": "2026"
+          },
+          {
+            "$integer": "9"
+          },
+          {
+            "$integer": "26"
+          },
+          {
+            "$integer": "12"
+          },
+          {
+            "$integer": "0"
+          },
+          {
+            "$integer": "0"
+          },
+          {
+            "$integer": "1"
+          },
+          {
+            "$integer": "3"
+          }
+        ]
+      },
+      "sequence": {
+        "$integer": "4"
+      },
+      "spec_version": [
+        "VE-002",
+        "0.2"
+      ],
+      "payload": {
+        "action": {
+          "$ref": "action"
+        },
+        "context": {
+          "$ref": "context"
+        },
+        "assessments": [
+          {
+            "binding": {
+              "action_id": {
+                "$bytes": "0000000000000000000000000000000000000000000000000000000000000064"
+              },
+              "action_digest": {
+                "$bytes": "5fa3775f8a288e9762e021ba8fb08302fbb3547bc15d9769c97bbcbbeb330b0c"
+              },
+              "bound_instance_fields": {},
+              "event_type": {
+                "authority": "https://github.com/cpbrands/VerifiedExecution",
+                "profile": "BOUNDED-LIFECYCLE-EVENT-TYPE-SEMANTIC-PROFILE",
+                "revision": "0.2-draft.1",
+                "kind": "EXECUTION_STARTED"
+              },
+              "event_id": {
+                "$bytes": "0000000000000000000000000000000000000000000000000000000000000005"
+              },
+              "prior_head": [
+                {
+                  "$bytes": "0000000000000000000000000000000000000000000000000000000000000004"
+                }
+              ],
+              "sequence": {
+                "$integer": "4"
+              },
+              "context": {
+                "$ref": "context"
+              }
+            },
+            "source": "lynx-observer",
+            "role": "execution",
+            "statement": [
+              "fact"
+            ],
+            "result": "established",
+            "basis": "Lynx-observer version 1 observed the actual material invocation for this exact instruction at the bound head/context, not scheduling, preparation or queueing."
+          },
+          {
+            "binding": {
+              "action_id": {
+                "$bytes": "0000000000000000000000000000000000000000000000000000000000000064"
+              },
+              "action_digest": {
+                "$bytes": "5fa3775f8a288e9762e021ba8fb08302fbb3547bc15d9769c97bbcbbeb330b0c"
+              },
+              "bound_instance_fields": {},
+              "event_type": {
+                "authority": "https://github.com/cpbrands/VerifiedExecution",
+                "profile": "BOUNDED-LIFECYCLE-EVENT-TYPE-SEMANTIC-PROFILE",
+                "revision": "0.2-draft.1",
+                "kind": "EXECUTION_STARTED"
+              },
+              "event_id": {
+                "$bytes": "0000000000000000000000000000000000000000000000000000000000000005"
+              },
+              "prior_head": [
+                {
+                  "$bytes": "0000000000000000000000000000000000000000000000000000000000000004"
+                }
+              ],
+              "sequence": {
+                "$integer": "4"
+              },
+              "context": {
+                "$ref": "context"
+              }
+            },
+            "source": "lynx-observer",
+            "role": "time",
+            "statement": [
+              "time"
+            ],
+            "result": [
+              "bound",
+              {
+                "earliest": [
+                  {
+                    "$integer": "2026"
+                  },
+                  {
+                    "$integer": "9"
+                  },
+                  {
+                    "$integer": "26"
+                  },
+                  {
+                    "$integer": "12"
+                  },
+                  {
+                    "$integer": "0"
+                  },
+                  {
+                    "$integer": "0"
+                  },
+                  {
+                    "$integer": "1"
+                  },
+                  {
+                    "$integer": "3"
+                  }
+                ],
+                "latest": [
+                  {
+                    "$integer": "2026"
+                  },
+                  {
+                    "$integer": "9"
+                  },
+                  {
+                    "$integer": "26"
+                  },
+                  {
+                    "$integer": "12"
+                  },
+                  {
+                    "$integer": "0"
+                  },
+                  {
+                    "$integer": "0"
+                  },
+                  {
+                    "$integer": "1"
+                  },
+                  {
+                    "$integer": "3"
+                  }
+                ]
+              }
+            ],
+            "basis": "Synthetic scoped UTC observation by lynx-observer version 1 for exactly the fact and Action in this Binding. Established occurrence bound: 2026-09-26 12:00:00 plus exactly 1/3 second, identical inclusive earliest/latest endpoints. No receipt or append-time substitution."
+          }
+        ]
+      },
+      "extensions": []
+    },
+    "event-EXECUTION_COMPLETED": {
+      "event_id": {
+        "$bytes": "0000000000000000000000000000000000000000000000000000000000000006"
+      },
+      "action_id": {
+        "$bytes": "0000000000000000000000000000000000000000000000000000000000000064"
+      },
+      "event_type": {
+        "authority": "https://github.com/cpbrands/VerifiedExecution",
+        "profile": "BOUNDED-LIFECYCLE-EVENT-TYPE-SEMANTIC-PROFILE",
+        "revision": "0.2-draft.1",
+        "kind": "EXECUTION_COMPLETED"
+      },
+      "occurred_at": {
+        "earliest": [
+          {
+            "$integer": "2026"
+          },
+          {
+            "$integer": "9"
+          },
+          {
+            "$integer": "26"
+          },
+          {
+            "$integer": "12"
+          },
+          {
+            "$integer": "0"
+          },
+          {
+            "$integer": "0"
+          },
+          {
+            "$integer": "1"
+          },
+          {
+            "$integer": "3"
+          }
+        ],
+        "latest": [
+          {
+            "$integer": "2026"
+          },
+          {
+            "$integer": "9"
+          },
+          {
+            "$integer": "26"
+          },
+          {
+            "$integer": "12"
+          },
+          {
+            "$integer": "0"
+          },
+          {
+            "$integer": "0"
+          },
+          {
+            "$integer": "1"
+          },
+          {
+            "$integer": "3"
+          }
+        ]
+      },
+      "sequence": {
+        "$integer": "5"
+      },
+      "spec_version": [
+        "VE-002",
+        "0.2"
+      ],
+      "payload": {
+        "action": {
+          "$ref": "action"
+        },
+        "context": {
+          "$ref": "context"
+        },
+        "assessments": [
+          {
+            "binding": {
+              "action_id": {
+                "$bytes": "0000000000000000000000000000000000000000000000000000000000000064"
+              },
+              "action_digest": {
+                "$bytes": "5fa3775f8a288e9762e021ba8fb08302fbb3547bc15d9769c97bbcbbeb330b0c"
+              },
+              "bound_instance_fields": {},
+              "event_type": {
+                "authority": "https://github.com/cpbrands/VerifiedExecution",
+                "profile": "BOUNDED-LIFECYCLE-EVENT-TYPE-SEMANTIC-PROFILE",
+                "revision": "0.2-draft.1",
+                "kind": "EXECUTION_COMPLETED"
+              },
+              "event_id": {
+                "$bytes": "0000000000000000000000000000000000000000000000000000000000000006"
+              },
+              "prior_head": [
+                {
+                  "$bytes": "0000000000000000000000000000000000000000000000000000000000000005"
+                }
+              ],
+              "sequence": {
+                "$integer": "5"
+              },
+              "context": {
+                "$ref": "context"
+              }
+            },
+            "source": "lynx-observer",
+            "role": "execution",
+            "statement": [
+              "fact"
+            ],
+            "result": "established",
+            "basis": "Lynx-observer version 1 received the established target-domain result that this exact CAD 10000.00 payment obligation settled through the participants’ Lynx accounts. This records participant-level settlement, not beneficiary credit."
+          },
+          {
+            "binding": {
+              "action_id": {
+                "$bytes": "0000000000000000000000000000000000000000000000000000000000000064"
+              },
+              "action_digest": {
+                "$bytes": "5fa3775f8a288e9762e021ba8fb08302fbb3547bc15d9769c97bbcbbeb330b0c"
+              },
+              "bound_instance_fields": {},
+              "event_type": {
+                "authority": "https://github.com/cpbrands/VerifiedExecution",
+                "profile": "BOUNDED-LIFECYCLE-EVENT-TYPE-SEMANTIC-PROFILE",
+                "revision": "0.2-draft.1",
+                "kind": "EXECUTION_COMPLETED"
+              },
+              "event_id": {
+                "$bytes": "0000000000000000000000000000000000000000000000000000000000000006"
+              },
+              "prior_head": [
+                {
+                  "$bytes": "0000000000000000000000000000000000000000000000000000000000000005"
+                }
+              ],
+              "sequence": {
+                "$integer": "5"
+              },
+              "context": {
+                "$ref": "context"
+              }
+            },
+            "source": "lynx-observer",
+            "role": "time",
+            "statement": [
+              "time"
+            ],
+            "result": [
+              "bound",
+              {
+                "earliest": [
+                  {
+                    "$integer": "2026"
+                  },
+                  {
+                    "$integer": "9"
+                  },
+                  {
+                    "$integer": "26"
+                  },
+                  {
+                    "$integer": "12"
+                  },
+                  {
+                    "$integer": "0"
+                  },
+                  {
+                    "$integer": "0"
+                  },
+                  {
+                    "$integer": "1"
+                  },
+                  {
+                    "$integer": "3"
+                  }
+                ],
+                "latest": [
+                  {
+                    "$integer": "2026"
+                  },
+                  {
+                    "$integer": "9"
+                  },
+                  {
+                    "$integer": "26"
+                  },
+                  {
+                    "$integer": "12"
+                  },
+                  {
+                    "$integer": "0"
+                  },
+                  {
+                    "$integer": "0"
+                  },
+                  {
+                    "$integer": "1"
+                  },
+                  {
+                    "$integer": "3"
+                  }
+                ]
+              }
+            ],
+            "basis": "Synthetic scoped UTC observation by lynx-observer version 1 for exactly the fact and Action in this Binding. Established occurrence bound: 2026-09-26 12:00:00 plus exactly 1/3 second, identical inclusive earliest/latest endpoints. No receipt or append-time substitution."
+          },
+          {
+            "binding": {
+              "action_id": {
+                "$bytes": "0000000000000000000000000000000000000000000000000000000000000064"
+              },
+              "action_digest": {
+                "$bytes": "5fa3775f8a288e9762e021ba8fb08302fbb3547bc15d9769c97bbcbbeb330b0c"
+              },
+              "bound_instance_fields": {},
+              "event_type": {
+                "authority": "https://github.com/cpbrands/VerifiedExecution",
+                "profile": "BOUNDED-LIFECYCLE-EVENT-TYPE-SEMANTIC-PROFILE",
+                "revision": "0.2-draft.1",
+                "kind": "EXECUTION_COMPLETED"
+              },
+              "event_id": {
+                "$bytes": "0000000000000000000000000000000000000000000000000000000000000006"
+              },
+              "prior_head": [
+                {
+                  "$bytes": "0000000000000000000000000000000000000000000000000000000000000005"
+                }
+              ],
+              "sequence": {
+                "$integer": "5"
+              },
+              "context": {
+                "$ref": "context"
+              }
+            },
+            "source": "lynx-observer",
+            "role": "execution",
+            "statement": [
+              "commit"
+            ],
+            "result": "committed",
+            "basis": "Synthetic target observation version 1 authoritatively established settlement of the exact represented obligation through both participants’ Lynx accounts; irrevocable target commit for this Action, not submission or customer credit."
+          }
+        ]
+      },
+      "extensions": []
+    },
+    "event-EXECUTION_FAILED": {
+      "event_id": {
+        "$bytes": "0000000000000000000000000000000000000000000000000000000000000007"
+      },
+      "action_id": {
+        "$bytes": "0000000000000000000000000000000000000000000000000000000000000064"
+      },
+      "event_type": {
+        "authority": "https://github.com/cpbrands/VerifiedExecution",
+        "profile": "BOUNDED-LIFECYCLE-EVENT-TYPE-SEMANTIC-PROFILE",
+        "revision": "0.2-draft.1",
+        "kind": "EXECUTION_FAILED"
+      },
+      "occurred_at": {
+        "earliest": [
+          {
+            "$integer": "2026"
+          },
+          {
+            "$integer": "9"
+          },
+          {
+            "$integer": "26"
+          },
+          {
+            "$integer": "12"
+          },
+          {
+            "$integer": "0"
+          },
+          {
+            "$integer": "0"
+          },
+          {
+            "$integer": "1"
+          },
+          {
+            "$integer": "3"
+          }
+        ],
+        "latest": [
+          {
+            "$integer": "2026"
+          },
+          {
+            "$integer": "9"
+          },
+          {
+            "$integer": "26"
+          },
+          {
+            "$integer": "12"
+          },
+          {
+            "$integer": "0"
+          },
+          {
+            "$integer": "0"
+          },
+          {
+            "$integer": "1"
+          },
+          {
+            "$integer": "3"
+          }
+        ]
+      },
+      "sequence": {
+        "$integer": "5"
+      },
+      "spec_version": [
+        "VE-002",
+        "0.2"
+      ],
+      "payload": {
+        "action": {
+          "$ref": "action"
+        },
+        "context": {
+          "$ref": "context"
+        },
+        "assessments": [
+          {
+            "binding": {
+              "action_id": {
+                "$bytes": "0000000000000000000000000000000000000000000000000000000000000064"
+              },
+              "action_digest": {
+                "$bytes": "5fa3775f8a288e9762e021ba8fb08302fbb3547bc15d9769c97bbcbbeb330b0c"
+              },
+              "bound_instance_fields": {},
+              "event_type": {
+                "authority": "https://github.com/cpbrands/VerifiedExecution",
+                "profile": "BOUNDED-LIFECYCLE-EVENT-TYPE-SEMANTIC-PROFILE",
+                "revision": "0.2-draft.1",
+                "kind": "EXECUTION_FAILED"
+              },
+              "event_id": {
+                "$bytes": "0000000000000000000000000000000000000000000000000000000000000007"
+              },
+              "prior_head": [
+                {
+                  "$bytes": "0000000000000000000000000000000000000000000000000000000000000005"
+                }
+              ],
+              "sequence": {
+                "$integer": "5"
+              },
+              "context": {
+                "$ref": "context"
+              }
+            },
+            "source": "lynx-observer",
+            "role": "execution",
+            "statement": [
+              "fact"
+            ],
+            "result": "established",
+            "basis": "Lynx-observer version 1 received the established target-domain definitive rejection of this exact invoked payment obligation before settlement. This is a known execution failure, not silence or timeout."
+          },
+          {
+            "binding": {
+              "action_id": {
+                "$bytes": "0000000000000000000000000000000000000000000000000000000000000064"
+              },
+              "action_digest": {
+                "$bytes": "5fa3775f8a288e9762e021ba8fb08302fbb3547bc15d9769c97bbcbbeb330b0c"
+              },
+              "bound_instance_fields": {},
+              "event_type": {
+                "authority": "https://github.com/cpbrands/VerifiedExecution",
+                "profile": "BOUNDED-LIFECYCLE-EVENT-TYPE-SEMANTIC-PROFILE",
+                "revision": "0.2-draft.1",
+                "kind": "EXECUTION_FAILED"
+              },
+              "event_id": {
+                "$bytes": "0000000000000000000000000000000000000000000000000000000000000007"
+              },
+              "prior_head": [
+                {
+                  "$bytes": "0000000000000000000000000000000000000000000000000000000000000005"
+                }
+              ],
+              "sequence": {
+                "$integer": "5"
+              },
+              "context": {
+                "$ref": "context"
+              }
+            },
+            "source": "lynx-observer",
+            "role": "time",
+            "statement": [
+              "time"
+            ],
+            "result": [
+              "bound",
+              {
+                "earliest": [
+                  {
+                    "$integer": "2026"
+                  },
+                  {
+                    "$integer": "9"
+                  },
+                  {
+                    "$integer": "26"
+                  },
+                  {
+                    "$integer": "12"
+                  },
+                  {
+                    "$integer": "0"
+                  },
+                  {
+                    "$integer": "0"
+                  },
+                  {
+                    "$integer": "1"
+                  },
+                  {
+                    "$integer": "3"
+                  }
+                ],
+                "latest": [
+                  {
+                    "$integer": "2026"
+                  },
+                  {
+                    "$integer": "9"
+                  },
+                  {
+                    "$integer": "26"
+                  },
+                  {
+                    "$integer": "12"
+                  },
+                  {
+                    "$integer": "0"
+                  },
+                  {
+                    "$integer": "0"
+                  },
+                  {
+                    "$integer": "1"
+                  },
+                  {
+                    "$integer": "3"
+                  }
+                ]
+              }
+            ],
+            "basis": "Synthetic scoped UTC observation by lynx-observer version 1 for exactly the fact and Action in this Binding. Established occurrence bound: 2026-09-26 12:00:00 plus exactly 1/3 second, identical inclusive earliest/latest endpoints. No receipt or append-time substitution."
+          }
+        ]
+      },
+      "extensions": []
+    }
+  },
+  "positive": [
+    {
+      "id": "event-ACTION_CREATED",
+      "type": "package",
+      "value": {
+        "profile": {
+          "authority": "https://github.com/cpbrands/VerifiedExecution",
+          "profile": "BOUNDED-LIFECYCLE-EVENT-REPRESENTATION-PROFILE",
+          "revision": "0.1-draft.1"
+        },
+        "publication": {
+          "$publication": true
+        },
+        "materials": {
+          "$materials": "package"
+        },
+        "event": {
+          "$ref": "event-ACTION_CREATED"
+        },
+        "decision_inputs": []
+      }
+    },
+    {
+      "id": "event-VALIDATION_STARTED",
+      "type": "package",
+      "value": {
+        "profile": {
+          "authority": "https://github.com/cpbrands/VerifiedExecution",
+          "profile": "BOUNDED-LIFECYCLE-EVENT-REPRESENTATION-PROFILE",
+          "revision": "0.1-draft.1"
+        },
+        "publication": {
+          "$publication": true
+        },
+        "materials": {
+          "$materials": "package"
+        },
+        "event": {
+          "$ref": "event-VALIDATION_STARTED"
+        },
+        "decision_inputs": []
+      }
+    },
+    {
+      "id": "event-VALIDATION_SUCCEEDED",
+      "type": "package",
+      "value": {
+        "profile": {
+          "authority": "https://github.com/cpbrands/VerifiedExecution",
+          "profile": "BOUNDED-LIFECYCLE-EVENT-REPRESENTATION-PROFILE",
+          "revision": "0.1-draft.1"
+        },
+        "publication": {
+          "$publication": true
+        },
+        "materials": {
+          "$materials": "package"
+        },
+        "event": {
+          "$ref": "event-VALIDATION_SUCCEEDED"
+        },
+        "decision_inputs": []
+      }
+    },
+    {
+      "id": "event-AUTHORIZATION_GRANTED",
+      "type": "package",
+      "value": {
+        "profile": {
+          "authority": "https://github.com/cpbrands/VerifiedExecution",
+          "profile": "BOUNDED-LIFECYCLE-EVENT-REPRESENTATION-PROFILE",
+          "revision": "0.1-draft.1"
+        },
+        "publication": {
+          "$publication": true
+        },
+        "materials": {
+          "$materials": "package"
+        },
+        "event": {
+          "$ref": "event-AUTHORIZATION_GRANTED"
+        },
+        "decision_inputs": []
+      }
+    },
+    {
+      "id": "event-EXECUTION_STARTED",
+      "type": "package",
+      "value": {
+        "profile": {
+          "authority": "https://github.com/cpbrands/VerifiedExecution",
+          "profile": "BOUNDED-LIFECYCLE-EVENT-REPRESENTATION-PROFILE",
+          "revision": "0.1-draft.1"
+        },
+        "publication": {
+          "$publication": true
+        },
+        "materials": {
+          "$materials": "package"
+        },
+        "event": {
+          "$ref": "event-EXECUTION_STARTED"
+        },
+        "decision_inputs": []
+      }
+    },
+    {
+      "id": "event-EXECUTION_COMPLETED",
+      "type": "package",
+      "value": {
+        "profile": {
+          "authority": "https://github.com/cpbrands/VerifiedExecution",
+          "profile": "BOUNDED-LIFECYCLE-EVENT-REPRESENTATION-PROFILE",
+          "revision": "0.1-draft.1"
+        },
+        "publication": {
+          "$publication": true
+        },
+        "materials": {
+          "$materials": "package"
+        },
+        "event": {
+          "$ref": "event-EXECUTION_COMPLETED"
+        },
+        "decision_inputs": []
+      }
+    },
+    {
+      "id": "event-EXECUTION_FAILED",
+      "type": "package",
+      "value": {
+        "profile": {
+          "authority": "https://github.com/cpbrands/VerifiedExecution",
+          "profile": "BOUNDED-LIFECYCLE-EVENT-REPRESENTATION-PROFILE",
+          "revision": "0.1-draft.1"
+        },
+        "publication": {
+          "$publication": true
+        },
+        "materials": {
+          "$materials": "package"
+        },
+        "event": {
+          "$ref": "event-EXECUTION_FAILED"
+        },
+        "decision_inputs": []
+      }
+    },
+    {
+      "id": "text-decomposed",
+      "type": "text",
+      "value": "é",
+      "anchor": "4365cc81"
+    },
+    {
+      "id": "text-composed",
+      "type": "text",
+      "value": "é",
+      "anchor": "42c3a9"
+    },
+    {
+      "id": "text-empty",
+      "type": "text",
+      "value": "",
+      "anchor": "40"
+    },
+    {
+      "id": "text-controls",
+      "type": "text",
+      "value": "\u0000\n﻿",
+      "anchor": "45000aefbbbf"
+    },
+    {
+      "id": "text-supplementary",
+      "type": "text",
+      "value": "😀",
+      "anchor": "44f09f9880"
+    },
+    {
+      "id": "integer-zero",
+      "type": "integer",
+      "value": {
+        "$integer": "0"
+      },
+      "anchor": "82f440"
+    },
+    {
+      "id": "integer-positive",
+      "type": "integer",
+      "value": {
+        "$integer": "256"
+      },
+      "anchor": "82f4420100"
+    },
+    {
+      "id": "integer-negative",
+      "type": "integer",
+      "value": {
+        "$integer": "-256"
+      },
+      "anchor": "82f5420100"
+    },
+    {
+      "id": "integer-above-native",
+      "type": "integer",
+      "value": {
+        "$integer": "18446744073709551616"
+      },
+      "anchor": "82f449010000000000000000"
+    },
+    {
+      "id": "integer-below-native",
+      "type": "integer",
+      "value": {
+        "$integer": "-18446744073709551617"
+      },
+      "anchor": "82f549010000000000000001"
+    },
+    {
+      "id": "sequence-zero",
+      "type": "u64",
+      "value": {
+        "$integer": "0"
+      },
+      "anchor": "00"
+    },
+    {
+      "id": "sequence-max",
+      "type": "u64",
+      "value": {
+        "$integer": "18446744073709551615"
+      },
+      "anchor": "1bffffffffffffffff"
+    },
+    {
+      "id": "extension-null",
+      "type": "extension",
+      "value": [
+        "null"
+      ],
+      "anchor": "81646e756c6c"
+    },
+    {
+      "id": "extension-text-decomposed",
+      "type": "extension",
+      "value": [
+        "text",
+        "é"
+      ],
+      "anchor": "8264746578744365cc81"
+    },
+    {
+      "id": "extension-text-composed",
+      "type": "extension",
+      "value": [
+        "text",
+        "é"
+      ],
+      "anchor": "82647465787442c3a9"
+    },
+    {
+      "id": "point-third",
+      "type": "interval",
+      "value": {
+        "earliest": [
+          {
+            "$integer": "2026"
+          },
+          {
+            "$integer": "9"
+          },
+          {
+            "$integer": "26"
+          },
+          {
+            "$integer": "12"
+          },
+          {
+            "$integer": "0"
+          },
+          {
+            "$integer": "0"
+          },
+          {
+            "$integer": "1"
+          },
+          {
+            "$integer": "3"
+          }
+        ],
+        "latest": [
+          {
+            "$integer": "2026"
+          },
+          {
+            "$integer": "9"
+          },
+          {
+            "$integer": "26"
+          },
+          {
+            "$integer": "12"
+          },
+          {
+            "$integer": "0"
+          },
+          {
+            "$integer": "0"
+          },
+          {
+            "$integer": "1"
+          },
+          {
+            "$integer": "3"
+          }
+        ]
+      }
+    },
+    {
+      "id": "far-future-rational",
+      "type": "endpoint",
+      "value": [
+        {
+          "$integer": "1208925819614629174706176"
+        },
+        {
+          "$integer": "2"
+        },
+        {
+          "$integer": "29"
+        },
+        {
+          "$integer": "23"
+        },
+        {
+          "$integer": "59"
+        },
+        {
+          "$integer": "59"
+        },
+        {
+          "$integer": "1237940039285380274899124224"
+        },
+        {
+          "$integer": "1237940039285380274899124225"
+        }
+      ]
+    },
+    {
+      "id": "octets-0",
+      "type": "octets",
+      "value": {
+        "$repeat_octets": [
+          "a5",
+          0
+        ]
+      }
+    },
+    {
+      "id": "octets-4096",
+      "type": "octets",
+      "value": {
+        "$repeat_octets": [
+          "a5",
+          4096
+        ]
+      }
+    },
+    {
+      "id": "octets-4097",
+      "type": "octets",
+      "value": {
+        "$repeat_octets": [
+          "a5",
+          4097
+        ]
+      }
+    },
+    {
+      "id": "octets-8192",
+      "type": "octets",
+      "value": {
+        "$repeat_octets": [
+          "a5",
+          8192
+        ]
+      }
+    },
+    {
+      "id": "octets-8193",
+      "type": "octets",
+      "value": {
+        "$repeat_octets": [
+          "a5",
+          8193
+        ]
+      }
+    },
+    {
+      "id": "text-split-scalar",
+      "type": "text",
+      "value": {
+        "$concat_text": [
+          {
+            "$repeat_text": [
+              "a",
+              4095
+            ]
+          },
+          "é"
+        ]
+      }
+    },
+    {
+      "id": "extension-collection",
+      "type": "extension",
+      "value": [
+        "record",
+        [
+          [
+            "non-NFC-é",
+            [
+              "set",
+              [
+                [
+                  "integer",
+                  {
+                    "$integer": "-1"
+                  }
+                ],
+                [
+                  "text",
+                  "é"
+                ],
+                [
+                  "null"
+                ]
+              ]
+            ]
+          ],
+          [
+            "list",
+            [
+              "list",
+              [
+                [
+                  "boolean",
+                  true
+                ],
+                [
+                  "octets",
+                  {
+                    "$bytes": "00ff"
+                  }
+                ]
+              ]
+            ]
+          ]
+        ]
+      ]
+    }
+  ]
+}
