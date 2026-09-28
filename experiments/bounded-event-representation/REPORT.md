@@ -7,7 +7,7 @@ document_type: Experimental Comparison Report
 category: Non-normative Validation
 author: Verified Execution Editorial Board
 created: 2026-09-26
-updated: 2026-09-26
+updated: 2026-09-28
 depends_on:
   - BOUNDED-LIFECYCLE-EVENT-REPRESENTATION-PROFILE
   - BOUNDED-LIFECYCLE-EVENT-TYPE-SEMANTIC-PROFILE
@@ -37,7 +37,7 @@ canonical bytes and equal re-encoding. Hand-derived anchors additionally check
 against correlated implementation errors. Negative tests assert exact failure
 classes, not mere disagreement.
 
-The clean-checkout results in §8 establish bounded representation agreement
+The historical clean-checkout results in §8 establish bounded representation agreement
 for the recorded vectors, not completion of every future conformance claim.
 
 ### Scope of a successful result
@@ -247,7 +247,10 @@ confidentiality/retention policy and operational input production remain with
 their existing owners. A full admission/projection integration and independent
 review remain separate from successful byte recovery.
 
-## 8. Validation record
+## 8. Historical PR #100 validation record
+
+This section records the merged experiment, before the transport-only correction
+in §9. Its successful run does not erase the subsequent timeout incidents.
 
 The complete suite passed **505/505**, with zero skipped, cancelled or failed
 tests: the pre-existing 302 tests plus the following 203 new tests.
@@ -314,3 +317,159 @@ Existing GitHub Actions run documentation validation and documentation-validator
 tests only; they do not execute this cross-language experiment or the complete
 repository suite. Their eventual success is not substituted for the local
 clean-checkout evidence above.
+
+## 9. Shared subprocess transport reliability correction
+
+### Incident evidence retained
+
+The correction starts at merged main
+`20728c56f1f8c6fae98b99c7ae9077662c62e334`; the retained PR #100 head is
+`5651349db972ade1a89a196cab94c013aad4b6e7`. All 19 merged blobs had been
+verified identical. Pre-merge verification passed uninterrupted, 505/505;
+post-merge experiment verification passed uninterrupted, 203/203. The
+post-merge complete suite nevertheless returned **504/505** when Python 3.12's
+`native-negative-sequence` invocation reached the unchanged 120-second limit.
+An earlier audit also timed out in `establishment-failed`; its isolated
+execution passed in 349 ms. Those failures remain part of the evidence.
+
+The subsequent read-only investigation observed three further ETIMEDOUTs:
+two subprocesses (Python and Node) during a 827.965-second loaded run, and a
+Python subprocess during a 265.737-second serialized complete-suite run.
+Its initial diagnostic collector did not preserve sufficient test counters or
+case names to reconstruct those entire runs; they are not claimed as passing
+suites. Two sampled Python stalls were in `json.load(sys.stdin)`/read while
+the parent waited in synchronous process transport, with empty observed pipe
+queues and negligible CPU. This localizes the observed wait before codec
+evaluation, but does not distinguish every possible input-delivery/EOF cause.
+Timed-out sampled children were terminated and reaped. Host sleep affected the
+loaded run's timing, but one observed stall preceded sleep and the serialized
+stall occurred while awake. Scheduling contention is therefore not established
+as the sole cause. Neither a Python-version-exclusive defect nor a particular
+Node/libuv/macOS defect was proved.
+
+Rapid isolated passes, other uninterrupted experiment passes and a later
+505/505 diagnostic pass do not invalidate these failures. No semantic, codec,
+fixture or canonical-byte defect was demonstrated. This change avoids the
+stdin-pipe transport path on which stalls were observed; it does not claim to
+identify or repair a proven upstream runtime defect.
+
+### Transport, cleanup and diagnostics
+
+Only `compare.mjs`, its tests and this report change. The identical
+`JSON.stringify({authority,request})` request is converted to UTF-8 and written
+completely to a uniquely created temporary directory (0700 on POSIX), with an
+exclusive/no-follow file open (0600). Positional writes leave the descriptor
+at offset zero; the same descriptor is inherited as child stdin, without a
+path reopen or a stdin pipe. The child reads ordinary-file EOF. No shell or
+request-bearing command argument is introduced. Programs, arguments, codec
+logic, JSON output interpretation, semantic assertions, the 256 MiB output
+buffer cap and the **120,000 ms timeout** remain unchanged. No retries,
+timeout increases, suppression or semantic transformations are added.
+
+A nested `finally` closes the descriptor and removes the private directory
+and request after success, decoder rejection, process failure, spawn failure,
+thrown launch error and timeout. Cleanup errors fail the invocation rather
+than being hidden. The optional launch/root parameters are test seams, not
+fixture-selected configuration. Output pipes remain managed by `spawnSync`;
+raw output buffers permit exact byte counts before the existing UTF-8/JSON
+interpretation. Failed invocation/output checks expose only codec, executable,
+PID, status, signal, error code, elapsed milliseconds and input/stdout/stderr
+byte counts where available. They do not print requests, authority material,
+child output or exception messages containing such material.
+
+The cost is private local temporary storage and file I/O per invocation,
+including roughly 11 MB of repeated governing material for ordinary requests.
+Normal completion leaves no request file. This is unlinking, not a forensic
+secure-erasure guarantee, nor crash recovery after power loss or forced parent
+termination. Permissions and behavior were exercised on macOS arm64; the
+supported Node/Python runtime range is unchanged, but these runs do not prove
+all-platform behavior or indefinite freedom from intermittent failures.
+
+### Added controls and exact accounting
+
+Eight transport test groups add to, rather than replace, all 203 existing
+experiment tests:
+
+1. Node and Python consume the full approximately 11 MB request, independently
+   report its exact byte count/SHA-256 and observe ordinary-file EOF.
+2. Deliberately truncating delivery by one byte causes the exact-input assertion
+   to fail even though the probe successfully exits and observes EOF.
+3. Both output pipes drain 3,145,728 bytes each, with exact diagnostic counts.
+4. Both actual codec paths verify regular-file stdin; unchanged valid encoding
+   and decoder rejection exercise cleanup.
+5. Nonzero exit cleans up and reports metadata without echoed private material.
+6. A thrown launch error cleans up and redacts its private exception message.
+7. Missing executable and malformed output clean up and retain safe diagnostics.
+8. A real child exceeds the unchanged 120-second deadline, receives SIGTERM,
+   returns ETIMEDOUT and is reaped; its input file and descriptor are removed.
+
+The controls assert absent temporary entries, closed descriptors (EBADF) and
+absent child PIDs (ESRCH), as applicable. The deliberate timeout is an expected
+passing control, not an unexpected suite timeout. Each full experiment run
+therefore takes at least 120 seconds longer than execution without that control.
+These groups are not new semantic vectors or semantic mutants. Counts are
+**211 experiment tests** and **513 complete tests** (302 + 203 + 8). The 64
+positives, 67 negatives, 43 mutations, binding/runner/provenance tests and
+18 hand-derived anchors remain unchanged. The anchors do not cover every
+complex encoding family.
+
+### Bounded correction-validation record
+
+All attempts below used the same corrected executable bytes in a full-history
+checkout, Node 24.19.0 / libuv 1.52.1 on macOS arm64. Python 3.12.14 retained
+its default 4,300-digit conversion limit; Python 3.9.6 was `/usr/bin/python3`.
+The table records wall durations, rounded to milliseconds. No failed attempt
+was discarded or retried. During the matrix, a temporary idle-sleep assertion
+kept the host awake without changing saved power settings or test deadlines.
+
+| Run | Python | File scheduling | Passed/total | Seconds |
+|---|---|---|---:|---:|
+| Focused transport controls, excluding the real timeout | 3.12.14 | Default | 7/7 | 0.829 |
+| Experiment 1 | 3.12.14 | Default | 211/211 | 242.354 |
+| Experiment 2 | 3.12.14 | Default | 211/211 | 237.847 |
+| Experiment 3 | 3.12.14 | Serial | 211/211 | 242.048 |
+| Experiment 4 | 3.12.14 | Serial | 211/211 | 237.971 |
+| Experiment 5 | 3.9.6 | Default | 211/211 | 250.742 |
+| Experiment 6 | 3.9.6 | Serial | 211/211 | 250.449 |
+| Complete 1 | 3.12.14 | Default | 513/513 | 242.388 |
+| Complete 2 | 3.12.14 | Serial | 513/513 | 264.699 |
+| Complete 3 | 3.9.6 | Serial | 513/513 | 279.887 |
+
+For every row, failed, skipped and cancelled counts were zero. The nine matrix
+runs had no unexpected timeout, remaining sampled child or temporary-input
+residue. Process-tree sampling was once per second; it supplements the focused
+descriptor/PID cleanup assertions rather than proving observation of every
+short-lived process. Default Node file concurrency was nine on this ten-way
+host; there is one experiment test file and four complete-suite test files.
+Serial scheduling is `--test-concurrency=1`, not case filtering. Only the
+separate seven-test focused command excludes the real timeout; all nine matrix
+runs include it and every original assertion.
+
+Exact command forms (with `PYTHON` set to the stated interpreter) were:
+
+```sh
+node --test --test-reporter=tap --test-name-pattern='^representation transport (?!real unchanged timeout)' experiments/bounded-event-representation/compare.test.mjs
+node --test --test-reporter=tap experiments/bounded-event-representation/compare.test.mjs
+node --test --test-reporter=tap --test-concurrency=1 experiments/bounded-event-representation/compare.test.mjs
+node --test --test-reporter=tap
+node --test --test-reporter=tap --test-concurrency=1
+```
+
+All 16 historical repository pins and six external fingerprints reverify.
+The existing selector binding, tampering rejection and missing-history/no-HEAD-
+fallback controls pass in the suites. Codecs, vectors, historical pins,
+selectors, source loader, prior experiments, profiles, specifications and
+workflows remain byte-identical to the merge base. The revised 18-file
+inventory, using §8's diagnostic algorithm, is
+`e3d49d9008fc5f7151427fe8f6919e42962a4e8bf0f335ebdd7f5fc354ac283e`;
+§8's different inventory remains the historical PR #100 record.
+
+Documentation validation passed for 152 Markdown documents. The three-file
+diff passed `git diff --check` and strict UTF-8, LF, trailing-whitespace and
+single-final-newline checks, with no BOM, literal NUL, replacement character or
+bidirectional-control characters. Actions still run only documentation validation and documentation-validator
+tests, not the complete suite above. Both stashes remain unapplied and the
+retained PR #100 branch is unchanged. These reliability checks do not establish
+general representation conformance, independent-team replication,
+authentication, fresh Lifecycle admission/projection evidence, portable
+readiness or approval of either Draft.

@@ -1,10 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync,mkdtempSync,mkdirSync,writeFileSync,rmSync} from 'node:fs';
+import {readFileSync,mkdtempSync,mkdirSync,writeFileSync,rmSync,readdirSync,statSync,fstatSync,ftruncateSync} from 'node:fs';
+import {createHash} from 'node:crypto';
 import {tmpdir} from 'node:os';
 import {join,dirname} from 'node:path';
 import {spawnSync} from 'node:child_process';
-import {fixtures,validateCases,governingContext,expand,invoke,positive,exactSemantics,checkedOutput} from './compare.mjs';
+import {fixtures,validateCases,governingContext,expand,invoke,positive,exactSemantics,checkedOutput,fileBackedProcess} from './compare.mjs';
 import {dir,pins,historical,verify,profileBinding} from './source-loader.mjs';
 import {patched} from './negative-plumbing.mjs';
 import {mutations,once,sourceFor} from './mutants.mjs';
@@ -177,4 +178,86 @@ test('representation missing establishment canonicalizes to unavailable only bef
   inputs.set('assessment_establishments',[]);
   const hex=cbor(root).toString('hex');
   for(const language of ['A','B'])assert.deepEqual(invoke(language,{op:'decode',type:'package',hex},authority),{ok:false,error:'binding/establishment-subjects'});
+});
+
+// Transport controls are not additional semantic vectors or codec mutations.
+const pythonCommand=process.env.PYTHON??'python3';
+const inputProbe="const fs=require('node:fs'),crypto=require('node:crypto');const b=fs.readFileSync(0);console.log(JSON.stringify({ok:true,value:{bytes:b.length,sha256:crypto.createHash('sha256').update(b).digest('hex'),eof:fs.readSync(0,Buffer.alloc(1),0,1,null),regular:fs.fstatSync(0).isFile()}}));";
+const pythonProbe="import sys,os,stat,hashlib,json\nb=sys.stdin.buffer.read()\nprint(json.dumps({'ok':True,'value':{'bytes':len(b),'sha256':hashlib.sha256(b).hexdigest(),'eof':len(sys.stdin.buffer.read(1)),'regular':stat.S_ISREG(os.fstat(0).st_mode)}}))";
+function transportControl(command,args,input,mutate=()=>{}){
+  const root=mkdtempSync(join(tmpdir(),'ve-transport-control-'));let fd;
+  try{
+    const r=fileBackedProcess(command,args,input,'control',{tempRoot:root,launch:(c,a,options)=>{
+      fd=options.stdio[0];assert.equal(typeof fd,'number');assert.ok(fstatSync(fd).isFile());
+      assert.equal(Object.hasOwn(options,'input'),false);assert.equal(options.timeout,120000);
+      const dirs=readdirSync(root);assert.equal(dirs.length,1);
+      if(process.platform!=='win32'){
+        assert.equal(statSync(join(root,dirs[0])).mode&0o777,0o700);
+        assert.equal(fstatSync(fd).mode&0o777,0o600);
+      }
+      mutate(fd,options);return spawnSync(c,a,options);
+    }});
+    assert.deepEqual(readdirSync(root),[],'temporary input residue');
+    if(fd!==undefined)assert.throws(()=>fstatSync(fd),{code:'EBADF'});
+    if(r.pid)assert.throws(()=>process.kill(r.pid,0),{code:'ESRCH'},'child must be reaped');
+    assert.equal(r.diagnostics.executable,command);assert.equal(r.diagnostics.codec,'control');
+    assert.equal(r.diagnostics.inputBytes,Buffer.byteLength(input));
+    assert.ok(Number.isFinite(r.diagnostics.elapsedMs)&&r.diagnostics.elapsedMs>=0);
+    return r;
+  }finally{rmSync(root,{recursive:true,force:true});}
+}
+const transportInput=()=>JSON.stringify({authority,request:{op:'decode',type:'u64',hex:'20'}});
+function assertExactInput(r,input){
+  assert.deepEqual(checkedOutput(r),{ok:true,value:{bytes:Buffer.byteLength(input),sha256:createHash('sha256').update(input).digest('hex'),eof:0,regular:true}},'transport/exact-input-and-EOF');
+}
+test('representation transport exact large input and ordinary-file EOF in both languages',()=>{
+  const input=transportInput();assert.ok(Buffer.byteLength(input)>11_000_000);
+  for(const [command,args]of [[process.execPath,['-e',inputProbe]],[pythonCommand,['-B','-c',pythonProbe]]])assertExactInput(transportControl(command,args,input),input);
+});
+test('representation transport truncated delivery is detected independently',()=>{
+  const input=transportInput();
+  const r=transportControl(process.execPath,['-e',inputProbe],input,fd=>ftruncateSync(fd,Buffer.byteLength(input)-1));
+  assert.equal(r.status,0);assert.throws(()=>assertExactInput(r,input),/transport\/exact-input-and-EOF/);
+});
+test('representation transport drains large stdout and stderr with exact byte diagnostics',()=>{
+  const code="const fs=require('node:fs');fs.readFileSync(0);for(let i=0;i<48;i++){fs.writeSync(1,Buffer.alloc(65536,111));fs.writeSync(2,Buffer.alloc(65536,101));}";
+  const r=transportControl(process.execPath,['-e',code],transportInput());assert.equal(r.status,0);
+  assert.equal(r.stdout,'o'.repeat(3145728));assert.equal(r.stderr,'e'.repeat(3145728));
+  assert.equal(r.diagnostics.stdoutBytes,3145728);assert.equal(r.diagnostics.stderrBytes,3145728);
+});
+test('representation transport actual Node and Python codec paths use files and clean decoder rejection',()=>{
+  const before=readdirSync(tmpdir()).filter(x=>x.startsWith('ve-event-stdin-')).sort();
+  for(const language of ['A','B']){
+    const guard=language==='A'?"\nif(!(await import('node:fs')).fstatSync(0).isFile())throw Error('transport/not-file');":"\nimport os,stat\nassert stat.S_ISREG(os.fstat(0).st_mode), 'transport/not-file'\n";
+    const source=sourceFor(language)+guard;
+    assert.deepEqual(invoke(language,{op:'encode',type:'text',value:'e\u0301'},authority,source),{ok:true,value:'4365cc81'});
+    assert.deepEqual(invoke(language,{op:'decode',type:'u64',hex:'20'},authority,source),{ok:false,error:'domain/uint64'});
+  }
+  assert.deepEqual(readdirSync(tmpdir()).filter(x=>x.startsWith('ve-event-stdin-')).sort(),before);
+  const r=transportControl(process.execPath,['-e',"console.log(JSON.stringify({ok:false,error:'domain/uint64'}))"],'rejection-input');
+  assert.deepEqual(checkedOutput(r),{ok:false,error:'domain/uint64'});
+});
+test('representation transport process failure cleans and reports metadata without material',()=>{
+  const secret='SENSITIVE-TRANSPORT-SENTINEL';
+  const r=transportControl(process.execPath,['-e',"const b=require('node:fs').readFileSync(0);process.stdout.write(b);process.stderr.write(b);process.exitCode=7;"],secret);
+  assert.equal(r.diagnostics.status,7);assert.equal(r.diagnostics.signal,null);assert.equal(r.diagnostics.errorCode,null);
+  assert.equal(r.diagnostics.stdoutBytes,secret.length);assert.equal(r.diagnostics.stderrBytes,secret.length);
+  assert.throws(()=>checkedOutput(r),e=>e.message.startsWith('runner/subprocess:')&&!e.message.includes(secret)&&e.message.includes('"pid":')&&e.message.includes('"elapsedMs":'));
+});
+test('representation transport thrown launch error cleans and redacts exception text',()=>{
+  const r=transportControl(process.execPath,[],'private-input',()=>{throw Object.assign(Error('private-input'),{code:'CONTROLLED_THROW'});});
+  assert.equal(r.diagnostics.errorCode,'CONTROLLED_THROW');assert.equal(r.diagnostics.pid,null);
+  assert.throws(()=>checkedOutput(r),e=>e.message.includes('CONTROLLED_THROW')&&!e.message.includes('private-input'));
+});
+test('representation transport spawn and malformed-output failures clean and carry diagnostics',()=>{
+  const r=transportControl(join(tmpdir(),'ve-no-such-executable','absent'),[],'private-input');
+  assert.equal(r.diagnostics.errorCode,'ENOENT');assert.throws(()=>checkedOutput(r),/runner\/subprocess/);
+  const bad=transportControl(process.execPath,['-e',"process.stdout.write('private-malformed-output')"],'private-input');
+  assert.throws(()=>checkedOutput(bad),e=>e.message.startsWith('runner/malformed-output:')&&!e.message.includes('private-malformed-output')&&e.message.includes('"stdoutBytes":24'));
+});
+test('representation transport real unchanged timeout terminates reaps and cleans',()=>{
+  const r=transportControl(process.execPath,['-e',"require('node:fs').readFileSync(0);setTimeout(()=>{},130000);"],'timeout-input');
+  assert.equal(r.diagnostics.errorCode,'ETIMEDOUT');assert.equal(r.diagnostics.status,null);assert.equal(r.diagnostics.signal,'SIGTERM');
+  assert.ok(r.diagnostics.elapsedMs>=120000,'unchanged 120-second deadline');
+  assert.throws(()=>checkedOutput(r),/runner\/subprocess/);
 });
