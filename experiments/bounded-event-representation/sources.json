@@ -1,0 +1,101 @@
+{
+  "format": "bounded-event-representation-source-pins-1",
+  "representation": {
+    "commit": "bc080e6037bdd3129d5132d90d9253ed85f59c1b",
+    "path": "specifications/BOUNDED-LIFECYCLE-EVENT-REPRESENTATION-PROFILE.md",
+    "blob": "6893d9caaf10a91b7d5c4ea5c5a7cf1022bbbc73",
+    "sha256": "8217fe6e6890dba182ebc8dcc2d4f9deeed824b71b3fddcfc31b0cf7458ce56e"
+  },
+  "semantic": {
+    "commit": "162de90510e7d64f6970d7ff0e9df6ee2dbd4d17",
+    "path": "specifications/BOUNDED-LIFECYCLE-EVENT-TYPE-SEMANTIC-PROFILE.md",
+    "blob": "a8a88e94be403be9ffc0efd01986a5db9446757e",
+    "sha256": "dfd184858a0a925c8da37c67a2ddd6c69e89f7ed064446779ed2122950e98c2b"
+  },
+  "imports": [
+    {
+      "commit": "56cdbbb34c10b603ce349b9b6ca0f6a48c2cc22f",
+      "path": "adrs/ADR-009-ve-occurrence-identifier-representation.md",
+      "blob": "b3fee4fee9a043e17fa418f986c914952555b5e7",
+      "sha256": "a02fe71422fce209e8b9676454ef7a944eb1be93e8d6de751b86cfe6fd4f6475"
+    },
+    {
+      "commit": "56cdbbb34c10b603ce349b9b6ca0f6a48c2cc22f",
+      "path": "adrs/ADR-ENC-001-VE-CBOR-1.md",
+      "blob": "f346e33317f5c53b4685ab816a02c8ffefeb4f22",
+      "sha256": "d76f23a622e92ad23e6cd68c150a65a618925c037bb8004b9a0159ea8e15e48f"
+    },
+    {
+      "commit": "56cdbbb34c10b603ce349b9b6ca0f6a48c2cc22f",
+      "path": "specifications/EVENT-SEMANTIC-FIELD-CONTRACT.md",
+      "blob": "c5e3075a6108de197287c7d2328977ca8d25a9a6",
+      "sha256": "26b48935bb4ef61376579278cf64be10e7533acbacb936436f689e4ee07e13e4"
+    },
+    {
+      "commit": "56cdbbb34c10b603ce349b9b6ca0f6a48c2cc22f",
+      "path": "specifications/LYNX-UG2026-CAD-CUSTOMER-CREDIT-TRANSFER-INTERBANK-SETTLEMENT-ACTION-SCHEMA.md",
+      "blob": "a3dfa9194141d53f69322c4a2ad93ccfc21426c1",
+      "sha256": "87a72d0e23c876a1ffe85222246c6a537613365a3809478636e7073caa852640"
+    },
+    {
+      "commit": "56cdbbb34c10b603ce349b9b6ca0f6a48c2cc22f",
+      "path": "rfcs/RFC-009-ve-occurrence-identifier-representation.md",
+      "blob": "1cc48903706f28d3eef0cf592d8c2189a99421e2",
+      "sha256": "781b870b73f14945cea4f6875f227bed97a65e772163e51b7cd7e73032f36653"
+    },
+    {
+      "commit": "56cdbbb34c10b603ce349b9b6ca0f6a48c2cc22f",
+      "path": "SPECIFICATION_GOVERNANCE.md",
+      "blob": "cd406061dfcdbaf091e0e9c2d8c5ed65f23aaf05",
+      "sha256": "0e4f0180cd97ae2357379f9b5bdc8eb75afe3971a45945884c73e9cb72e0d24f"
+    },
+    {
+      "commit": "56cdbbb34c10b603ce349b9b6ca0f6a48c2cc22f",
+      "path": "specifications/VE-000-verified-execution-core-specification.md",
+      "blob": "f9b174e5cb43a62014402df7342553485ec0a68d",
+      "sha256": "a9537aa20f098ec30deaa293b8dad3c9e99f67a5039b0adee26c24163a568802"
+    },
+    {
+      "commit": "56cdbbb34c10b603ce349b9b6ca0f6a48c2cc22f",
+      "path": "specifications/VE-001-action-specification.md",
+      "blob": "4ad588fba3475fbeb83d4c0958e4d9f75e56fd89",
+      "sha256": "ee4e37f43be4e2f630636f79cbaa39f1d688107477bd5d9bcb03e628985bd2b5"
+    },
+    {
+      "commit": "56cdbbb34c10b603ce349b9b6ca0f6a48c2cc22f",
+      "path": "specifications/VE-001-ACTION-CANONICAL-REPRESENTATION-PROFILE.md",
+      "blob": "fc3ae376e02339d67a8760a747ad55116b80a10f",
+      "sha256": "9b79efcb630513212b3397ca60c74a66f32bd7aeb8877139e87c5a910a843ed3"
+    },
+    {
+      "commit": "56cdbbb34c10b603ce349b9b6ca0f6a48c2cc22f",
+      "path": "specifications/VE-002-event-specification.md",
+      "blob": "b7ee2bafd8e2483e506961e5dabfe778939aa38f",
+      "sha256": "fa8f6fd2b7d497b775de1df84b9d478824bd3c31f68b7d1992713508628c7fee"
+    },
+    {
+      "commit": "56cdbbb34c10b603ce349b9b6ca0f6a48c2cc22f",
+      "path": "specifications/VE-003-lifecycle.md",
+      "blob": "f95c55596dfe6b33f9343cbb8914cadffd4a7073",
+      "sha256": "2e2852c53c004a93ec6c21902c2b110772fe4ebb9b7a151bd2e7aaa6856322b3"
+    },
+    {
+      "commit": "56cdbbb34c10b603ce349b9b6ca0f6a48c2cc22f",
+      "path": "specifications/VE-004-receipt-specification.md",
+      "blob": "2800f3a13423754dfe4e3ab11fd3fb3f226ee9f1",
+      "sha256": "01c9d183239a145518089ebdb8fd16a8789666dd06e424bf66556f32a28c23fd"
+    },
+    {
+      "commit": "56cdbbb34c10b603ce349b9b6ca0f6a48c2cc22f",
+      "path": "specifications/VE-005-adapter-specification.md",
+      "blob": "6ecafd9b3fe8156ccaa1770ff94ee3a8348fb8bc",
+      "sha256": "17ba6a8f8c034df7041692e1bb1c96704b8f4704453aa28bc1d958123496d98b"
+    },
+    {
+      "commit": "56cdbbb34c10b603ce349b9b6ca0f6a48c2cc22f",
+      "path": "specifications/VE-006-execution-boundary-specification.md",
+      "blob": "2897359cb70ed092e8ca7753552fc950df5bc857",
+      "sha256": "5f0f78b9e67c02c81f66c4e70a0238b8e0446128cd5a78f50108eaf7b07296e7"
+    }
+  ]
+}
