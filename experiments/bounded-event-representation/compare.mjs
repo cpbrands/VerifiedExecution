@@ -1,6 +1,8 @@
 // Shared fixture expansion, process transport and comparison; no codec logic.
 import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';
+import {readFileSync,mkdtempSync,chmodSync,openSync,writeSync,closeSync,rmSync,constants} from 'node:fs';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
 import {spawnSync} from 'node:child_process';
 import {fileURLToPath,pathToFileURL} from 'node:url';
 import {catalog,pins,dir} from './source-loader.mjs';
@@ -57,13 +59,45 @@ export function expand(value,authority,active=new Set()){
   }
   return Object.fromEntries(Object.entries(value).map(([k,v])=>[k,expand(v,authority,active)]));
 }
+// The optional launch/root parameters are test seams, never fixture-controlled.
+// Positional writes preserve offset zero on the inherited descriptor. No stdin
+// pipe, shell, retry, timeout override or request-bearing command argument exists.
+export function fileBackedProcess(command,args,input,codec,{launch=spawnSync,tempRoot=tmpdir()}={}){
+  const bytes=Buffer.from(input,'utf8'),started=performance.now();let r;
+  try{
+    const temporary=mkdtempSync(join(tempRoot,'ve-event-stdin-'));let fd;
+    try{
+      chmodSync(temporary,0o700);
+      fd=openSync(join(temporary,'request'),constants.O_CREAT|constants.O_EXCL|constants.O_RDWR|(constants.O_NOFOLLOW??0),0o600);
+      for(let offset=0;offset<bytes.length;){
+        const n=writeSync(fd,bytes,offset,bytes.length-offset,offset);
+        if(n===0)throw Object.assign(Error('input write made no progress'),{code:'INPUT_WRITE_ZERO'});
+        offset+=n;
+      }
+      r=launch(command,args,{stdio:[fd,'pipe','pipe'],encoding:'buffer',timeout:120000,maxBuffer:256*1024*1024});
+    }finally{
+      try{if(fd!==undefined)closeSync(fd);}finally{rmSync(temporary,{recursive:true,force:true});}
+    }
+  }catch(error){
+    // Do not include exception messages, arguments or child output: they can
+    // contain semantic material. A cleanup failure also fails the invocation.
+    r={...r,error:{code:error.code??'TRANSPORT_EXCEPTION'},status:r?.status??null};
+  }
+  r.diagnostics={codec,executable:command,pid:r.pid??null,status:r.status??null,signal:r.signal??null,errorCode:r.error?.code??null,
+    elapsedMs:performance.now()-started,inputBytes:bytes.length,stdoutBytes:Buffer.byteLength(r.stdout??''),stderrBytes:Buffer.byteLength(r.stderr??'')};
+  if(Buffer.isBuffer(r.stdout))r.stdout=r.stdout.toString('utf8');
+  if(Buffer.isBuffer(r.stderr))r.stderr=r.stderr.toString('utf8');
+  return r;
+}
 export function checkedOutput(r){
-  assert.ok(!r.error&&r.status===0,`runner/subprocess: ${r.error?.message??r.stderr}`);
+  assert.ok(!r.error&&r.status===0,`runner/subprocess: ${JSON.stringify(r.diagnostics??{status:r.status??null,errorCode:r.error?.code??null})}`);
+  try{
   let out;try{out=JSON.parse(r.stdout);}catch{throw Error('runner/malformed-output');}
   assert.ok(out&&typeof out==='object'&&!Array.isArray(out),'runner/malformed-output');
   assert.equal(typeof out.ok,'boolean','runner/malformed-output');
   assert.deepEqual(Object.keys(out).sort(),out.ok?['ok','value']:['error','ok'],'runner/malformed-output');
   if(!out.ok)assert.equal(typeof out.error,'string','runner/malformed-output');return out;
+  }catch(error){throw Error(`runner/malformed-output: ${JSON.stringify(r.diagnostics??{})}`);}
 }
 export function invoke(language,request,authority,source=null){
   const command=language==='A'?process.execPath:(process.env.PYTHON??'python3');
@@ -77,7 +111,7 @@ export function invoke(language,request,authority,source=null){
       args=['-B','-c',source+'\nimport json,sys\ncodec=sys.modules[__name__]\nmessage=json.load(sys.stdin)'+wrapper];
     }
   }
-  const r=spawnSync(command,args,{input:JSON.stringify({authority,request}),encoding:'utf8',timeout:120000,maxBuffer:256*1024*1024});
+  const r=fileBackedProcess(command,args,JSON.stringify({authority,request}),language);
   return checkedOutput(r);
 }
 function normalized(value,key=''){
