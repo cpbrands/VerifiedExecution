@@ -48,10 +48,18 @@ AUTHORIZATION_GRANTED, EXECUTION_STARTED, EXECUTION_COMPLETED,
 EXECUTION_FAILED. No other owner or transition becomes supported here.
 
 **Conclusion:** explicit canonicality, exact-value and immutable-source controls
-have bounded same-author support. The strongest outstanding author-controlled
-risks are end-to-end resource containment and hostile-input/failure-path evidence.
-Confidentiality, durable material access and secure operational establishment
-also require owners. Approval is not recommended on this evidence alone.
+have bounded same-author support. Abstract-profile approval remains gated on the
+representation mapping, canonicality, full-domain preservation, failure-contract
+clarity, immutable owner/dependency availability, security analysis of the
+abstract representation and independent-implementability evidence. The strongest
+outstanding author-controlled implementation-assurance risks are end-to-end
+resource containment and hostile-input/failure-path evidence. Environment and
+interpreter trust, temporary storage, crash residue, operational confidentiality,
+logging, retention, backups and recovery are separate deployment gates requiring
+their owners. Abstract-profile approval is not recommended on the current record,
+but T06/T11/T12 or an unanswered operational-owner request block that approval
+only if it demonstrates a general defect in the mapping, failure contract, domain
+preservation, canonicality, dependency completeness or independent implementability.
 No demonstrated conflict with Approved semantics, necessary new primitive or
 duplicated execution authority is found. No RFC/ADR is required for this analysis.
 
@@ -209,9 +217,13 @@ stop**. A threat may have several, since code, specification and deployment
 obligations are not interchangeable. No new tests or exploit claims occur here.
 
 Assessment completion means every threat has a trace, residual risk, owner and
-decision; it does not mean every risk is resolved. Approval needs independent
-review of outstanding security/coverage questions and explicit owner disposition
-under Governance §§16–18. Deployment needs its own threat/risk acceptance.
+decision; it does not mean every risk is resolved. Abstract-profile approval
+needs independent review of its mapping, canonicality, full-domain/failure
+contract, dependency completeness, abstract security properties and independent
+implementability under Governance §§16–18. Implementation assurance needs its
+own parser/resource, failure-path, adversarial and platform evidence. Deployment
+needs its own threat/risk acceptance and operational-owner dispositions. One
+gate class cannot be reported as satisfying either of the others.
 Stop affected work if a mitigation would narrow admitted Text/integer/rational/
 structural values, normalize them, change canonical bytes, retarget identifiers
 or alter Approved semantics. Use versioned profile and applicable RFC/ADR/spec
@@ -525,38 +537,45 @@ governance instead; do not encode a mitigation as a hidden conformance rule.
 
 ## 5. Risk disposition and approval gates
 
-| Disposition | Exact assessment |
-|---|---|
-| Currently controlled, bounded evidence only | T01/T03 selected canonical and malformed forms; T07 exact fixed provenance/selector; T08 retention/unsupported boundaries; T11 normal transport paths. These are not universal parser or security proofs. |
-| Accepted for bounded Draft investigation only | Synthetic, reviewed, local inputs with trusted environment: T04–T06 resource costs, T10 material handling, T11–T12 local process/storage assumptions. This document cannot accept a deployment owner's risk. |
-| Blocks representation approval on the present record | Independent scrutiny of full-domain/canonical argument and residual parser/authority differentials (T01–T03/T07–T09); end-to-end failure/resource evidence and disposition (T04–T06/T12); explicit security/material/retention owner dispositions (T10–T13), plus existing Draft dependency maturity. Closing this document does not close those gates. |
-| Needs executable adversarial evidence | Missing combinations in T01–T03; size/depth/pre-parser/algorithmic paths in T04–T06; failure/inheritance/crash/cleanup boundaries in T11–T12; acquisition budget paths in T13. Plans below are not executed tests. |
-| Requires operational controls | Safe presentation, independent version/authority establishment, access/encryption/retention, trusted launch and filesystem, resource isolation and durable lawful materials. Not all must be kernel features or normative representation rules. |
-| Requires independent review | Security reviewer checks threat assumptions and residual acceptance; separate implementer tests correlated-codec/anchor gaps. Same-author source review and differently structured codecs are not independent-team evidence. |
+| Gate class | Exact assessment | Consequence |
+|---|---|---|
+| **Abstract-profile approval** | Review the representation mapping, canonicality/injectivity, full-domain preservation, failure-contract clarity, immutable owner/dependency availability and security properties of the abstract representation; obtain evidence of independent implementability. T01–T03/T07–T09 inform these questions, while T13's durable immutable-material concern remains a legitimate representation-completeness issue. | These items block abstract-profile approval on the present record. Same-author codecs and finite vectors do not close them. A harness finding blocks this gate only when it demonstrates a general problem with the mapping, failure contract, domain preservation, canonicality, dependency completeness or independent implementability. |
+| **Implementation assurance** | Establish parser/resource behavior, implementation-specific failure handling, executable adversarial outcomes and platform-specific correctness for each claimed implementation. T03–T06 and relevant T11–T13 paths require bounded evidence. | Blocks assurance claims for the affected implementation. T06/T11/T12 do not unconditionally block abstract-profile approval merely because this experiment harness retains implementation risk. A general profile defect discovered through that evidence is escalated to the abstract-profile gate. |
+| **Deployment** | Establish environment/interpreter trust, temporary-storage and crash-residue handling, operational confidentiality, safe logging/presentation, retention, backups, recovery, authentication/establishment integration and resource isolation. T02/T09–T13 and named operational owners govern these duties. | Blocks deployment or a deployment-specific risk acceptance, not abstract-profile approval by default. An unanswered owner request remains visible; it changes the profile gate only if it exposes one of the general representation/dependency problems above. |
+| **Currently controlled, bounded evidence only** | T01/T03 selected canonical and malformed forms; T07 exact fixed provenance/selector; T08 retention/unsupported boundaries; T11 normal transport paths. | These are not universal parser, profile-security or deployment proofs. |
+| **Accepted for bounded Draft investigation only** | Synthetic, reviewed, local inputs with trusted environment: T04–T06 resource costs, T10 material handling, T11–T12 local process/storage assumptions. | Permits only the stated investigation. This document cannot accept a deployment owner's risk or approve the abstract profile. |
+| **Requires independent review** | A security reviewer checks threat assumptions and residual classification; a separate implementer tests correlated-codec/anchor gaps. | Same-author source review and differently structured codecs are not independent-team evidence. |
 
 The R1–R9 readiness risks are all disposed, not all resolved: R1 → T10;
 R2/R3 → T11; R4 → T04/T05/T06; R5 → T03/T05/T06;
 R6 → T12; R7 → T07/T13; R8 → T09; R9 → T01/T02/T07/T08.
 
 Reviewers may accept justified residual operational risks for a precisely stated
-deployment; documenting risks alone is not acceptance. A production trust/clock
-implementation is not required merely to keep this subordinate profile Draft.
-Neither independent-team replication nor any finite vector set proves the entire
-unbounded finite domain. Approval requires reasoned coverage and a full-domain
-argument, not an impossible exhaustive enumeration or a raw test-count threshold.
+deployment; documenting risks alone is not acceptance, and an operational-owner
+response is not an unconditional abstract-profile approval gate. A production
+trust/clock implementation is not required merely to keep this subordinate profile
+Draft. Neither independent-team replication nor any finite vector set proves the
+entire unbounded finite domain. Abstract-profile approval requires reasoned coverage,
+a full-domain argument and evidence of independent implementability, not an
+impossible exhaustive enumeration or a raw test-count threshold.
 
 ## 6. Prioritized evidence/remediation plan and one next artifact
 
-1. **Priority 1, author-controlled:** produce a bounded resource/failure evidence
-   package for T03–T06 and T11–T13, preceded by independent review of this threat
-   model. Isolate decoder costs from fixture/JSON/authority/download/transport
-   costs; use synthetic material and predeclared per-run/aggregate budgets.
-2. **Priority 1, external/operational:** request data/publication and launch/storage
-   owner dispositions for T02/T07/T09–T13. Lack of response remains an open
-   deployment/approval gate, not an implementation default.
-3. **Priority 2, independent assurance:** obtain canonical/full-domain review and
-   independent-implementation evidence targeted at unanchored complex families,
+1. **Priority 1, author-controlled implementation assurance:** produce a bounded
+   resource/failure evidence package for T03–T06 and T11–T13, preceded by
+   independent review of this threat model. Isolate decoder costs from fixture/
+   JSON/authority/download/transport costs; include the isolated semantic-domain
+   rejection control below; use synthetic material and predeclared per-run/
+   aggregate budgets. This selected next artifact does not itself close the
+   abstract-profile or deployment gates.
+2. **Priority 1, abstract-profile assurance:** obtain canonical/full-domain review
+   and independent-implementation evidence targeted at unanchored complex families,
    malformed combinations, foreign/opaque boundaries and platform differences.
+3. **Priority 1, external/deployment:** request data/publication and launch/storage
+   owner dispositions for T02/T07/T09–T13. Lack of response remains an open
+   deployment gate, not an implementation default or unconditional abstract-profile
+   blocker. Immutable owner-material availability remains separately relevant to
+   representation completeness.
 4. **Only after evidence identifies a defect:** propose the smallest local fix
    with exact regression. Do not modify code, pins, bytes or timeout here; escalate
    semantic conflicts before fixing them. Allocation/promotion remains later work.
@@ -580,6 +599,17 @@ Its minimum acceptance criteria, subject to separate authorization:
   chosen for costly comparisons and pre-parser allocation. Cover exact admitted
   Text controls without executing/rendering them unsafely. Include small valid
   controls so fast early failures cannot masquerade as exercised expensive paths.
+- Include one isolated semantic-domain rejection under sufficient resources. The
+  selected witness is the existing well-formed canonical carrier value
+  `calendar-year-zero`: its endpoint year
+  `0` violates P §5.2's pinned rule that year is a positive mathematical integer.
+  Its nearby valid control is the same well-formed canonical endpoint with year
+  `1` and every other component unchanged. Derive the rejection oracle explicitly
+  from P §5.2; do not infer it from codec output. Record domain rejection separately
+  from malformed-carrier rejection, unsupported interpretation, resource
+  unavailability or incomplete processing, harness/process failure, and
+  authentication or establishment failure. Existing implementations may retain
+  their existing classifications; this criterion invents no error code or rule.
 - Define numeric CPU/wall/memory/disk/process/descriptor and repetition ceilings
   **before** running; a trusted external watchdog protects the test host where
   the harness cannot. Stop on budget exhaustion, unexpected output, retained
@@ -620,10 +650,12 @@ noncanonical data. Operational quotas produce incomplete processing; safe
 presentation produces a view, not replacement semantic content.
 
 This closes the author-controlled **assessment inventory and disposition** task,
-not independent review or risk remediation. P and R remain Draft. Both codecs
-remain same-author; the transport correction avoids the observed pipe path
-without proving its root cause. No general portability, authentication, fresh
-admission/projection evidence or representation approval is established.
+not independent review, implementation assurance, deployment risk acceptance or
+risk remediation. P and R remain Draft. Both codecs remain same-author; the
+transport correction avoids the observed pipe path without proving its root cause.
+No general portability, authentication, fresh admission/projection evidence or
+representation approval is established. The three gate classes remain separate;
+the selected evidence package begins none of them in this change.
 
 ## 8. Verification of this document
 
@@ -643,4 +675,4 @@ permanent allocation, approval, PR merge or next-artifact execution occurs here.
 
 | Version | Date | Change |
 |---|---|---|
-| 0.1 | 2026-09-29 | Pin merged evidence, assess thirteen representation/integration/harness threats, separate demonstrated controls from residual owner/evidence duties, and select one bounded resource/failure evidence package without implementation or approval. |
+| 0.1 | 2026-09-29 | Pin merged evidence, assess thirteen representation/integration/harness threats, separate abstract-profile, implementation-assurance and deployment gates, and select one bounded resource/failure evidence package with an isolated semantic-domain control, without implementation or approval. |
