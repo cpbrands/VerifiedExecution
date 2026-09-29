@@ -20,6 +20,8 @@
   },
   "controlledInnerCutoffs": {
     "wallMilliseconds": 500,
+    "memoryBytes": 134217728,
+    "memoryAllocationBytes": 268435456,
     "fileBytes": 1024,
     "capturedOutputBytes": 65536
   }

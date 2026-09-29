@@ -35,6 +35,12 @@ test('resource outcomes, presentation, and aftermath stay distinct',()=>{
   assert.equal(incomplete.evidenceDisposition,'expected-incomplete-processing');
   assert.deepEqual(incomplete.actualOutcome,{A:'processing-incomplete/resource-limit',B:'processing-incomplete/resource-limit'});
   const text=results.attempts.find(a=>a.caseId==='valid-text-controls');assert.equal(text.presentation.view,'code-points-and-digest-only');
+  const memory=results.attempts.find(a=>a.caseId==='controlled-memory-watchdog-cutoff');
+  assert.equal(memory.evidenceDisposition,'test-safety-cutoff');assert.deepEqual(memory.actualOutcome,{watchdog:'aggregate-rss-memory-limit'});
+  assert.equal(memory.outcomeClass,'harness-process-failure');assert.equal(memory.inputBytes,0);assert.equal(memory.carrierBytes,null);
+  assert.equal(memory.caseObservations.configuredMemoryBytes,budgets.controlledInnerCutoffs.memoryBytes);
+  assert.ok(memory.caseObservations.syntheticAllocationBytes<budgets.perAttempt.memoryBytes);
+  assert.ok(memory.resources.peakRssBytes>budgets.controlledInnerCutoffs.memoryBytes);assert.ok(memory.resources.memoryMonitor.peakGroupMembers>=2);
   const fd=results.attempts.find(a=>a.caseId==='controlled-fd-cutoff');assert.equal(fd.caseObservations.openedDescriptors,fd.caseObservations.closedDescriptors);
-  for(const a of results.attempts){assert.equal(a.aftermath.processGroupSurvived,false);assert.deepEqual(a.aftermath.tempResidueAfterCleanup,[]);assert.equal(a.aftermath.cleanupError,null);assert.ok(a.resources.peakTempBytes<=budgets.perAttempt.fileBytes);}
+  for(const a of results.attempts){assert.equal(a.resources.aggregateMemoryWatchdogEnforced,true);assert.equal(a.aftermath.processGroupSurvived,false);assert.deepEqual(a.aftermath.tempResidueAfterCleanup,[]);assert.equal(a.aftermath.cleanupError,null);assert.ok(a.resources.peakTempBytes<=budgets.perAttempt.fileBytes);if(a!==memory)assert.ok(a.resources.peakRssBytes<=budgets.perAttempt.memoryBytes);}
 });

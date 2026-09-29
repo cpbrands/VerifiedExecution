@@ -40,10 +40,10 @@ external editions before any evidence case ran. Every attempt repeated source,
 base and inventory checks; there was no fallback to working-tree or current
 source bytes.
 
-The final bounded run recorded **29/29 expected attempts**, zero failed evidence
+The final bounded run recorded **30/30 expected attempts**, zero failed evidence
 assertions, zero inconclusive environmental results and zero deterministic
 implementation defects. One carrier was correctly classified as incomplete due
-to a resource guard; four controlled inner operations reached their predeclared
+to a resource guard; five controlled inner operations reached their predeclared
 safety cutoffs; one platform capability was recorded unsupported. These are not
 semantic invalidity. No result requires a representation/profile correction,
 Approved semantic change, RFC, ADR or new primitive.
@@ -68,25 +68,37 @@ before the final evidence run.
 | Concurrent attempts | 1 |
 | Aggregate wall time | 300,000 ms |
 | Controlled inner wall cutoff | 500 ms |
+| Controlled inner memory cutoff | 134,217,728 bytes |
+| Synthetic self-test allocation | 268,435,456 bytes |
 | Controlled inner file cutoff | 1,024 bytes |
 | Controlled inner output cutoff | 65,536 bytes |
 
 Each attempt ran as a separate process session under
 [watchdog.py](watchdog.py). On the recorded macOS host it enforced CPU,
-file-size and descriptor limits and an external wall timeout, bounded captured
-output, killed the whole process group on timeout, ran one attempt at a time,
-inventoried temporary material and recreated an empty isolation root after
-cleanup. The manifest code permits at most four worker/descendant processes and
-uses synchronous child calls; macOS supplied no safe per-attempt hard process
-count limit, so `platform-process-limit` records that hard capability as
-unsupported rather than claiming enforcement.
+file-size and descriptor limits and external wall and aggregate-memory cutoffs,
+bounded captured output, killed the whole process group on a cutoff, ran one
+attempt at a time, inventoried temporary material and recreated an empty
+isolation root after cleanup. The manifest code permits at most four
+worker/descendant processes and uses synchronous child calls; macOS supplied no
+safe per-attempt hard process count limit, so `platform-process-limit` records
+that hard capability as unsupported rather than claiming enforcement.
 
-macOS exposes `RLIMIT_AS` but rejected setting it in a pre-exec child. The
-watchdog therefore recorded hard memory enforcement as unavailable on this host,
-measured peak resident memory for every isolated attempt and stopped if the
-measured value exceeded 2 GiB. The maximum observed peak was 567,476,224 bytes.
-This is bounded host evidence, not proof against transient allocation or another
-platform's allocator behavior.
+The external memory monitor used `/bin/ps` every 25 ms to sum resident memory
+for every member of the isolated process group. A measurement or parsing failure
+stops the group and fails the attempt closed. Exceeding the applicable ceiling
+sends `SIGTERM` to the group, permits a bounded 250 ms descendant-reaping window,
+then sends `SIGKILL` to the same group if it remains. macOS exposes `RLIMIT_AS`
+but rejected setting it in a pre-exec child, so hard address-space enforcement
+remained unavailable while active aggregate-RSS enforcement was present. The
+largest ordinary attempt reached 679,952,384 bytes, below the 2,147,483,648-byte
+ceiling.
+
+The separate watchdog self-test used a 134,217,728-byte inner ceiling and a
+synthetic descendant that attempted a 268,435,456-byte allocation. The monitor
+observed two group members, crossed the inner ceiling at 144,556,032 bytes on
+sample six, terminated the group in 482.621 ms and found no surviving group or
+residue. That is a resource/safety cutoff, not semantic invalidity. No 2 GiB
+destructive allocation was used.
 
 ## 3. Evidence contract and classifications
 
@@ -111,15 +123,15 @@ and pass/failure/inconclusive classification. It retains expected failures and
 safety cutoffs alongside accepted values.
 
 The final run used Node v24.19.0, Python 3.9.6 and
-`macOS-27.0-arm64-arm-64bit`. It completed in 16,761 ms. Maxima were:
+`macOS-27.0-arm64-arm-64bit`. It completed in 17,203 ms. Maxima were:
 
 | Observation | Maximum |
 |---|---:|
 | Complete request | 30,104,554 bytes |
 | Canonical carrier | 9,484,254 bytes |
-| Attempt wall time | 1,146.149 ms |
-| Attempt CPU, user + system | 1.326123 s |
-| Peak RSS | 567,476,224 bytes |
+| Attempt wall time | 1,133.289 ms |
+| Attempt CPU, user + system | 1.581165 s |
+| Aggregate process-group peak RSS | 679,952,384 bytes |
 | Peak isolated temp material | 30,105,211 bytes |
 
 ## 4. Case inventory and actual outcomes
@@ -151,11 +163,12 @@ The final run used Node v24.19.0, Python 3.9.6 and
 | controlled cleanup failure | T11/T12 | inner `EACCES`, one inner residue inventoried, outer cleanup complete | pass |
 | controlled parent interruption | T11/T12 | `SIGTERM`, descendant cleanup issued, no surviving process group | pass |
 | hostile child | T12 | `ETIMEDOUT` at 500 ms, no surviving process group | test-safety cutoff |
-| FD exhaustion | T06/T12 | `EMFILE`; 52 opened descriptors and all 52 closed | test-safety cutoff |
+| memory watchdog self-test | T06/T12 | two-member group crossed 128 MiB inner ceiling; whole group terminated with no residue | test-safety cutoff |
+| FD exhaustion | T06/T12 | `EMFILE`; 53 opened descriptors and all 53 closed in this run | test-safety cutoff |
 | hard process-count capability | T12 | serial cap active; hard platform limit unavailable | unsupported platform |
 
 There were no deterministic defects, unexpected evidence failures or
-environmental inconclusives. The four safety cutoffs are deliberate bounded
+environmental inconclusives. The five safety cutoffs are deliberate bounded
 failure cases, not failed assertions. No case was automatically retried.
 
 ## 5. Isolated calendar-domain oracle
@@ -168,8 +181,8 @@ but year `0` violates that semantic field domain. Both implementations returned
 
 | Case | Complete input | Carrier | Carrier SHA-256 | Wall | Peak RSS | Outcome |
 |---|---:|---:|---|---:|---:|---|
-| year `0` | 11,165,373 bytes | 16 bytes | `f86e49dfee6ba1fe2e2a5fb2abec34163bdfade3da7ce4fe1495f7009f8b8549` | 299.846 ms | 123,748,352 bytes | A/B `domain/positive` |
-| year `1` | 11,165,478 bytes | 17 bytes | `1515f9388807116bb8137c16823d7166fdd722a12a90616167b0137736d85a39` | 423.478 ms | 124,125,184 bytes | A/B accepted |
+| year `0` | 11,165,373 bytes | 16 bytes | `f86e49dfee6ba1fe2e2a5fb2abec34163bdfade3da7ce4fe1495f7009f8b8549` | 287.96 ms | 187,318,272 bytes | A/B `domain/positive` |
+| year `1` | 11,165,478 bytes | 17 bytes | `1515f9388807116bb8137c16823d7166fdd722a12a90616167b0137736d85a39` | 409.462 ms | 241,369,088 bytes | A/B accepted |
 
 The values are otherwise identical. Neither attempt approached a safety budget.
 The result is semantic-domain rejection, not malformed carrier rejection,
@@ -201,8 +214,9 @@ Harness qualification preserved these stopped conditions in the development
 record rather than converting them into evidence passes:
 
 1. missing pinned external bodies failed closed before the first control;
-2. macOS rejected `RLIMIT_AS` in pre-exec, leading to the explicit unsupported
-   hard-memory capability and peak-RSS postcondition;
+2. macOS rejected `RLIMIT_AS` in pre-exec; the first published harness retained
+   only a peak-RSS postcondition, and review required the active aggregate-RSS
+   process-group monitor and controlled cutoff now recorded here;
 3. `xcrun_db` was detected as residue, then made an inventoried cleanup input;
 4. the first repeated-material candidate was 76,038,201 bytes and stopped before
    codec execution because it exceeded the 32 MiB input budget; the retained
@@ -213,7 +227,7 @@ record rather than converting them into evidence passes:
    publication.
 
 These are harness-qualification incidents, not representation failures. They
-have no fabricated duration/resource records and are not counted among the 29
+have no fabricated duration/resource records and are not counted among the 30
 final attempts.
 
 ## 8. Gate disposition and limitations
@@ -224,9 +238,10 @@ The three assurance gates remain separate:
   canonicality, injectivity, dependency-completeness or general failure-contract
   defect. Same-author finite evidence does not close this gate.
 - **Implementation assurance:** the cases add bounded evidence for these two
-  structured implementations on one host. Hard address-space and process-count
-  containment remain unsupported on this platform; other runtimes, OSes,
-  schedulers and larger valid finite values remain untested.
+  structured implementations on one host. Active aggregate-RSS containment was
+  exercised, while hard address-space and process-count platform limits remain
+  unsupported; other runtimes, OSes, schedulers and larger valid finite values
+  remain untested.
 - **Deployment:** this package supplies no real authentication/establishment,
   trust/clock integration, confidentiality policy, crash-remanence guarantee,
   backup/recovery, durable source publication or operational risk acceptance.
@@ -248,7 +263,8 @@ PYTHON=/usr/bin/python3 node experiments/bounded-representation-adversarial/adve
 
 The package test validates manifest closure, every declared repetition, all
 seven outcome classes, the year-zero/year-one distinction, incomplete-resource
-classification, safe Text presentation, FD closure and process/temp aftermath.
+classification, safe Text presentation, active memory monitoring, the controlled
+memory cutoff, FD closure and process/temp aftermath.
 Repository documentation validation and its focused test remain separate checks.
 The historical 211-test representation matrix and 513-test repository suite are
 not rerun merely for repetition; the new package imports the unchanged codecs
@@ -258,4 +274,5 @@ and source closure and adds no codec mapping or canonical byte rule.
 
 | Version | Date | Change |
 |---|---|---|
+| 0.2 | 2026-09-29 | Add active process-group aggregate-RSS enforcement and its controlled descendant cutoff; align the reported FD count with the regenerated ledger. |
 | 0.1 | 2026-09-29 | Add bounded same-author resource/failure evidence with predeclared budgets, isolated A/B controls, external watchdog, calendar-domain oracle and retained controlled failures. |

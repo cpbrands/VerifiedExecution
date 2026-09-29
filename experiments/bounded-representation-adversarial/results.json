@@ -24,6 +24,8 @@
     },
     "controlledInnerCutoffs": {
       "wallMilliseconds": 500,
+      "memoryBytes": 134217728,
+      "memoryAllocationBytes": 268435456,
       "fileBytes": 1024,
       "capturedOutputBytes": 65536
     }
@@ -317,6 +319,17 @@
       "repetitions": 1
     },
     {
+      "id": "controlled-memory-watchdog-cutoff",
+      "threats": [
+        "T06",
+        "T12"
+      ],
+      "stage": "external process-group memory monitoring",
+      "expected": "aggregate RSS cutoff at the controlled 128 MiB ceiling; no semantic classification",
+      "outcomeClass": "harness-process-failure",
+      "repetitions": 1
+    },
+    {
       "id": "controlled-fd-cutoff",
       "threats": [
         "T06",
@@ -362,17 +375,28 @@
       "presentation": null,
       "caseObservations": {},
       "resources": {
-        "wallMilliseconds": 449.467,
-        "cpuUserSeconds": 0.308227,
-        "cpuSystemSeconds": 0.120953,
-        "peakRssBytes": 123944960,
-        "peakTempBytes": 11166013,
-        "hardMemoryLimitEnforced": false,
+        "wallMilliseconds": 458.204,
+        "cpuUserSeconds": 0.312187,
+        "cpuSystemSeconds": 0.203977,
+        "peakRssBytes": 209666048,
+        "peakTempBytes": 11165356,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 209666048,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 11
+        },
         "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
           "cpu": true,
           "fds": true,
           "file": true,
-          "memory": false,
           "processes": false
         },
         "stdoutBytes": 342,
@@ -382,9 +406,7 @@
         "processGroupSurvived": false,
         "fileDescriptorsBefore": 5,
         "fileDescriptorsAfter": 5,
-        "tempResidueBeforeCleanup": [
-          "xcrun_db"
-        ],
+        "tempResidueBeforeCleanup": [],
         "tempResidueAfterCleanup": [],
         "cleanupError": null
       },
@@ -420,17 +442,28 @@
       "presentation": null,
       "caseObservations": {},
       "resources": {
-        "wallMilliseconds": 426.342,
-        "cpuUserSeconds": 0.311448,
-        "cpuSystemSeconds": 0.114835,
-        "peakRssBytes": 124010496,
-        "peakTempBytes": 11166013,
-        "hardMemoryLimitEnforced": false,
+        "wallMilliseconds": 407.713,
+        "cpuUserSeconds": 0.311879,
+        "cpuSystemSeconds": 0.182108,
+        "peakRssBytes": 198688768,
+        "peakTempBytes": 11165356,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 198688768,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 10
+        },
         "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
           "cpu": true,
           "fds": true,
           "file": true,
-          "memory": false,
           "processes": false
         },
         "stdoutBytes": 342,
@@ -440,9 +473,7 @@
         "processGroupSurvived": false,
         "fileDescriptorsBefore": 5,
         "fileDescriptorsAfter": 5,
-        "tempResidueBeforeCleanup": [
-          "xcrun_db"
-        ],
+        "tempResidueBeforeCleanup": [],
         "tempResidueAfterCleanup": [],
         "cleanupError": null
       },
@@ -479,17 +510,28 @@
       "presentation": null,
       "caseObservations": {},
       "resources": {
-        "wallMilliseconds": 440.669,
-        "cpuUserSeconds": 0.325345,
-        "cpuSystemSeconds": 0.11147,
-        "peakRssBytes": 123748352,
-        "peakTempBytes": 11175877,
-        "hardMemoryLimitEnforced": false,
+        "wallMilliseconds": 455.233,
+        "cpuUserSeconds": 0.328569,
+        "cpuSystemSeconds": 0.189981,
+        "peakRssBytes": 237191168,
+        "peakTempBytes": 11175220,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 237191168,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 11
+        },
         "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
           "cpu": true,
           "fds": true,
           "file": true,
-          "memory": false,
           "processes": false
         },
         "stdoutBytes": 347,
@@ -499,9 +541,7 @@
         "processGroupSurvived": false,
         "fileDescriptorsBefore": 5,
         "fileDescriptorsAfter": 5,
-        "tempResidueBeforeCleanup": [
-          "xcrun_db"
-        ],
+        "tempResidueBeforeCleanup": [],
         "tempResidueAfterCleanup": [],
         "cleanupError": null
       },
@@ -538,17 +578,28 @@
       "presentation": null,
       "caseObservations": {},
       "resources": {
-        "wallMilliseconds": 425.233,
-        "cpuUserSeconds": 0.314593,
-        "cpuSystemSeconds": 0.112026,
-        "peakRssBytes": 124190720,
-        "peakTempBytes": 11171072,
-        "hardMemoryLimitEnforced": false,
+        "wallMilliseconds": 449.458,
+        "cpuUserSeconds": 0.323011,
+        "cpuSystemSeconds": 0.189465,
+        "peakRssBytes": 240746496,
+        "peakTempBytes": 11170415,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 240746496,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 11
+        },
         "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
           "cpu": true,
           "fds": true,
           "file": true,
-          "memory": false,
           "processes": false
         },
         "stdoutBytes": 351,
@@ -558,9 +609,7 @@
         "processGroupSurvived": false,
         "fileDescriptorsBefore": 5,
         "fileDescriptorsAfter": 5,
-        "tempResidueBeforeCleanup": [
-          "xcrun_db"
-        ],
+        "tempResidueBeforeCleanup": [],
         "tempResidueAfterCleanup": [],
         "cleanupError": null
       },
@@ -630,17 +679,28 @@
       },
       "caseObservations": {},
       "resources": {
-        "wallMilliseconds": 473.867,
-        "cpuUserSeconds": 0.362109,
-        "cpuSystemSeconds": 0.115821,
-        "peakRssBytes": 151175168,
-        "peakTempBytes": 11166094,
-        "hardMemoryLimitEnforced": false,
+        "wallMilliseconds": 493.103,
+        "cpuUserSeconds": 0.36318,
+        "cpuSystemSeconds": 0.208088,
+        "peakRssBytes": 256999424,
+        "peakTempBytes": 11165437,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 256999424,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 12
+        },
         "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
           "cpu": true,
           "fds": true,
           "file": true,
-          "memory": false,
           "processes": false
         },
         "stdoutBytes": 738,
@@ -650,9 +710,7 @@
         "processGroupSurvived": false,
         "fileDescriptorsBefore": 5,
         "fileDescriptorsAfter": 5,
-        "tempResidueBeforeCleanup": [
-          "xcrun_db"
-        ],
+        "tempResidueBeforeCleanup": [],
         "tempResidueAfterCleanup": [],
         "cleanupError": null
       },
@@ -720,17 +778,28 @@
       },
       "caseObservations": {},
       "resources": {
-        "wallMilliseconds": 890.888,
-        "cpuUserSeconds": 0.716447,
-        "cpuSystemSeconds": 0.222684,
-        "peakRssBytes": 545439744,
-        "peakTempBytes": 17463592,
-        "hardMemoryLimitEnforced": false,
+        "wallMilliseconds": 858.123,
+        "cpuUserSeconds": 0.73773,
+        "cpuSystemSeconds": 0.385121,
+        "peakRssBytes": 657391616,
+        "peakTempBytes": 17462935,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 657391616,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 20
+        },
         "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
           "cpu": true,
           "fds": true,
           "file": true,
-          "memory": false,
           "processes": false
         },
         "stdoutBytes": 759,
@@ -740,9 +809,7 @@
         "processGroupSurvived": false,
         "fileDescriptorsBefore": 5,
         "fileDescriptorsAfter": 5,
-        "tempResidueBeforeCleanup": [
-          "xcrun_db"
-        ],
+        "tempResidueBeforeCleanup": [],
         "tempResidueAfterCleanup": [],
         "cleanupError": null
       },
@@ -779,17 +846,28 @@
       "presentation": null,
       "caseObservations": {},
       "resources": {
-        "wallMilliseconds": 450.885,
-        "cpuUserSeconds": 0.32868,
-        "cpuSystemSeconds": 0.114951,
-        "peakRssBytes": 124157952,
-        "peakTempBytes": 11168059,
-        "hardMemoryLimitEnforced": false,
+        "wallMilliseconds": 456.092,
+        "cpuUserSeconds": 0.334266,
+        "cpuSystemSeconds": 0.193429,
+        "peakRssBytes": 226295808,
+        "peakTempBytes": 11167402,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 226295808,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 11
+        },
         "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
           "cpu": true,
           "fds": true,
           "file": true,
-          "memory": false,
           "processes": false
         },
         "stdoutBytes": 344,
@@ -799,9 +877,7 @@
         "processGroupSurvived": false,
         "fileDescriptorsBefore": 5,
         "fileDescriptorsAfter": 5,
-        "tempResidueBeforeCleanup": [
-          "xcrun_db"
-        ],
+        "tempResidueBeforeCleanup": [],
         "tempResidueAfterCleanup": [],
         "cleanupError": null
       },
@@ -838,17 +914,28 @@
       "presentation": null,
       "caseObservations": {},
       "resources": {
-        "wallMilliseconds": 460.373,
-        "cpuUserSeconds": 0.343635,
-        "cpuSystemSeconds": 0.117874,
-        "peakRssBytes": 149241856,
-        "peakTempBytes": 11693627,
-        "hardMemoryLimitEnforced": false,
+        "wallMilliseconds": 453.135,
+        "cpuUserSeconds": 0.348969,
+        "cpuSystemSeconds": 0.195483,
+        "peakRssBytes": 248102912,
+        "peakTempBytes": 11692970,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 248102912,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 11
+        },
         "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
           "cpu": true,
           "fds": true,
           "file": true,
-          "memory": false,
           "processes": false
         },
         "stdoutBytes": 349,
@@ -858,9 +945,7 @@
         "processGroupSurvived": false,
         "fileDescriptorsBefore": 5,
         "fileDescriptorsAfter": 5,
-        "tempResidueBeforeCleanup": [
-          "xcrun_db"
-        ],
+        "tempResidueBeforeCleanup": [],
         "tempResidueAfterCleanup": [],
         "cleanupError": null
       },
@@ -898,17 +983,28 @@
       "presentation": null,
       "caseObservations": {},
       "resources": {
-        "wallMilliseconds": 1146.149,
-        "cpuUserSeconds": 1.145785,
-        "cpuSystemSeconds": 0.180338,
-        "peakRssBytes": 567476224,
-        "peakTempBytes": 30105211,
-        "hardMemoryLimitEnforced": false,
+        "wallMilliseconds": 1133.289,
+        "cpuUserSeconds": 1.182173,
+        "cpuSystemSeconds": 0.398992,
+        "peakRssBytes": 679952384,
+        "peakTempBytes": 30104554,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 679952384,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 27
+        },
         "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
           "cpu": true,
           "fds": true,
           "file": true,
-          "memory": false,
           "processes": false
         },
         "stdoutBytes": 358,
@@ -918,9 +1014,7 @@
         "processGroupSurvived": false,
         "fileDescriptorsBefore": 5,
         "fileDescriptorsAfter": 5,
-        "tempResidueBeforeCleanup": [
-          "xcrun_db"
-        ],
+        "tempResidueBeforeCleanup": [],
         "tempResidueAfterCleanup": [],
         "cleanupError": null
       },
@@ -956,17 +1050,28 @@
       "presentation": null,
       "caseObservations": {},
       "resources": {
-        "wallMilliseconds": 312.338,
-        "cpuUserSeconds": 0.209711,
-        "cpuSystemSeconds": 0.088763,
-        "peakRssBytes": 123912192,
-        "peakTempBytes": 11165998,
-        "hardMemoryLimitEnforced": false,
+        "wallMilliseconds": 327.683,
+        "cpuUserSeconds": 0.213108,
+        "cpuSystemSeconds": 0.141587,
+        "peakRssBytes": 228655104,
+        "peakTempBytes": 11165341,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 228655104,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 8
+        },
         "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
           "cpu": true,
           "fds": true,
           "file": true,
-          "memory": false,
           "processes": false
         },
         "stdoutBytes": 366,
@@ -976,9 +1081,7 @@
         "processGroupSurvived": false,
         "fileDescriptorsBefore": 5,
         "fileDescriptorsAfter": 5,
-        "tempResidueBeforeCleanup": [
-          "xcrun_db"
-        ],
+        "tempResidueBeforeCleanup": [],
         "tempResidueAfterCleanup": [],
         "cleanupError": null
       },
@@ -1015,17 +1118,28 @@
       "presentation": null,
       "caseObservations": {},
       "resources": {
-        "wallMilliseconds": 298.649,
-        "cpuUserSeconds": 0.204859,
-        "cpuSystemSeconds": 0.084874,
-        "peakRssBytes": 123600896,
-        "peakTempBytes": 11166004,
-        "hardMemoryLimitEnforced": false,
+        "wallMilliseconds": 288.201,
+        "cpuUserSeconds": 0.208265,
+        "cpuSystemSeconds": 0.131571,
+        "peakRssBytes": 187203584,
+        "peakTempBytes": 11165347,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 187203584,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 7
+        },
         "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
           "cpu": true,
           "fds": true,
           "file": true,
-          "memory": false,
           "processes": false
         },
         "stdoutBytes": 369,
@@ -1035,9 +1149,7 @@
         "processGroupSurvived": false,
         "fileDescriptorsBefore": 5,
         "fileDescriptorsAfter": 5,
-        "tempResidueBeforeCleanup": [
-          "xcrun_db"
-        ],
+        "tempResidueBeforeCleanup": [],
         "tempResidueAfterCleanup": [],
         "cleanupError": null
       },
@@ -1074,17 +1186,28 @@
       "presentation": null,
       "caseObservations": {},
       "resources": {
-        "wallMilliseconds": 423.478,
-        "cpuUserSeconds": 0.315997,
-        "cpuSystemSeconds": 0.112022,
-        "peakRssBytes": 124125184,
-        "peakTempBytes": 11166135,
-        "hardMemoryLimitEnforced": false,
+        "wallMilliseconds": 409.462,
+        "cpuUserSeconds": 0.319167,
+        "cpuSystemSeconds": 0.183571,
+        "peakRssBytes": 241369088,
+        "peakTempBytes": 11165478,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 241369088,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 10
+        },
         "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
           "cpu": true,
           "fds": true,
           "file": true,
-          "memory": false,
           "processes": false
         },
         "stdoutBytes": 347,
@@ -1094,9 +1217,7 @@
         "processGroupSurvived": false,
         "fileDescriptorsBefore": 5,
         "fileDescriptorsAfter": 5,
-        "tempResidueBeforeCleanup": [
-          "xcrun_db"
-        ],
+        "tempResidueBeforeCleanup": [],
         "tempResidueAfterCleanup": [],
         "cleanupError": null
       },
@@ -1133,17 +1254,28 @@
       "presentation": null,
       "caseObservations": {},
       "resources": {
-        "wallMilliseconds": 299.846,
-        "cpuUserSeconds": 0.206242,
-        "cpuSystemSeconds": 0.084817,
-        "peakRssBytes": 123748352,
-        "peakTempBytes": 11166030,
-        "hardMemoryLimitEnforced": false,
+        "wallMilliseconds": 287.96,
+        "cpuUserSeconds": 0.209265,
+        "cpuSystemSeconds": 0.130671,
+        "peakRssBytes": 187318272,
+        "peakTempBytes": 11165373,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 187318272,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 7
+        },
         "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
           "cpu": true,
           "fds": true,
           "file": true,
-          "memory": false,
           "processes": false
         },
         "stdoutBytes": 354,
@@ -1153,9 +1285,7 @@
         "processGroupSurvived": false,
         "fileDescriptorsBefore": 5,
         "fileDescriptorsAfter": 5,
-        "tempResidueBeforeCleanup": [
-          "xcrun_db"
-        ],
+        "tempResidueBeforeCleanup": [],
         "tempResidueAfterCleanup": [],
         "cleanupError": null
       },
@@ -1192,17 +1322,28 @@
       "presentation": null,
       "caseObservations": {},
       "resources": {
-        "wallMilliseconds": 313.105,
-        "cpuUserSeconds": 0.213432,
-        "cpuSystemSeconds": 0.086065,
-        "peakRssBytes": 123518976,
-        "peakTempBytes": 11166034,
-        "hardMemoryLimitEnforced": false,
+        "wallMilliseconds": 289.034,
+        "cpuUserSeconds": 0.212244,
+        "cpuSystemSeconds": 0.13276,
+        "peakRssBytes": 227786752,
+        "peakTempBytes": 11165377,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 227786752,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 7
+        },
         "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
           "cpu": true,
           "fds": true,
           "file": true,
-          "memory": false,
           "processes": false
         },
         "stdoutBytes": 354,
@@ -1212,9 +1353,7 @@
         "processGroupSurvived": false,
         "fileDescriptorsBefore": 5,
         "fileDescriptorsAfter": 5,
-        "tempResidueBeforeCleanup": [
-          "xcrun_db"
-        ],
+        "tempResidueBeforeCleanup": [],
         "tempResidueAfterCleanup": [],
         "cleanupError": null
       },
@@ -1251,17 +1390,28 @@
       "presentation": null,
       "caseObservations": {},
       "resources": {
-        "wallMilliseconds": 298.902,
-        "cpuUserSeconds": 0.20467,
-        "cpuSystemSeconds": 0.083406,
-        "peakRssBytes": 123895808,
-        "peakTempBytes": 11166013,
-        "hardMemoryLimitEnforced": false,
+        "wallMilliseconds": 290.89,
+        "cpuUserSeconds": 0.211768,
+        "cpuSystemSeconds": 0.133669,
+        "peakRssBytes": 187351040,
+        "peakTempBytes": 11165356,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 187351040,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 7
+        },
         "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
           "cpu": true,
           "fds": true,
           "file": true,
-          "memory": false,
           "processes": false
         },
         "stdoutBytes": 404,
@@ -1271,9 +1421,7 @@
         "processGroupSurvived": false,
         "fileDescriptorsBefore": 5,
         "fileDescriptorsAfter": 5,
-        "tempResidueBeforeCleanup": [
-          "xcrun_db"
-        ],
+        "tempResidueBeforeCleanup": [],
         "tempResidueAfterCleanup": [],
         "cleanupError": null
       },
@@ -1310,17 +1458,28 @@
       "presentation": null,
       "caseObservations": {},
       "resources": {
-        "wallMilliseconds": 298.997,
-        "cpuUserSeconds": 0.205686,
-        "cpuSystemSeconds": 0.084681,
-        "peakRssBytes": 123977728,
-        "peakTempBytes": 11166014,
-        "hardMemoryLimitEnforced": false,
+        "wallMilliseconds": 324.248,
+        "cpuUserSeconds": 0.211794,
+        "cpuSystemSeconds": 0.140591,
+        "peakRssBytes": 155648000,
+        "peakTempBytes": 11165357,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 155648000,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 8
+        },
         "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
           "cpu": true,
           "fds": true,
           "file": true,
-          "memory": false,
           "processes": false
         },
         "stdoutBytes": 402,
@@ -1330,9 +1489,7 @@
         "processGroupSurvived": false,
         "fileDescriptorsBefore": 5,
         "fileDescriptorsAfter": 5,
-        "tempResidueBeforeCleanup": [
-          "xcrun_db"
-        ],
+        "tempResidueBeforeCleanup": [],
         "tempResidueAfterCleanup": [],
         "cleanupError": null
       },
@@ -1366,17 +1523,28 @@
       "presentation": null,
       "caseObservations": {},
       "resources": {
-        "wallMilliseconds": 175.66,
-        "cpuUserSeconds": 0.097974,
-        "cpuSystemSeconds": 0.056223,
-        "peakRssBytes": 71761920,
-        "peakTempBytes": 491,
-        "hardMemoryLimitEnforced": false,
+        "wallMilliseconds": 165.717,
+        "cpuUserSeconds": 0.09582,
+        "cpuSystemSeconds": 0.080907,
+        "peakRssBytes": 58933248,
+        "peakTempBytes": 0,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 58933248,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 4
+        },
         "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
           "cpu": true,
           "fds": true,
           "file": true,
-          "memory": false,
           "processes": false
         },
         "stdoutBytes": 264,
@@ -1386,9 +1554,7 @@
         "processGroupSurvived": false,
         "fileDescriptorsBefore": 5,
         "fileDescriptorsAfter": 5,
-        "tempResidueBeforeCleanup": [
-          "xcrun_db"
-        ],
+        "tempResidueBeforeCleanup": [],
         "tempResidueAfterCleanup": [],
         "cleanupError": null
       },
@@ -1422,17 +1588,28 @@
       "presentation": null,
       "caseObservations": {},
       "resources": {
-        "wallMilliseconds": 161.068,
-        "cpuUserSeconds": 0.093625,
-        "cpuSystemSeconds": 0.053074,
-        "peakRssBytes": 71745536,
-        "peakTempBytes": 491,
-        "hardMemoryLimitEnforced": false,
+        "wallMilliseconds": 165.913,
+        "cpuUserSeconds": 0.093167,
+        "cpuSystemSeconds": 0.079769,
+        "peakRssBytes": 56573952,
+        "peakTempBytes": 0,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 56573952,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 4
+        },
         "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
           "cpu": true,
           "fds": true,
           "file": true,
-          "memory": false,
           "processes": false
         },
         "stdoutBytes": 257,
@@ -1442,9 +1619,7 @@
         "processGroupSurvived": false,
         "fileDescriptorsBefore": 5,
         "fileDescriptorsAfter": 5,
-        "tempResidueBeforeCleanup": [
-          "xcrun_db"
-        ],
+        "tempResidueBeforeCleanup": [],
         "tempResidueAfterCleanup": [],
         "cleanupError": null
       },
@@ -1483,17 +1658,28 @@
         "establishmentStatus": "failed"
       },
       "resources": {
-        "wallMilliseconds": 424.813,
-        "cpuUserSeconds": 0.316503,
-        "cpuSystemSeconds": 0.113024,
-        "peakRssBytes": 124190720,
-        "peakTempBytes": 11166053,
-        "hardMemoryLimitEnforced": false,
+        "wallMilliseconds": 457.062,
+        "cpuUserSeconds": 0.334801,
+        "cpuSystemSeconds": 0.198304,
+        "peakRssBytes": 235716608,
+        "peakTempBytes": 11165396,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 235716608,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 11
+        },
         "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
           "cpu": true,
           "fds": true,
           "file": true,
-          "memory": false,
           "processes": false
         },
         "stdoutBytes": 373,
@@ -1503,9 +1689,7 @@
         "processGroupSurvived": false,
         "fileDescriptorsBefore": 5,
         "fileDescriptorsAfter": 5,
-        "tempResidueBeforeCleanup": [
-          "xcrun_db"
-        ],
+        "tempResidueBeforeCleanup": [],
         "tempResidueAfterCleanup": [],
         "cleanupError": null
       },
@@ -1571,17 +1755,28 @@
       },
       "caseObservations": {},
       "resources": {
-        "wallMilliseconds": 305.248,
-        "cpuUserSeconds": 0.208199,
-        "cpuSystemSeconds": 0.084217,
-        "peakRssBytes": 123928576,
-        "peakTempBytes": 11166024,
-        "hardMemoryLimitEnforced": false,
+        "wallMilliseconds": 329.079,
+        "cpuUserSeconds": 0.220874,
+        "cpuSystemSeconds": 0.148234,
+        "peakRssBytes": 222494720,
+        "peakTempBytes": 11165367,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 222494720,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 8
+        },
         "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
           "cpu": true,
           "fds": true,
           "file": true,
-          "memory": false,
           "processes": false
         },
         "stdoutBytes": 675,
@@ -1591,9 +1786,7 @@
         "processGroupSurvived": false,
         "fileDescriptorsBefore": 5,
         "fileDescriptorsAfter": 5,
-        "tempResidueBeforeCleanup": [
-          "xcrun_db"
-        ],
+        "tempResidueBeforeCleanup": [],
         "tempResidueAfterCleanup": [],
         "cleanupError": null
       },
@@ -1628,7 +1821,7 @@
       "caseObservations": {
         "diagnostics": {
           "codec": "permission",
-          "elapsedMs": 0.06524999999999181,
+          "elapsedMs": 0.06591600000001563,
           "errorCode": "EACCES",
           "inputBytes": 2,
           "signal": null,
@@ -1638,17 +1831,28 @@
         }
       },
       "resources": {
-        "wallMilliseconds": 171.401,
-        "cpuUserSeconds": 0.094369,
-        "cpuSystemSeconds": 0.053996,
-        "peakRssBytes": 72204288,
-        "peakTempBytes": 491,
-        "hardMemoryLimitEnforced": false,
+        "wallMilliseconds": 163.076,
+        "cpuUserSeconds": 0.094456,
+        "cpuSystemSeconds": 0.080158,
+        "peakRssBytes": 56508416,
+        "peakTempBytes": 0,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 56508416,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 4
+        },
         "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
           "cpu": true,
           "fds": true,
           "file": true,
-          "memory": false,
           "processes": false
         },
         "stdoutBytes": 417,
@@ -1659,8 +1863,7 @@
         "fileDescriptorsBefore": 5,
         "fileDescriptorsAfter": 5,
         "tempResidueBeforeCleanup": [
-          "blocked",
-          "xcrun_db"
+          "blocked"
         ],
         "tempResidueAfterCleanup": [],
         "cleanupError": null
@@ -1695,7 +1898,7 @@
       "caseObservations": {
         "diagnostics": {
           "codec": "launch",
-          "elapsedMs": 0.8238749999999868,
+          "elapsedMs": 0.756040999999982,
           "errorCode": "ENOENT",
           "inputBytes": 2,
           "signal": null,
@@ -1705,29 +1908,38 @@
         }
       },
       "resources": {
-        "wallMilliseconds": 161.354,
-        "cpuUserSeconds": 0.094983,
-        "cpuSystemSeconds": 0.054865,
-        "peakRssBytes": 72155136,
-        "peakTempBytes": 491,
-        "hardMemoryLimitEnforced": false,
+        "wallMilliseconds": 166.308,
+        "cpuUserSeconds": 0.094636,
+        "cpuSystemSeconds": 0.079431,
+        "peakRssBytes": 55525376,
+        "peakTempBytes": 0,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 55525376,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 4
+        },
         "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
           "cpu": true,
           "fds": true,
           "file": true,
-          "memory": false,
           "processes": false
         },
-        "stdoutBytes": 408,
+        "stdoutBytes": 407,
         "stderrBytes": 0
       },
       "aftermath": {
         "processGroupSurvived": false,
         "fileDescriptorsBefore": 5,
         "fileDescriptorsAfter": 5,
-        "tempResidueBeforeCleanup": [
-          "xcrun_db"
-        ],
+        "tempResidueBeforeCleanup": [],
         "tempResidueAfterCleanup": [],
         "cleanupError": null
       },
@@ -1767,17 +1979,28 @@
         }
       },
       "resources": {
-        "wallMilliseconds": 188.841,
-        "cpuUserSeconds": 0.112475,
-        "cpuSystemSeconds": 0.061095,
-        "peakRssBytes": 71761920,
-        "peakTempBytes": 657,
-        "hardMemoryLimitEnforced": false,
+        "wallMilliseconds": 198.997,
+        "cpuUserSeconds": 0.112018,
+        "cpuSystemSeconds": 0.093786,
+        "peakRssBytes": 75677696,
+        "peakTempBytes": 0,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 75677696,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 5
+        },
         "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
           "cpu": true,
           "fds": true,
           "file": true,
-          "memory": false,
           "processes": false
         },
         "stdoutBytes": 299,
@@ -1788,8 +2011,7 @@
         "fileDescriptorsBefore": 5,
         "fileDescriptorsAfter": 5,
         "tempResidueBeforeCleanup": [
-          "tmp71aao4db",
-          "xcrun_db"
+          "tmp0utl_9sx"
         ],
         "tempResidueAfterCleanup": [],
         "cleanupError": null
@@ -1828,17 +2050,28 @@
         }
       },
       "resources": {
-        "wallMilliseconds": 191.914,
-        "cpuUserSeconds": 0.113379,
-        "cpuSystemSeconds": 0.057362,
-        "peakRssBytes": 71630848,
-        "peakTempBytes": 491,
-        "hardMemoryLimitEnforced": false,
+        "wallMilliseconds": 204.229,
+        "cpuUserSeconds": 0.112406,
+        "cpuSystemSeconds": 0.091433,
+        "peakRssBytes": 109576192,
+        "peakTempBytes": 0,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 109576192,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 5
+        },
         "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
           "cpu": true,
           "fds": true,
           "file": true,
-          "memory": false,
           "processes": false
         },
         "stdoutBytes": 290,
@@ -1848,9 +2081,7 @@
         "processGroupSurvived": false,
         "fileDescriptorsBefore": 5,
         "fileDescriptorsAfter": 5,
-        "tempResidueBeforeCleanup": [
-          "xcrun_db"
-        ],
+        "tempResidueBeforeCleanup": [],
         "tempResidueAfterCleanup": [],
         "cleanupError": null
       },
@@ -1887,17 +2118,28 @@
         "outerCleanup": "complete"
       },
       "resources": {
-        "wallMilliseconds": 162.778,
-        "cpuUserSeconds": 0.093196,
-        "cpuSystemSeconds": 0.05441,
-        "peakRssBytes": 72138752,
-        "peakTempBytes": 491,
-        "hardMemoryLimitEnforced": false,
+        "wallMilliseconds": 161.511,
+        "cpuUserSeconds": 0.094181,
+        "cpuSystemSeconds": 0.080503,
+        "peakRssBytes": 56475648,
+        "peakTempBytes": 0,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 56475648,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 4
+        },
         "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
           "cpu": true,
           "fds": true,
           "file": true,
-          "memory": false,
           "processes": false
         },
         "stdoutBytes": 297,
@@ -1907,9 +2149,7 @@
         "processGroupSurvived": false,
         "fileDescriptorsBefore": 5,
         "fileDescriptorsAfter": 5,
-        "tempResidueBeforeCleanup": [
-          "xcrun_db"
-        ],
+        "tempResidueBeforeCleanup": [],
         "tempResidueAfterCleanup": [],
         "cleanupError": null
       },
@@ -1945,17 +2185,28 @@
         "childCleanup": "kill-issued-if-created"
       },
       "resources": {
-        "wallMilliseconds": 193.816,
-        "cpuUserSeconds": 0.114389,
-        "cpuSystemSeconds": 0.058064,
-        "peakRssBytes": 71598080,
-        "peakTempBytes": 491,
-        "hardMemoryLimitEnforced": false,
+        "wallMilliseconds": 207.41,
+        "cpuUserSeconds": 0.112845,
+        "cpuSystemSeconds": 0.091362,
+        "peakRssBytes": 117784576,
+        "peakTempBytes": 0,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 117784576,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 5
+        },
         "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
           "cpu": true,
           "fds": true,
           "file": true,
-          "memory": false,
           "processes": false
         },
         "stdoutBytes": 293,
@@ -1965,9 +2216,7 @@
         "processGroupSurvived": false,
         "fileDescriptorsBefore": 5,
         "fileDescriptorsAfter": 5,
-        "tempResidueBeforeCleanup": [
-          "xcrun_db"
-        ],
+        "tempResidueBeforeCleanup": [],
         "tempResidueAfterCleanup": [],
         "cleanupError": null
       },
@@ -2004,17 +2253,28 @@
         }
       },
       "resources": {
-        "wallMilliseconds": 682.649,
-        "cpuUserSeconds": 0.111978,
-        "cpuSystemSeconds": 0.063206,
-        "peakRssBytes": 71843840,
-        "peakTempBytes": 491,
-        "hardMemoryLimitEnforced": false,
+        "wallMilliseconds": 685.597,
+        "cpuUserSeconds": 0.140213,
+        "cpuSystemSeconds": 0.200618,
+        "peakRssBytes": 116064256,
+        "peakTempBytes": 0,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 116064256,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 16
+        },
         "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
           "cpu": true,
           "fds": true,
           "file": true,
-          "memory": false,
           "processes": false
         },
         "stdoutBytes": 293,
@@ -2024,9 +2284,7 @@
         "processGroupSurvived": false,
         "fileDescriptorsBefore": 5,
         "fileDescriptorsAfter": 5,
-        "tempResidueBeforeCleanup": [
-          "xcrun_db"
-        ],
+        "tempResidueBeforeCleanup": [],
         "tempResidueAfterCleanup": [],
         "cleanupError": null
       },
@@ -2036,6 +2294,76 @@
         "node": "v24.19.0",
         "platform": "darwin",
         "architecture": "arm64"
+      },
+      "classification": "pass"
+    },
+    {
+      "attemptId": "controlled-memory-watchdog-cutoff#1",
+      "caseId": "controlled-memory-watchdog-cutoff",
+      "repetition": 1,
+      "threats": [
+        "T06",
+        "T12"
+      ],
+      "targetedStage": "external process-group memory monitoring",
+      "expectedOutcome": "aggregate RSS cutoff at the controlled 128 MiB ceiling; no semantic classification",
+      "outcomeClass": "harness-process-failure",
+      "actualOutcome": {
+        "watchdog": "aggregate-rss-memory-limit"
+      },
+      "evidenceDisposition": "test-safety-cutoff",
+      "inputBytes": 0,
+      "carrierBytes": null,
+      "relevantBytes": null,
+      "presentation": null,
+      "caseObservations": {
+        "configuredMemoryBytes": 134217728,
+        "syntheticAllocationBytes": 268435456,
+        "cutoff": "aggregate-rss-memory-limit",
+        "monitorSamples": 6
+      },
+      "resources": {
+        "wallMilliseconds": 482.621,
+        "cpuUserSeconds": 0.033145,
+        "cpuSystemSeconds": 0.064498,
+        "peakRssBytes": 144556032,
+        "peakTempBytes": 0,
+        "memoryBudgetBytes": 134217728,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 144556032,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 6
+        },
+        "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
+          "cpu": true,
+          "fds": true,
+          "file": true,
+          "processes": false
+        },
+        "stdoutBytes": 0,
+        "stderrBytes": 0
+      },
+      "aftermath": {
+        "processGroupSurvived": false,
+        "fileDescriptorsBefore": 5,
+        "fileDescriptorsAfter": 5,
+        "tempResidueBeforeCleanup": [],
+        "tempResidueAfterCleanup": [],
+        "cleanupError": null
+      },
+      "runtime": {
+        "os": "macOS-27.0-arm64-arm-64bit",
+        "python": "3.9.6",
+        "node": null,
+        "platform": null,
+        "architecture": null
       },
       "classification": "pass"
     },
@@ -2063,17 +2391,28 @@
         "openedDescriptors": 53
       },
       "resources": {
-        "wallMilliseconds": 163.558,
-        "cpuUserSeconds": 0.095569,
-        "cpuSystemSeconds": 0.053709,
-        "peakRssBytes": 71647232,
-        "peakTempBytes": 491,
-        "hardMemoryLimitEnforced": false,
+        "wallMilliseconds": 165.985,
+        "cpuUserSeconds": 0.09594,
+        "cpuSystemSeconds": 0.078688,
+        "peakRssBytes": 59015168,
+        "peakTempBytes": 0,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 59015168,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 4
+        },
         "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
           "cpu": true,
           "fds": true,
           "file": true,
-          "memory": false,
           "processes": false
         },
         "stdoutBytes": 288,
@@ -2083,9 +2422,7 @@
         "processGroupSurvived": false,
         "fileDescriptorsBefore": 5,
         "fileDescriptorsAfter": 5,
-        "tempResidueBeforeCleanup": [
-          "xcrun_db"
-        ],
+        "tempResidueBeforeCleanup": [],
         "tempResidueAfterCleanup": [],
         "cleanupError": null
       },
@@ -2120,17 +2457,28 @@
         "hardProcessLimit": "reported-by-watchdog"
       },
       "resources": {
-        "wallMilliseconds": 174.767,
-        "cpuUserSeconds": 0.095334,
-        "cpuSystemSeconds": 0.055963,
-        "peakRssBytes": 71876608,
-        "peakTempBytes": 491,
-        "hardMemoryLimitEnforced": false,
+        "wallMilliseconds": 165.582,
+        "cpuUserSeconds": 0.092423,
+        "cpuSystemSeconds": 0.078164,
+        "peakRssBytes": 58687488,
+        "peakTempBytes": 0,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 58687488,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 4
+        },
         "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
           "cpu": true,
           "fds": true,
           "file": true,
-          "memory": false,
           "processes": false
         },
         "stdoutBytes": 308,
@@ -2140,9 +2488,7 @@
         "processGroupSurvived": false,
         "fileDescriptorsBefore": 5,
         "fileDescriptorsAfter": 5,
-        "tempResidueBeforeCleanup": [
-          "xcrun_db"
-        ],
+        "tempResidueBeforeCleanup": [],
         "tempResidueAfterCleanup": [],
         "cleanupError": null
       },
@@ -2157,14 +2503,14 @@
     }
   ],
   "summary": {
-    "attempts": 29,
-    "pass": 29,
+    "attempts": 30,
+    "pass": 30,
     "failure": 0,
     "inconclusive": 0,
     "deterministicImplementationDefect": 0,
     "expectedIncomplete": 1,
-    "testSafetyCutoff": 4,
+    "testSafetyCutoff": 5,
     "unsupportedPlatform": 1,
-    "elapsedMilliseconds": 16761
+    "elapsedMilliseconds": 17203
   }
 }
