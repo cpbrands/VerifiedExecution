@@ -1,0 +1,33 @@
+{
+  "format": "bounded-representation-adversarial-cases-1",
+  "cases": [
+    {"id":"small-integer-control","threats":["T04"],"stage":"codec encode/decode","expected":"valid semantic value","outcomeClass":"valid-resource-intensive","repetitions":2},
+    {"id":"valid-integer-32768-bit","threats":["T04","T06"],"stage":"JSON/pre-parser and integer codec","expected":"exact A/B canonical agreement","outcomeClass":"valid-resource-intensive","repetitions":1},
+    {"id":"valid-rational-near-coprime","threats":["T04","T05"],"stage":"endpoint arithmetic and codec","expected":"exact A/B canonical agreement","outcomeClass":"valid-resource-intensive","repetitions":1},
+    {"id":"valid-text-controls","threats":["T05","T10","T11","T12"],"stage":"Text mapping and safe presentation","expected":"exact bytes retained; escaped view only","outcomeClass":"valid-resource-intensive","repetitions":1},
+    {"id":"preparser-valid-text-2mib","threats":["T05","T06"],"stage":"JSON/pre-parser allocation and Text codec","expected":"exact A/B canonical agreement","outcomeClass":"valid-resource-intensive","repetitions":1},
+    {"id":"valid-list-depth-128","threats":["T05","T06"],"stage":"nested list conversion","expected":"exact A/B canonical agreement","outcomeClass":"valid-resource-intensive","repetitions":1},
+    {"id":"valid-set-common-prefix","threats":["T05","T06"],"stage":"set encoding, comparison and sorting","expected":"exact A/B canonical agreement","outcomeClass":"valid-resource-intensive","repetitions":1},
+    {"id":"valid-repeated-material-package","threats":["T05","T06","T13"],"stage":"package material comparison and codec","expected":"exact A/B canonical agreement","outcomeClass":"valid-resource-intensive","repetitions":1},
+    {"id":"malformed-truncated-bytes","threats":["T03"],"stage":"carrier parser","expected":"encoding/truncated from A and B","outcomeClass":"malformed-carrier-rejection","repetitions":1},
+    {"id":"malformed-length-declaration","threats":["T03","T05"],"stage":"carrier length parser","expected":"encoding/truncated from A and B","outcomeClass":"malformed-carrier-rejection","repetitions":1},
+    {"id":"calendar-year-one-control","threats":["T03","T04"],"stage":"endpoint domain validation","expected":"valid canonical endpoint","outcomeClass":"valid-resource-intensive","repetitions":1},
+    {"id":"calendar-year-zero","threats":["T03","T04"],"stage":"endpoint domain validation","expected":"domain/positive from A and B under sufficient resources","outcomeClass":"canonical-field-domain-violation","repetitions":1},
+    {"id":"rational-unreduced","threats":["T03","T04"],"stage":"endpoint domain validation","expected":"domain/endpoint from A and B","outcomeClass":"canonical-field-domain-violation","repetitions":1},
+    {"id":"unsupported-extension-constructor","threats":["T03","T08"],"stage":"extension interpretation","expected":"unsupported/extension-constructor from A and B","outcomeClass":"unsupported-interpretation","repetitions":1},
+    {"id":"resource-size-declaration","threats":["T03","T05"],"stage":"carrier resource guard","expected":"processing-incomplete/resource-limit from A and B","outcomeClass":"resource-unavailable-incomplete","repetitions":1},
+    {"id":"dependency-unavailable","threats":["T07","T13"],"stage":"immutable source loading","expected":"closed failure with no HEAD fallback","outcomeClass":"unsupported-interpretation","repetitions":1},
+    {"id":"dependency-substitution","threats":["T07","T13"],"stage":"source fingerprint verification","expected":"closed provenance failure","outcomeClass":"unsupported-interpretation","repetitions":1},
+    {"id":"establishment-failed","threats":["T02","T09"],"stage":"establishment carriage","expected":"canonical carriage preserves failed status","outcomeClass":"authentication-establishment-failure","repetitions":1},
+    {"id":"diagnostic-injection","threats":["T10","T11","T12"],"stage":"diagnostic presentation","expected":"unsupported/test-type without reflected control text","outcomeClass":"unsupported-interpretation","repetitions":1},
+    {"id":"controlled-permission-failure","threats":["T11","T12"],"stage":"temporary input creation","expected":"sanitized transport failure and no residue","outcomeClass":"harness-process-failure","repetitions":1},
+    {"id":"controlled-launch-failure","threats":["T12"],"stage":"child launch","expected":"sanitized ENOENT and no partial success","outcomeClass":"harness-process-failure","repetitions":1},
+    {"id":"controlled-write-cutoff","threats":["T06","T11","T12"],"stage":"child file write","expected":"bounded file-size cutoff","outcomeClass":"harness-process-failure","repetitions":1},
+    {"id":"controlled-output-cutoff","threats":["T06","T12"],"stage":"child output capture","expected":"bounded output cutoff","outcomeClass":"harness-process-failure","repetitions":1},
+    {"id":"controlled-cleanup-failure","threats":["T11","T12"],"stage":"inner transport cleanup","expected":"cleanup failure surfaced; outer isolation removes residue","outcomeClass":"harness-process-failure","repetitions":1},
+    {"id":"controlled-parent-interruption","threats":["T11","T12"],"stage":"parent/child lifecycle","expected":"interruption surfaced and child reaped","outcomeClass":"harness-process-failure","repetitions":1},
+    {"id":"controlled-hostile-child","threats":["T12"],"stage":"hostile child lifecycle","expected":"inner watchdog cutoff and child reaped","outcomeClass":"harness-process-failure","repetitions":1},
+    {"id":"controlled-fd-cutoff","threats":["T06","T12"],"stage":"file-descriptor allocation","expected":"EMFILE cutoff and all opened descriptors closed","outcomeClass":"harness-process-failure","repetitions":1},
+    {"id":"platform-process-limit","threats":["T12"],"stage":"process-count enforcement capability","expected":"record hard-limit support separately from serial process cap","outcomeClass":"harness-process-failure","repetitions":1}
+  ]
+}

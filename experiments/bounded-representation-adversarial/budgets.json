@@ -1,0 +1,26 @@
+{
+  "format": "bounded-representation-adversarial-budgets-1",
+  "baseCommit": "bdd24a7b9de7132ecc7ce0e9c65d883a7ecf08d2",
+  "sourceInventorySha256": "6103f472047d5edda61c63a80d33557280ad603a41109e0c9d35dc44544d3293",
+  "perAttempt": {
+    "wallMilliseconds": 20000,
+    "cpuSeconds": 12,
+    "memoryBytes": 2147483648,
+    "fileBytes": 67108864,
+    "fileDescriptors": 64,
+    "childProcesses": 4,
+    "inputBytes": 33554432,
+    "capturedOutputBytes": 1048576
+  },
+  "aggregate": {
+    "wallMilliseconds": 300000,
+    "attempts": 30,
+    "repetitionsPerCase": 2,
+    "concurrentAttempts": 1
+  },
+  "controlledInnerCutoffs": {
+    "wallMilliseconds": 500,
+    "fileBytes": 1024,
+    "capturedOutputBytes": 65536
+  }
+}
