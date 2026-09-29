@@ -477,10 +477,21 @@ All 16 historical repository pins and six external fingerprints reverify.
 The existing selector binding, tampering rejection and missing-history/no-HEAD-
 fallback controls pass in the suites. Codecs, vectors, historical pins,
 selectors, source loader, prior experiments, profiles, specifications and
-workflows remain byte-identical to the merge base. The revised 18-file
-inventory, using §8's diagnostic algorithm, is
-`e3d49d9008fc5f7151427fe8f6919e42962a4e8bf0f335ebdd7f5fc354ac283e`;
-§8's different inventory remains the historical PR #100 record.
+workflows remain byte-identical to the merge base. Using §8's diagnostic
+algorithm, which covers every tracked file under
+`experiments/bounded-event-representation/` except `REPORT.md`, the inventory
+history is:
+
+- PR #101 head `973c2a90df2005f908cabcc29642ae0613bc8ea6`:
+  `e3d49d9008fc5f7151427fe8f6919e42962a4e8bf0f335ebdd7f5fc354ac283e`;
+- audited pre-metadata-correction head
+  `6d0c6260cec60fd7ec2d3cdd831d5946af3f6a08`:
+  `6103f472047d5edda61c63a80d33557280ad603a41109e0c9d35dc44544d3293`.
+
+This metadata-only report correction changes no covered file, so its resulting
+18-file inventory remains
+`6103f472047d5edda61c63a80d33557280ad603a41109e0c9d35dc44544d3293`.
+Section 8's different inventory remains the historical PR #100 record.
 
 Documentation validation passed for 152 Markdown documents. The three-file
 diff passed `git diff --check` and strict UTF-8, LF, trailing-whitespace and
