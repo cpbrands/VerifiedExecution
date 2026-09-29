@@ -272,7 +272,20 @@ requirements or permission to implement changes in this PR:
 6. Assess copied-status trust, publication substitution, canonical/Unicode
    confusion, unknown critical/owned material and owner-set equality. Maintain
    Action-owned NFC/digest versus Event Text distinctions and precise invalid,
-   unsupported, unestablished and processing-incomplete boundaries.
+   unsupported, unestablished and processing-incomplete boundaries. Evaluate
+   embedded NUL; BOM as admitted semantic Text versus a malformed carrier marker;
+   newline and carriage-return controls; bidirectional and other display-affecting
+   controls; terminal, log and diagnostic injection; malformed UTF-8 and forbidden
+   scalar encodings; truncated packages and carrier structures; duplicate,
+   missing, extra or misordered structural members where applicable; invalid
+   lengths, trailing data, malformed chunks/lists/records, adversarial nesting,
+   oversized declarations and resource-exhaustion inputs. Valid Event Text code
+   points admitted by the Draft, including permitted controls, must remain exact:
+   safe display, logging and diagnostic escaping must not normalize, remove or
+   silently rewrite the underlying semantic value. Malformed carrier input must
+   reject deterministically without crashes, hangs, partial acceptance, resource
+   leaks or diagnostic injection. Assess these risks without selecting a
+   mitigation or changing representation semantics in the assessment mandate.
 7. Record external-material acquisition, retained editions, restoration and
    distribution-rights uncertainties with named responsible owner roles; do not
    assert legal permission or authenticity from a fingerprint. Identify a bounded
