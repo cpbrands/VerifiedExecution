@@ -400,20 +400,24 @@ experiment tests:
 5. Nonzero exit cleans up and reports metadata without echoed private material.
 6. A thrown launch error cleans up and redacts its private exception message.
 7. Missing executable and malformed output clean up and retain safe diagnostics.
-8. A real child exceeds the unchanged 120-second deadline, receives SIGTERM,
+8. The control first observes and asserts the unchanged production timeout of
+   120,000 ms, then the launch test seam injects a 500 ms test-only deadline.
+   A child that remains alive beyond that short deadline receives SIGTERM,
    returns ETIMEDOUT and is reaped; its input file and descriptor are removed.
 
 The controls assert absent temporary entries, closed descriptors (EBADF) and
-absent child PIDs (ESRCH), as applicable. The deliberate timeout is an expected
-passing control, not an unexpected suite timeout. Each full experiment run
-therefore takes at least 120 seconds longer than execution without that control.
-These groups are not new semantic vectors or semantic mutants. Counts are
+absent child PIDs (ESRCH), as applicable. The deliberate short timeout is an
+expected passing control, not an unexpected suite timeout. The test-only
+override is applied only after the production value has been asserted; it does
+not configure or weaken production behavior. Production remains fixed at
+120,000 ms with no retry, increase or decrease. These groups are not new
+semantic vectors or semantic mutants. Counts are
 **211 experiment tests** and **513 complete tests** (302 + 203 + 8). The 64
 positives, 67 negatives, 43 mutations, binding/runner/provenance tests and
 18 hand-derived anchors remain unchanged. The anchors do not cover every
 complex encoding family.
 
-### Bounded correction-validation record
+### Historical bounded correction-validation record
 
 All attempts below used the same corrected executable bytes in a full-history
 checkout, Node 24.19.0 / libuv 1.52.1 on macOS arm64. Python 3.12.14 retained
@@ -424,7 +428,7 @@ kept the host awake without changing saved power settings or test deadlines.
 
 | Run | Python | File scheduling | Passed/total | Seconds |
 |---|---|---|---:|---:|
-| Focused transport controls, excluding the real timeout | 3.12.14 | Default | 7/7 | 0.829 |
+| Focused transport controls, excluding the then-real timeout | 3.12.14 | Default | 7/7 | 0.829 |
 | Experiment 1 | 3.12.14 | Default | 211/211 | 242.354 |
 | Experiment 2 | 3.12.14 | Default | 211/211 | 237.847 |
 | Experiment 3 | 3.12.14 | Serial | 211/211 | 242.048 |
@@ -442,10 +446,14 @@ descriptor/PID cleanup assertions rather than proving observation of every
 short-lived process. Default Node file concurrency was nine on this ten-way
 host; there is one experiment test file and four complete-suite test files.
 Serial scheduling is `--test-concurrency=1`, not case filtering. Only the
-separate seven-test focused command excludes the real timeout; all nine matrix
-runs include it and every original assertion.
+separate seven-test focused command excluded the then-real timeout; all nine
+historical matrix runs included it and every original assertion. Those runs
+remain evidence for the original production-duration control. The current
+control preserves the same timeout, termination, reaping and cleanup assertions
+using the short test-only override described above.
 
-Exact command forms (with `PYTHON` set to the stated interpreter) were:
+Historical exact command forms (with `PYTHON` set to the stated interpreter)
+were:
 
 ```sh
 node --test --test-reporter=tap --test-name-pattern='^representation transport (?!real unchanged timeout)' experiments/bounded-event-representation/compare.test.mjs
@@ -454,6 +462,16 @@ node --test --test-reporter=tap --test-concurrency=1 experiments/bounded-event-r
 node --test --test-reporter=tap
 node --test --test-reporter=tap --test-concurrency=1
 ```
+
+The review-requested test-duration correction was then validated once with
+Python 3.12.14 and Node 24.19.0. All eight focused transport controls passed in
+1.680 seconds of Node test duration (1.84 seconds wall); the injected timeout
+control completed in 506.7 ms. The complete experiment passed 211/211 in
+125.236 seconds of Node test duration (125.26 seconds wall). The complete
+repository suite passed 513/513 in 125.924 seconds of Node test duration
+(125.96 seconds wall), with zero failures, skips, cancellations or timeouts.
+No nine-run matrix was repeated. These results confirm the efficient test seam;
+they do not replace or weaken the production 120,000 ms invariant.
 
 All 16 historical repository pins and six external fingerprints reverify.
 The existing selector binding, tampering rejection and missing-history/no-HEAD-

@@ -255,9 +255,14 @@ test('representation transport spawn and malformed-output failures clean and car
   const bad=transportControl(process.execPath,['-e',"process.stdout.write('private-malformed-output')"],'private-input');
   assert.throws(()=>checkedOutput(bad),e=>e.message.startsWith('runner/malformed-output:')&&!e.message.includes('private-malformed-output')&&e.message.includes('"stdoutBytes":24'));
 });
-test('representation transport real unchanged timeout terminates reaps and cleans',()=>{
-  const r=transportControl(process.execPath,['-e',"require('node:fs').readFileSync(0);setTimeout(()=>{},130000);"],'timeout-input');
+test('representation transport test-only timeout terminates reaps and cleans while production remains unchanged',()=>{
+  let observedProductionTimeout;
+  const r=transportControl(process.execPath,['-e',"require('node:fs').readFileSync(0);setTimeout(()=>{},5000);"],'timeout-input',(_fd,options)=>{
+    observedProductionTimeout=options.timeout;assert.equal(observedProductionTimeout,120000);
+    options.timeout=500;
+  });
+  assert.equal(observedProductionTimeout,120000,'production deadline observed before test-only override');
   assert.equal(r.diagnostics.errorCode,'ETIMEDOUT');assert.equal(r.diagnostics.status,null);assert.equal(r.diagnostics.signal,'SIGTERM');
-  assert.ok(r.diagnostics.elapsedMs>=120000,'unchanged 120-second deadline');
+  assert.ok(r.diagnostics.elapsedMs>=500,'injected test-only deadline');
   assert.throws(()=>checkedOutput(r),/runner\/subprocess/);
 });
