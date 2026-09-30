@@ -1,0 +1,2516 @@
+{
+  "format": "bounded-representation-adversarial-results-1",
+  "baseCommit": "bdd24a7b9de7132ecc7ce0e9c65d883a7ecf08d2",
+  "sourceInventorySha256": "6103f472047d5edda61c63a80d33557280ad603a41109e0c9d35dc44544d3293",
+  "budgets": {
+    "format": "bounded-representation-adversarial-budgets-1",
+    "baseCommit": "bdd24a7b9de7132ecc7ce0e9c65d883a7ecf08d2",
+    "sourceInventorySha256": "6103f472047d5edda61c63a80d33557280ad603a41109e0c9d35dc44544d3293",
+    "perAttempt": {
+      "wallMilliseconds": 20000,
+      "cpuSeconds": 12,
+      "memoryBytes": 2147483648,
+      "fileBytes": 67108864,
+      "fileDescriptors": 64,
+      "childProcesses": 4,
+      "inputBytes": 33554432,
+      "capturedOutputBytes": 1048576
+    },
+    "aggregate": {
+      "wallMilliseconds": 300000,
+      "attempts": 30,
+      "repetitionsPerCase": 2,
+      "concurrentAttempts": 1
+    },
+    "controlledInnerCutoffs": {
+      "wallMilliseconds": 500,
+      "memoryBytes": 134217728,
+      "memoryAllocationBytes": 268435456,
+      "fileBytes": 1024,
+      "capturedOutputBytes": 65536
+    }
+  },
+  "cases": [
+    {
+      "id": "small-integer-control",
+      "threats": [
+        "T04"
+      ],
+      "stage": "codec encode/decode",
+      "expected": "valid semantic value",
+      "outcomeClass": "valid-resource-intensive",
+      "repetitions": 2
+    },
+    {
+      "id": "valid-integer-32768-bit",
+      "threats": [
+        "T04",
+        "T06"
+      ],
+      "stage": "JSON/pre-parser and integer codec",
+      "expected": "exact A/B canonical agreement",
+      "outcomeClass": "valid-resource-intensive",
+      "repetitions": 1
+    },
+    {
+      "id": "valid-rational-near-coprime",
+      "threats": [
+        "T04",
+        "T05"
+      ],
+      "stage": "endpoint arithmetic and codec",
+      "expected": "exact A/B canonical agreement",
+      "outcomeClass": "valid-resource-intensive",
+      "repetitions": 1
+    },
+    {
+      "id": "valid-text-controls",
+      "threats": [
+        "T05",
+        "T10",
+        "T11",
+        "T12"
+      ],
+      "stage": "Text mapping and safe presentation",
+      "expected": "exact bytes retained; escaped view only",
+      "outcomeClass": "valid-resource-intensive",
+      "repetitions": 1
+    },
+    {
+      "id": "preparser-valid-text-2mib",
+      "threats": [
+        "T05",
+        "T06"
+      ],
+      "stage": "JSON/pre-parser allocation and Text codec",
+      "expected": "exact A/B canonical agreement",
+      "outcomeClass": "valid-resource-intensive",
+      "repetitions": 1
+    },
+    {
+      "id": "valid-list-depth-128",
+      "threats": [
+        "T05",
+        "T06"
+      ],
+      "stage": "nested list conversion",
+      "expected": "exact A/B canonical agreement",
+      "outcomeClass": "valid-resource-intensive",
+      "repetitions": 1
+    },
+    {
+      "id": "valid-set-common-prefix",
+      "threats": [
+        "T05",
+        "T06"
+      ],
+      "stage": "set encoding, comparison and sorting",
+      "expected": "exact A/B canonical agreement",
+      "outcomeClass": "valid-resource-intensive",
+      "repetitions": 1
+    },
+    {
+      "id": "valid-repeated-material-package",
+      "threats": [
+        "T05",
+        "T06",
+        "T13"
+      ],
+      "stage": "package material comparison and codec",
+      "expected": "exact A/B canonical agreement",
+      "outcomeClass": "valid-resource-intensive",
+      "repetitions": 1
+    },
+    {
+      "id": "malformed-truncated-bytes",
+      "threats": [
+        "T03"
+      ],
+      "stage": "carrier parser",
+      "expected": "encoding/truncated from A and B",
+      "outcomeClass": "malformed-carrier-rejection",
+      "repetitions": 1
+    },
+    {
+      "id": "malformed-length-declaration",
+      "threats": [
+        "T03",
+        "T05"
+      ],
+      "stage": "carrier length parser",
+      "expected": "encoding/truncated from A and B",
+      "outcomeClass": "malformed-carrier-rejection",
+      "repetitions": 1
+    },
+    {
+      "id": "calendar-year-one-control",
+      "threats": [
+        "T03",
+        "T04"
+      ],
+      "stage": "endpoint domain validation",
+      "expected": "valid canonical endpoint",
+      "outcomeClass": "valid-resource-intensive",
+      "repetitions": 1
+    },
+    {
+      "id": "calendar-year-zero",
+      "threats": [
+        "T03",
+        "T04"
+      ],
+      "stage": "endpoint domain validation",
+      "expected": "domain/positive from A and B under sufficient resources",
+      "outcomeClass": "canonical-field-domain-violation",
+      "repetitions": 1
+    },
+    {
+      "id": "rational-unreduced",
+      "threats": [
+        "T03",
+        "T04"
+      ],
+      "stage": "endpoint domain validation",
+      "expected": "domain/endpoint from A and B",
+      "outcomeClass": "canonical-field-domain-violation",
+      "repetitions": 1
+    },
+    {
+      "id": "unsupported-extension-constructor",
+      "threats": [
+        "T03",
+        "T08"
+      ],
+      "stage": "extension interpretation",
+      "expected": "unsupported/extension-constructor from A and B",
+      "outcomeClass": "unsupported-interpretation",
+      "repetitions": 1
+    },
+    {
+      "id": "resource-size-declaration",
+      "threats": [
+        "T03",
+        "T05"
+      ],
+      "stage": "carrier resource guard",
+      "expected": "processing-incomplete/resource-limit from A and B",
+      "outcomeClass": "resource-unavailable-incomplete",
+      "repetitions": 1
+    },
+    {
+      "id": "dependency-unavailable",
+      "threats": [
+        "T07",
+        "T13"
+      ],
+      "stage": "immutable source loading",
+      "expected": "closed failure with no HEAD fallback",
+      "outcomeClass": "unsupported-interpretation",
+      "repetitions": 1
+    },
+    {
+      "id": "dependency-substitution",
+      "threats": [
+        "T07",
+        "T13"
+      ],
+      "stage": "source fingerprint verification",
+      "expected": "closed provenance failure",
+      "outcomeClass": "unsupported-interpretation",
+      "repetitions": 1
+    },
+    {
+      "id": "establishment-failed",
+      "threats": [
+        "T02",
+        "T09"
+      ],
+      "stage": "establishment carriage",
+      "expected": "canonical carriage preserves failed status",
+      "outcomeClass": "authentication-establishment-failure",
+      "repetitions": 1
+    },
+    {
+      "id": "diagnostic-injection",
+      "threats": [
+        "T10",
+        "T11",
+        "T12"
+      ],
+      "stage": "diagnostic presentation",
+      "expected": "unsupported/test-type without reflected control text",
+      "outcomeClass": "unsupported-interpretation",
+      "repetitions": 1
+    },
+    {
+      "id": "controlled-permission-failure",
+      "threats": [
+        "T11",
+        "T12"
+      ],
+      "stage": "temporary input creation",
+      "expected": "sanitized transport failure and no residue",
+      "outcomeClass": "harness-process-failure",
+      "repetitions": 1
+    },
+    {
+      "id": "controlled-launch-failure",
+      "threats": [
+        "T12"
+      ],
+      "stage": "child launch",
+      "expected": "sanitized ENOENT and no partial success",
+      "outcomeClass": "harness-process-failure",
+      "repetitions": 1
+    },
+    {
+      "id": "controlled-write-cutoff",
+      "threats": [
+        "T06",
+        "T11",
+        "T12"
+      ],
+      "stage": "child file write",
+      "expected": "bounded file-size cutoff",
+      "outcomeClass": "harness-process-failure",
+      "repetitions": 1
+    },
+    {
+      "id": "controlled-output-cutoff",
+      "threats": [
+        "T06",
+        "T12"
+      ],
+      "stage": "child output capture",
+      "expected": "bounded output cutoff",
+      "outcomeClass": "harness-process-failure",
+      "repetitions": 1
+    },
+    {
+      "id": "controlled-cleanup-failure",
+      "threats": [
+        "T11",
+        "T12"
+      ],
+      "stage": "inner transport cleanup",
+      "expected": "cleanup failure surfaced; outer isolation removes residue",
+      "outcomeClass": "harness-process-failure",
+      "repetitions": 1
+    },
+    {
+      "id": "controlled-parent-interruption",
+      "threats": [
+        "T11",
+        "T12"
+      ],
+      "stage": "parent/child lifecycle",
+      "expected": "interruption surfaced and child reaped",
+      "outcomeClass": "harness-process-failure",
+      "repetitions": 1
+    },
+    {
+      "id": "controlled-hostile-child",
+      "threats": [
+        "T12"
+      ],
+      "stage": "hostile child lifecycle",
+      "expected": "inner watchdog cutoff and child reaped",
+      "outcomeClass": "harness-process-failure",
+      "repetitions": 1
+    },
+    {
+      "id": "controlled-memory-watchdog-cutoff",
+      "threats": [
+        "T06",
+        "T12"
+      ],
+      "stage": "external process-group memory monitoring",
+      "expected": "aggregate RSS cutoff at the controlled 128 MiB ceiling; no semantic classification",
+      "outcomeClass": "harness-process-failure",
+      "repetitions": 1
+    },
+    {
+      "id": "controlled-fd-cutoff",
+      "threats": [
+        "T06",
+        "T12"
+      ],
+      "stage": "file-descriptor allocation",
+      "expected": "EMFILE cutoff and all opened descriptors closed",
+      "outcomeClass": "harness-process-failure",
+      "repetitions": 1
+    },
+    {
+      "id": "platform-process-limit",
+      "threats": [
+        "T12"
+      ],
+      "stage": "process-count enforcement capability",
+      "expected": "record hard-limit support separately from serial process cap",
+      "outcomeClass": "harness-process-failure",
+      "repetitions": 1
+    }
+  ],
+  "attempts": [
+    {
+      "attemptId": "small-integer-control#1",
+      "caseId": "small-integer-control",
+      "repetition": 1,
+      "threats": [
+        "T04"
+      ],
+      "targetedStage": "codec encode/decode",
+      "expectedOutcome": "valid semantic value",
+      "outcomeClass": "valid-resource-intensive",
+      "actualOutcome": {
+        "A": "accepted",
+        "B": "accepted"
+      },
+      "evidenceDisposition": "pass",
+      "inputBytes": 11165356,
+      "carrierBytes": 4,
+      "relevantBytes": {
+        "canonicalSha256": "f6ef213cf263cfa58a644107b8c9bd88e086bd1e41423632f9d2718a9176db8b"
+      },
+      "presentation": null,
+      "caseObservations": {},
+      "resources": {
+        "wallMilliseconds": 458.204,
+        "cpuUserSeconds": 0.312187,
+        "cpuSystemSeconds": 0.203977,
+        "peakRssBytes": 209666048,
+        "peakTempBytes": 11165356,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 209666048,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 11
+        },
+        "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
+          "cpu": true,
+          "fds": true,
+          "file": true,
+          "processes": false
+        },
+        "stdoutBytes": 342,
+        "stderrBytes": 0
+      },
+      "aftermath": {
+        "processGroupSurvived": false,
+        "fileDescriptorsBefore": 5,
+        "fileDescriptorsAfter": 5,
+        "tempResidueBeforeCleanup": [],
+        "tempResidueAfterCleanup": [],
+        "cleanupError": null
+      },
+      "runtime": {
+        "os": "macOS-27.0-arm64-arm-64bit",
+        "python": "3.9.6",
+        "node": "v24.19.0",
+        "platform": "darwin",
+        "architecture": "arm64"
+      },
+      "classification": "pass"
+    },
+    {
+      "attemptId": "small-integer-control#2",
+      "caseId": "small-integer-control",
+      "repetition": 2,
+      "threats": [
+        "T04"
+      ],
+      "targetedStage": "codec encode/decode",
+      "expectedOutcome": "valid semantic value",
+      "outcomeClass": "valid-resource-intensive",
+      "actualOutcome": {
+        "A": "accepted",
+        "B": "accepted"
+      },
+      "evidenceDisposition": "pass",
+      "inputBytes": 11165356,
+      "carrierBytes": 4,
+      "relevantBytes": {
+        "canonicalSha256": "f6ef213cf263cfa58a644107b8c9bd88e086bd1e41423632f9d2718a9176db8b"
+      },
+      "presentation": null,
+      "caseObservations": {},
+      "resources": {
+        "wallMilliseconds": 407.713,
+        "cpuUserSeconds": 0.311879,
+        "cpuSystemSeconds": 0.182108,
+        "peakRssBytes": 198688768,
+        "peakTempBytes": 11165356,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 198688768,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 10
+        },
+        "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
+          "cpu": true,
+          "fds": true,
+          "file": true,
+          "processes": false
+        },
+        "stdoutBytes": 342,
+        "stderrBytes": 0
+      },
+      "aftermath": {
+        "processGroupSurvived": false,
+        "fileDescriptorsBefore": 5,
+        "fileDescriptorsAfter": 5,
+        "tempResidueBeforeCleanup": [],
+        "tempResidueAfterCleanup": [],
+        "cleanupError": null
+      },
+      "runtime": {
+        "os": "macOS-27.0-arm64-arm-64bit",
+        "python": "3.9.6",
+        "node": "v24.19.0",
+        "platform": "darwin",
+        "architecture": "arm64"
+      },
+      "classification": "pass"
+    },
+    {
+      "attemptId": "valid-integer-32768-bit#1",
+      "caseId": "valid-integer-32768-bit",
+      "repetition": 1,
+      "threats": [
+        "T04",
+        "T06"
+      ],
+      "targetedStage": "JSON/pre-parser and integer codec",
+      "expectedOutcome": "exact A/B canonical agreement",
+      "outcomeClass": "valid-resource-intensive",
+      "actualOutcome": {
+        "A": "accepted",
+        "B": "accepted"
+      },
+      "evidenceDisposition": "pass",
+      "inputBytes": 11175220,
+      "carrierBytes": 4101,
+      "relevantBytes": {
+        "canonicalSha256": "85ede5bbebb1f2380f5b8541455acf6d4871a686d34523a3510a2b695d6f4d19"
+      },
+      "presentation": null,
+      "caseObservations": {},
+      "resources": {
+        "wallMilliseconds": 455.233,
+        "cpuUserSeconds": 0.328569,
+        "cpuSystemSeconds": 0.189981,
+        "peakRssBytes": 237191168,
+        "peakTempBytes": 11175220,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 237191168,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 11
+        },
+        "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
+          "cpu": true,
+          "fds": true,
+          "file": true,
+          "processes": false
+        },
+        "stdoutBytes": 347,
+        "stderrBytes": 0
+      },
+      "aftermath": {
+        "processGroupSurvived": false,
+        "fileDescriptorsBefore": 5,
+        "fileDescriptorsAfter": 5,
+        "tempResidueBeforeCleanup": [],
+        "tempResidueAfterCleanup": [],
+        "cleanupError": null
+      },
+      "runtime": {
+        "os": "macOS-27.0-arm64-arm-64bit",
+        "python": "3.9.6",
+        "node": "v24.19.0",
+        "platform": "darwin",
+        "architecture": "arm64"
+      },
+      "classification": "pass"
+    },
+    {
+      "attemptId": "valid-rational-near-coprime#1",
+      "caseId": "valid-rational-near-coprime",
+      "repetition": 1,
+      "threats": [
+        "T04",
+        "T05"
+      ],
+      "targetedStage": "endpoint arithmetic and codec",
+      "expectedOutcome": "exact A/B canonical agreement",
+      "outcomeClass": "valid-resource-intensive",
+      "actualOutcome": {
+        "A": "accepted",
+        "B": "accepted"
+      },
+      "evidenceDisposition": "pass",
+      "inputBytes": 11170415,
+      "carrierBytes": 2070,
+      "relevantBytes": {
+        "canonicalSha256": "9a3c573cdbca513d240e956e44f351a8072f9f686c9955a13d508501a694d75f"
+      },
+      "presentation": null,
+      "caseObservations": {},
+      "resources": {
+        "wallMilliseconds": 449.458,
+        "cpuUserSeconds": 0.323011,
+        "cpuSystemSeconds": 0.189465,
+        "peakRssBytes": 240746496,
+        "peakTempBytes": 11170415,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 240746496,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 11
+        },
+        "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
+          "cpu": true,
+          "fds": true,
+          "file": true,
+          "processes": false
+        },
+        "stdoutBytes": 351,
+        "stderrBytes": 0
+      },
+      "aftermath": {
+        "processGroupSurvived": false,
+        "fileDescriptorsBefore": 5,
+        "fileDescriptorsAfter": 5,
+        "tempResidueBeforeCleanup": [],
+        "tempResidueAfterCleanup": [],
+        "cleanupError": null
+      },
+      "runtime": {
+        "os": "macOS-27.0-arm64-arm-64bit",
+        "python": "3.9.6",
+        "node": "v24.19.0",
+        "platform": "darwin",
+        "architecture": "arm64"
+      },
+      "classification": "pass"
+    },
+    {
+      "attemptId": "valid-text-controls#1",
+      "caseId": "valid-text-controls",
+      "repetition": 1,
+      "threats": [
+        "T05",
+        "T10",
+        "T11",
+        "T12"
+      ],
+      "targetedStage": "Text mapping and safe presentation",
+      "expectedOutcome": "exact bytes retained; escaped view only",
+      "outcomeClass": "valid-resource-intensive",
+      "actualOutcome": {
+        "A": "accepted",
+        "B": "accepted"
+      },
+      "evidenceDisposition": "pass",
+      "inputBytes": 11165403,
+      "carrierBytes": 50,
+      "relevantBytes": {
+        "canonicalSha256": "794ee7192fb5b3eb3817ee1d0e70e02b8e45a008d2ca5e0df7241fb69e7617c2"
+      },
+      "presentation": {
+        "codePoints": [
+          "U+0070",
+          "U+0072",
+          "U+0065",
+          "U+0066",
+          "U+0069",
+          "U+0078",
+          "U+0000",
+          "U+000A",
+          "U+000D",
+          "U+0009",
+          "U+001B",
+          "U+005B",
+          "U+0033",
+          "U+0031",
+          "U+006D",
+          "U+005D",
+          "U+0020",
+          "U+0066",
+          "U+0061",
+          "U+006B",
+          "U+0065",
+          "U+0020",
+          "U+0050",
+          "U+0041"
+        ],
+        "scalarCount": 46,
+        "utf8Bytes": 48,
+        "utf8Sha256": "69a8757d4a65bb53aca6373c7c5f18b80514b2f78f8b1988b72d12dc157a108e",
+        "view": "code-points-and-digest-only"
+      },
+      "caseObservations": {},
+      "resources": {
+        "wallMilliseconds": 493.103,
+        "cpuUserSeconds": 0.36318,
+        "cpuSystemSeconds": 0.208088,
+        "peakRssBytes": 256999424,
+        "peakTempBytes": 11165437,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 256999424,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 12
+        },
+        "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
+          "cpu": true,
+          "fds": true,
+          "file": true,
+          "processes": false
+        },
+        "stdoutBytes": 738,
+        "stderrBytes": 0
+      },
+      "aftermath": {
+        "processGroupSurvived": false,
+        "fileDescriptorsBefore": 5,
+        "fileDescriptorsAfter": 5,
+        "tempResidueBeforeCleanup": [],
+        "tempResidueAfterCleanup": [],
+        "cleanupError": null
+      },
+      "runtime": {
+        "os": "macOS-27.0-arm64-arm-64bit",
+        "python": "3.9.6",
+        "node": "v24.19.0",
+        "platform": "darwin",
+        "architecture": "arm64"
+      },
+      "classification": "pass"
+    },
+    {
+      "attemptId": "preparser-valid-text-2mib#1",
+      "caseId": "preparser-valid-text-2mib",
+      "repetition": 1,
+      "threats": [
+        "T05",
+        "T06"
+      ],
+      "targetedStage": "JSON/pre-parser allocation and Text codec",
+      "expectedOutcome": "exact A/B canonical agreement",
+      "outcomeClass": "valid-resource-intensive",
+      "actualOutcome": {
+        "A": "accepted",
+        "B": "accepted"
+      },
+      "evidenceDisposition": "pass",
+      "inputBytes": 14311067,
+      "carrierBytes": 3148799,
+      "relevantBytes": {
+        "canonicalSha256": "a78c11e7e411d2bc8c8cb067d8ba6acf1702f26b5f9ec07ba98b6306dfc2f178"
+      },
+      "presentation": {
+        "codePoints": [
+          "U+0065",
+          "U+0301",
+          "U+0065",
+          "U+0301",
+          "U+0065",
+          "U+0301",
+          "U+0065",
+          "U+0301",
+          "U+0065",
+          "U+0301",
+          "U+0065",
+          "U+0301",
+          "U+0065",
+          "U+0301",
+          "U+0065",
+          "U+0301",
+          "U+0065",
+          "U+0301",
+          "U+0065",
+          "U+0301",
+          "U+0065",
+          "U+0301",
+          "U+0065",
+          "U+0301"
+        ],
+        "scalarCount": 2097152,
+        "utf8Bytes": 3145728,
+        "utf8Sha256": "6952c6d2fb7f3eb227173b4b861f086bee4751089c8e79d223dc85f686c9f1a2",
+        "view": "code-points-and-digest-only"
+      },
+      "caseObservations": {},
+      "resources": {
+        "wallMilliseconds": 858.123,
+        "cpuUserSeconds": 0.73773,
+        "cpuSystemSeconds": 0.385121,
+        "peakRssBytes": 657391616,
+        "peakTempBytes": 17462935,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 657391616,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 20
+        },
+        "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
+          "cpu": true,
+          "fds": true,
+          "file": true,
+          "processes": false
+        },
+        "stdoutBytes": 759,
+        "stderrBytes": 0
+      },
+      "aftermath": {
+        "processGroupSurvived": false,
+        "fileDescriptorsBefore": 5,
+        "fileDescriptorsAfter": 5,
+        "tempResidueBeforeCleanup": [],
+        "tempResidueAfterCleanup": [],
+        "cleanupError": null
+      },
+      "runtime": {
+        "os": "macOS-27.0-arm64-arm-64bit",
+        "python": "3.9.6",
+        "node": "v24.19.0",
+        "platform": "darwin",
+        "architecture": "arm64"
+      },
+      "classification": "pass"
+    },
+    {
+      "attemptId": "valid-list-depth-128#1",
+      "caseId": "valid-list-depth-128",
+      "repetition": 1,
+      "threats": [
+        "T05",
+        "T06"
+      ],
+      "targetedStage": "nested list conversion",
+      "expectedOutcome": "exact A/B canonical agreement",
+      "outcomeClass": "valid-resource-intensive",
+      "actualOutcome": {
+        "A": "accepted",
+        "B": "accepted"
+      },
+      "evidenceDisposition": "pass",
+      "inputBytes": 11166758,
+      "carrierBytes": 1030,
+      "relevantBytes": {
+        "canonicalSha256": "18573e1d175f960922071e2895d337209ea3d9240fb592daa5e9d4312d67a1f8"
+      },
+      "presentation": null,
+      "caseObservations": {},
+      "resources": {
+        "wallMilliseconds": 456.092,
+        "cpuUserSeconds": 0.334266,
+        "cpuSystemSeconds": 0.193429,
+        "peakRssBytes": 226295808,
+        "peakTempBytes": 11167402,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 226295808,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 11
+        },
+        "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
+          "cpu": true,
+          "fds": true,
+          "file": true,
+          "processes": false
+        },
+        "stdoutBytes": 344,
+        "stderrBytes": 0
+      },
+      "aftermath": {
+        "processGroupSurvived": false,
+        "fileDescriptorsBefore": 5,
+        "fileDescriptorsAfter": 5,
+        "tempResidueBeforeCleanup": [],
+        "tempResidueAfterCleanup": [],
+        "cleanupError": null
+      },
+      "runtime": {
+        "os": "macOS-27.0-arm64-arm-64bit",
+        "python": "3.9.6",
+        "node": "v24.19.0",
+        "platform": "darwin",
+        "architecture": "arm64"
+      },
+      "classification": "pass"
+    },
+    {
+      "attemptId": "valid-set-common-prefix#1",
+      "caseId": "valid-set-common-prefix",
+      "repetition": 1,
+      "threats": [
+        "T05",
+        "T06"
+      ],
+      "targetedStage": "set encoding, comparison and sorting",
+      "expectedOutcome": "exact A/B canonical agreement",
+      "outcomeClass": "valid-resource-intensive",
+      "actualOutcome": {
+        "A": "accepted",
+        "B": "accepted"
+      },
+      "evidenceDisposition": "pass",
+      "inputBytes": 11429415,
+      "carrierBytes": 263814,
+      "relevantBytes": {
+        "canonicalSha256": "68e483594c9c08bd544eabe392e9cae65a8d0dee5cde63d1b23dd028d6980b10"
+      },
+      "presentation": null,
+      "caseObservations": {},
+      "resources": {
+        "wallMilliseconds": 453.135,
+        "cpuUserSeconds": 0.348969,
+        "cpuSystemSeconds": 0.195483,
+        "peakRssBytes": 248102912,
+        "peakTempBytes": 11692970,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 248102912,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 11
+        },
+        "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
+          "cpu": true,
+          "fds": true,
+          "file": true,
+          "processes": false
+        },
+        "stdoutBytes": 349,
+        "stderrBytes": 0
+      },
+      "aftermath": {
+        "processGroupSurvived": false,
+        "fileDescriptorsBefore": 5,
+        "fileDescriptorsAfter": 5,
+        "tempResidueBeforeCleanup": [],
+        "tempResidueAfterCleanup": [],
+        "cleanupError": null
+      },
+      "runtime": {
+        "os": "macOS-27.0-arm64-arm-64bit",
+        "python": "3.9.6",
+        "node": "v24.19.0",
+        "platform": "darwin",
+        "architecture": "arm64"
+      },
+      "classification": "pass"
+    },
+    {
+      "attemptId": "valid-repeated-material-package#1",
+      "caseId": "valid-repeated-material-package",
+      "repetition": 1,
+      "threats": [
+        "T05",
+        "T06",
+        "T13"
+      ],
+      "targetedStage": "package material comparison and codec",
+      "expectedOutcome": "exact A/B canonical agreement",
+      "outcomeClass": "valid-resource-intensive",
+      "actualOutcome": {
+        "A": "accepted",
+        "B": "accepted"
+      },
+      "evidenceDisposition": "pass",
+      "inputBytes": 30104554,
+      "carrierBytes": 9484254,
+      "relevantBytes": {
+        "canonicalSha256": "a3340b6fe27cf2295e31a55605c7207a4aa2fe18385e2a06006be57adad3a008"
+      },
+      "presentation": null,
+      "caseObservations": {},
+      "resources": {
+        "wallMilliseconds": 1133.289,
+        "cpuUserSeconds": 1.182173,
+        "cpuSystemSeconds": 0.398992,
+        "peakRssBytes": 679952384,
+        "peakTempBytes": 30104554,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 679952384,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 27
+        },
+        "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
+          "cpu": true,
+          "fds": true,
+          "file": true,
+          "processes": false
+        },
+        "stdoutBytes": 358,
+        "stderrBytes": 0
+      },
+      "aftermath": {
+        "processGroupSurvived": false,
+        "fileDescriptorsBefore": 5,
+        "fileDescriptorsAfter": 5,
+        "tempResidueBeforeCleanup": [],
+        "tempResidueAfterCleanup": [],
+        "cleanupError": null
+      },
+      "runtime": {
+        "os": "macOS-27.0-arm64-arm-64bit",
+        "python": "3.9.6",
+        "node": "v24.19.0",
+        "platform": "darwin",
+        "architecture": "arm64"
+      },
+      "classification": "pass"
+    },
+    {
+      "attemptId": "malformed-truncated-bytes#1",
+      "caseId": "malformed-truncated-bytes",
+      "repetition": 1,
+      "threats": [
+        "T03"
+      ],
+      "targetedStage": "carrier parser",
+      "expectedOutcome": "encoding/truncated from A and B",
+      "outcomeClass": "malformed-carrier-rejection",
+      "actualOutcome": {
+        "A": "encoding/truncated",
+        "B": "encoding/truncated"
+      },
+      "evidenceDisposition": "pass",
+      "inputBytes": 11165341,
+      "carrierBytes": 2,
+      "relevantBytes": {
+        "canonicalSha256": "d1693f8807f6a5c250a65ba6c79c09cc3cc3651882d79b6dff1b4d2fac6b38f3"
+      },
+      "presentation": null,
+      "caseObservations": {},
+      "resources": {
+        "wallMilliseconds": 327.683,
+        "cpuUserSeconds": 0.213108,
+        "cpuSystemSeconds": 0.141587,
+        "peakRssBytes": 228655104,
+        "peakTempBytes": 11165341,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 228655104,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 8
+        },
+        "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
+          "cpu": true,
+          "fds": true,
+          "file": true,
+          "processes": false
+        },
+        "stdoutBytes": 366,
+        "stderrBytes": 0
+      },
+      "aftermath": {
+        "processGroupSurvived": false,
+        "fileDescriptorsBefore": 5,
+        "fileDescriptorsAfter": 5,
+        "tempResidueBeforeCleanup": [],
+        "tempResidueAfterCleanup": [],
+        "cleanupError": null
+      },
+      "runtime": {
+        "os": "macOS-27.0-arm64-arm-64bit",
+        "python": "3.9.6",
+        "node": "v24.19.0",
+        "platform": "darwin",
+        "architecture": "arm64"
+      },
+      "classification": "pass"
+    },
+    {
+      "attemptId": "malformed-length-declaration#1",
+      "caseId": "malformed-length-declaration",
+      "repetition": 1,
+      "threats": [
+        "T03",
+        "T05"
+      ],
+      "targetedStage": "carrier length parser",
+      "expectedOutcome": "encoding/truncated from A and B",
+      "outcomeClass": "malformed-carrier-rejection",
+      "actualOutcome": {
+        "A": "encoding/truncated",
+        "B": "encoding/truncated"
+      },
+      "evidenceDisposition": "pass",
+      "inputBytes": 11165347,
+      "carrierBytes": 4,
+      "relevantBytes": {
+        "canonicalSha256": "63f215777e1fe74aa201269b85aa71154a49916a22c5a13d070bd76f4bf71efa"
+      },
+      "presentation": null,
+      "caseObservations": {},
+      "resources": {
+        "wallMilliseconds": 288.201,
+        "cpuUserSeconds": 0.208265,
+        "cpuSystemSeconds": 0.131571,
+        "peakRssBytes": 187203584,
+        "peakTempBytes": 11165347,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 187203584,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 7
+        },
+        "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
+          "cpu": true,
+          "fds": true,
+          "file": true,
+          "processes": false
+        },
+        "stdoutBytes": 369,
+        "stderrBytes": 0
+      },
+      "aftermath": {
+        "processGroupSurvived": false,
+        "fileDescriptorsBefore": 5,
+        "fileDescriptorsAfter": 5,
+        "tempResidueBeforeCleanup": [],
+        "tempResidueAfterCleanup": [],
+        "cleanupError": null
+      },
+      "runtime": {
+        "os": "macOS-27.0-arm64-arm-64bit",
+        "python": "3.9.6",
+        "node": "v24.19.0",
+        "platform": "darwin",
+        "architecture": "arm64"
+      },
+      "classification": "pass"
+    },
+    {
+      "attemptId": "calendar-year-one-control#1",
+      "caseId": "calendar-year-one-control",
+      "repetition": 1,
+      "threats": [
+        "T03",
+        "T04"
+      ],
+      "targetedStage": "endpoint domain validation",
+      "expectedOutcome": "valid canonical endpoint",
+      "outcomeClass": "valid-resource-intensive",
+      "actualOutcome": {
+        "A": "accepted",
+        "B": "accepted"
+      },
+      "evidenceDisposition": "pass",
+      "inputBytes": 11165478,
+      "carrierBytes": 17,
+      "relevantBytes": {
+        "canonicalSha256": "1515f9388807116bb8137c16823d7166fdd722a12a90616167b0137736d85a39"
+      },
+      "presentation": null,
+      "caseObservations": {},
+      "resources": {
+        "wallMilliseconds": 409.462,
+        "cpuUserSeconds": 0.319167,
+        "cpuSystemSeconds": 0.183571,
+        "peakRssBytes": 241369088,
+        "peakTempBytes": 11165478,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 241369088,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 10
+        },
+        "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
+          "cpu": true,
+          "fds": true,
+          "file": true,
+          "processes": false
+        },
+        "stdoutBytes": 347,
+        "stderrBytes": 0
+      },
+      "aftermath": {
+        "processGroupSurvived": false,
+        "fileDescriptorsBefore": 5,
+        "fileDescriptorsAfter": 5,
+        "tempResidueBeforeCleanup": [],
+        "tempResidueAfterCleanup": [],
+        "cleanupError": null
+      },
+      "runtime": {
+        "os": "macOS-27.0-arm64-arm-64bit",
+        "python": "3.9.6",
+        "node": "v24.19.0",
+        "platform": "darwin",
+        "architecture": "arm64"
+      },
+      "classification": "pass"
+    },
+    {
+      "attemptId": "calendar-year-zero#1",
+      "caseId": "calendar-year-zero",
+      "repetition": 1,
+      "threats": [
+        "T03",
+        "T04"
+      ],
+      "targetedStage": "endpoint domain validation",
+      "expectedOutcome": "domain/positive from A and B under sufficient resources",
+      "outcomeClass": "canonical-field-domain-violation",
+      "actualOutcome": {
+        "A": "domain/positive",
+        "B": "domain/positive"
+      },
+      "evidenceDisposition": "pass",
+      "inputBytes": 11165373,
+      "carrierBytes": 16,
+      "relevantBytes": {
+        "canonicalSha256": "f86e49dfee6ba1fe2e2a5fb2abec34163bdfade3da7ce4fe1495f7009f8b8549"
+      },
+      "presentation": null,
+      "caseObservations": {},
+      "resources": {
+        "wallMilliseconds": 287.96,
+        "cpuUserSeconds": 0.209265,
+        "cpuSystemSeconds": 0.130671,
+        "peakRssBytes": 187318272,
+        "peakTempBytes": 11165373,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 187318272,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 7
+        },
+        "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
+          "cpu": true,
+          "fds": true,
+          "file": true,
+          "processes": false
+        },
+        "stdoutBytes": 354,
+        "stderrBytes": 0
+      },
+      "aftermath": {
+        "processGroupSurvived": false,
+        "fileDescriptorsBefore": 5,
+        "fileDescriptorsAfter": 5,
+        "tempResidueBeforeCleanup": [],
+        "tempResidueAfterCleanup": [],
+        "cleanupError": null
+      },
+      "runtime": {
+        "os": "macOS-27.0-arm64-arm-64bit",
+        "python": "3.9.6",
+        "node": "v24.19.0",
+        "platform": "darwin",
+        "architecture": "arm64"
+      },
+      "classification": "pass"
+    },
+    {
+      "attemptId": "rational-unreduced#1",
+      "caseId": "rational-unreduced",
+      "repetition": 1,
+      "threats": [
+        "T03",
+        "T04"
+      ],
+      "targetedStage": "endpoint domain validation",
+      "expectedOutcome": "domain/endpoint from A and B",
+      "outcomeClass": "canonical-field-domain-violation",
+      "actualOutcome": {
+        "A": "domain/endpoint",
+        "B": "domain/endpoint"
+      },
+      "evidenceDisposition": "pass",
+      "inputBytes": 11165377,
+      "carrierBytes": 18,
+      "relevantBytes": {
+        "canonicalSha256": "d1be6f1e5df3f6f197bbbe0529882cf5b61a775084f4cffa02c3c078a8b12efd"
+      },
+      "presentation": null,
+      "caseObservations": {},
+      "resources": {
+        "wallMilliseconds": 289.034,
+        "cpuUserSeconds": 0.212244,
+        "cpuSystemSeconds": 0.13276,
+        "peakRssBytes": 227786752,
+        "peakTempBytes": 11165377,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 227786752,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 7
+        },
+        "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
+          "cpu": true,
+          "fds": true,
+          "file": true,
+          "processes": false
+        },
+        "stdoutBytes": 354,
+        "stderrBytes": 0
+      },
+      "aftermath": {
+        "processGroupSurvived": false,
+        "fileDescriptorsBefore": 5,
+        "fileDescriptorsAfter": 5,
+        "tempResidueBeforeCleanup": [],
+        "tempResidueAfterCleanup": [],
+        "cleanupError": null
+      },
+      "runtime": {
+        "os": "macOS-27.0-arm64-arm-64bit",
+        "python": "3.9.6",
+        "node": "v24.19.0",
+        "platform": "darwin",
+        "architecture": "arm64"
+      },
+      "classification": "pass"
+    },
+    {
+      "attemptId": "unsupported-extension-constructor#1",
+      "caseId": "unsupported-extension-constructor",
+      "repetition": 1,
+      "threats": [
+        "T03",
+        "T08"
+      ],
+      "targetedStage": "extension interpretation",
+      "expectedOutcome": "unsupported/extension-constructor from A and B",
+      "outcomeClass": "unsupported-interpretation",
+      "actualOutcome": {
+        "A": "unsupported/extension-constructor",
+        "B": "unsupported/extension-constructor"
+      },
+      "evidenceDisposition": "pass",
+      "inputBytes": 11165356,
+      "carrierBytes": 7,
+      "relevantBytes": {
+        "canonicalSha256": "6b28bc3a870a068a3dee27c01bd601afd7e3ea1b89d917bca532317c04f3d838"
+      },
+      "presentation": null,
+      "caseObservations": {},
+      "resources": {
+        "wallMilliseconds": 290.89,
+        "cpuUserSeconds": 0.211768,
+        "cpuSystemSeconds": 0.133669,
+        "peakRssBytes": 187351040,
+        "peakTempBytes": 11165356,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 187351040,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 7
+        },
+        "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
+          "cpu": true,
+          "fds": true,
+          "file": true,
+          "processes": false
+        },
+        "stdoutBytes": 404,
+        "stderrBytes": 0
+      },
+      "aftermath": {
+        "processGroupSurvived": false,
+        "fileDescriptorsBefore": 5,
+        "fileDescriptorsAfter": 5,
+        "tempResidueBeforeCleanup": [],
+        "tempResidueAfterCleanup": [],
+        "cleanupError": null
+      },
+      "runtime": {
+        "os": "macOS-27.0-arm64-arm-64bit",
+        "python": "3.9.6",
+        "node": "v24.19.0",
+        "platform": "darwin",
+        "architecture": "arm64"
+      },
+      "classification": "pass"
+    },
+    {
+      "attemptId": "resource-size-declaration#1",
+      "caseId": "resource-size-declaration",
+      "repetition": 1,
+      "threats": [
+        "T03",
+        "T05"
+      ],
+      "targetedStage": "carrier resource guard",
+      "expectedOutcome": "processing-incomplete/resource-limit from A and B",
+      "outcomeClass": "resource-unavailable-incomplete",
+      "actualOutcome": {
+        "A": "processing-incomplete/resource-limit",
+        "B": "processing-incomplete/resource-limit"
+      },
+      "evidenceDisposition": "expected-incomplete-processing",
+      "inputBytes": 11165357,
+      "carrierBytes": 9,
+      "relevantBytes": {
+        "canonicalSha256": "8ab1fcaa4634fbd2e114aa67e07df78cfaf0d7a9d92d980fb7a703457e52becb"
+      },
+      "presentation": null,
+      "caseObservations": {},
+      "resources": {
+        "wallMilliseconds": 324.248,
+        "cpuUserSeconds": 0.211794,
+        "cpuSystemSeconds": 0.140591,
+        "peakRssBytes": 155648000,
+        "peakTempBytes": 11165357,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 155648000,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 8
+        },
+        "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
+          "cpu": true,
+          "fds": true,
+          "file": true,
+          "processes": false
+        },
+        "stdoutBytes": 402,
+        "stderrBytes": 0
+      },
+      "aftermath": {
+        "processGroupSurvived": false,
+        "fileDescriptorsBefore": 5,
+        "fileDescriptorsAfter": 5,
+        "tempResidueBeforeCleanup": [],
+        "tempResidueAfterCleanup": [],
+        "cleanupError": null
+      },
+      "runtime": {
+        "os": "macOS-27.0-arm64-arm-64bit",
+        "python": "3.9.6",
+        "node": "v24.19.0",
+        "platform": "darwin",
+        "architecture": "arm64"
+      },
+      "classification": "pass"
+    },
+    {
+      "attemptId": "dependency-unavailable#1",
+      "caseId": "dependency-unavailable",
+      "repetition": 1,
+      "threats": [
+        "T07",
+        "T13"
+      ],
+      "targetedStage": "immutable source loading",
+      "expectedOutcome": "closed failure with no HEAD fallback",
+      "outcomeClass": "unsupported-interpretation",
+      "actualOutcome": {
+        "loader": "provenance/missing-history"
+      },
+      "evidenceDisposition": "pass",
+      "inputBytes": 0,
+      "carrierBytes": null,
+      "relevantBytes": null,
+      "presentation": null,
+      "caseObservations": {},
+      "resources": {
+        "wallMilliseconds": 165.717,
+        "cpuUserSeconds": 0.09582,
+        "cpuSystemSeconds": 0.080907,
+        "peakRssBytes": 58933248,
+        "peakTempBytes": 0,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 58933248,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 4
+        },
+        "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
+          "cpu": true,
+          "fds": true,
+          "file": true,
+          "processes": false
+        },
+        "stdoutBytes": 264,
+        "stderrBytes": 0
+      },
+      "aftermath": {
+        "processGroupSurvived": false,
+        "fileDescriptorsBefore": 5,
+        "fileDescriptorsAfter": 5,
+        "tempResidueBeforeCleanup": [],
+        "tempResidueAfterCleanup": [],
+        "cleanupError": null
+      },
+      "runtime": {
+        "os": "macOS-27.0-arm64-arm-64bit",
+        "python": "3.9.6",
+        "node": "v24.19.0",
+        "platform": "darwin",
+        "architecture": "arm64"
+      },
+      "classification": "pass"
+    },
+    {
+      "attemptId": "dependency-substitution#1",
+      "caseId": "dependency-substitution",
+      "repetition": 1,
+      "threats": [
+        "T07",
+        "T13"
+      ],
+      "targetedStage": "source fingerprint verification",
+      "expectedOutcome": "closed provenance failure",
+      "outcomeClass": "unsupported-interpretation",
+      "actualOutcome": {
+        "loader": "provenance/sha256"
+      },
+      "evidenceDisposition": "pass",
+      "inputBytes": 18,
+      "carrierBytes": null,
+      "relevantBytes": null,
+      "presentation": null,
+      "caseObservations": {},
+      "resources": {
+        "wallMilliseconds": 165.913,
+        "cpuUserSeconds": 0.093167,
+        "cpuSystemSeconds": 0.079769,
+        "peakRssBytes": 56573952,
+        "peakTempBytes": 0,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 56573952,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 4
+        },
+        "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
+          "cpu": true,
+          "fds": true,
+          "file": true,
+          "processes": false
+        },
+        "stdoutBytes": 257,
+        "stderrBytes": 0
+      },
+      "aftermath": {
+        "processGroupSurvived": false,
+        "fileDescriptorsBefore": 5,
+        "fileDescriptorsAfter": 5,
+        "tempResidueBeforeCleanup": [],
+        "tempResidueAfterCleanup": [],
+        "cleanupError": null
+      },
+      "runtime": {
+        "os": "macOS-27.0-arm64-arm-64bit",
+        "python": "3.9.6",
+        "node": "v24.19.0",
+        "platform": "darwin",
+        "architecture": "arm64"
+      },
+      "classification": "pass"
+    },
+    {
+      "attemptId": "establishment-failed#1",
+      "caseId": "establishment-failed",
+      "repetition": 1,
+      "threats": [
+        "T02",
+        "T09"
+      ],
+      "targetedStage": "establishment carriage",
+      "expectedOutcome": "canonical carriage preserves failed status",
+      "outcomeClass": "authentication-establishment-failure",
+      "actualOutcome": {
+        "A": "accepted",
+        "B": "accepted"
+      },
+      "evidenceDisposition": "pass",
+      "inputBytes": 11165379,
+      "carrierBytes": 25,
+      "relevantBytes": {
+        "canonicalSha256": "d695764799b4df86039962cc93b0e0a4693212098f7903ed3736e45c3eb824ab"
+      },
+      "presentation": null,
+      "caseObservations": {
+        "establishmentStatus": "failed"
+      },
+      "resources": {
+        "wallMilliseconds": 457.062,
+        "cpuUserSeconds": 0.334801,
+        "cpuSystemSeconds": 0.198304,
+        "peakRssBytes": 235716608,
+        "peakTempBytes": 11165396,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 235716608,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 11
+        },
+        "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
+          "cpu": true,
+          "fds": true,
+          "file": true,
+          "processes": false
+        },
+        "stdoutBytes": 373,
+        "stderrBytes": 0
+      },
+      "aftermath": {
+        "processGroupSurvived": false,
+        "fileDescriptorsBefore": 5,
+        "fileDescriptorsAfter": 5,
+        "tempResidueBeforeCleanup": [],
+        "tempResidueAfterCleanup": [],
+        "cleanupError": null
+      },
+      "runtime": {
+        "os": "macOS-27.0-arm64-arm-64bit",
+        "python": "3.9.6",
+        "node": "v24.19.0",
+        "platform": "darwin",
+        "architecture": "arm64"
+      },
+      "classification": "pass"
+    },
+    {
+      "attemptId": "diagnostic-injection#1",
+      "caseId": "diagnostic-injection",
+      "repetition": 1,
+      "threats": [
+        "T10",
+        "T11",
+        "T12"
+      ],
+      "targetedStage": "diagnostic presentation",
+      "expectedOutcome": "unsupported/test-type without reflected control text",
+      "outcomeClass": "unsupported-interpretation",
+      "actualOutcome": {
+        "A": "unsupported/test-type",
+        "B": "unsupported/test-type"
+      },
+      "evidenceDisposition": "pass",
+      "inputBytes": 11165367,
+      "carrierBytes": null,
+      "relevantBytes": null,
+      "presentation": {
+        "codePoints": [
+          "U+0075",
+          "U+006E",
+          "U+006B",
+          "U+006E",
+          "U+006F",
+          "U+0077",
+          "U+006E",
+          "U+000A",
+          "U+0050",
+          "U+0041",
+          "U+0053",
+          "U+0053",
+          "U+0020",
+          "U+0066",
+          "U+0061",
+          "U+006B",
+          "U+0065",
+          "U+000D",
+          "U+001B",
+          "U+005B",
+          "U+0033",
+          "U+0031",
+          "U+006D"
+        ],
+        "scalarCount": 23,
+        "utf8Bytes": 23,
+        "utf8Sha256": "acf30917300d0eac0aecc90feb173374fecf336638f54f7a3dada679b3292d21",
+        "view": "code-points-and-digest-only"
+      },
+      "caseObservations": {},
+      "resources": {
+        "wallMilliseconds": 329.079,
+        "cpuUserSeconds": 0.220874,
+        "cpuSystemSeconds": 0.148234,
+        "peakRssBytes": 222494720,
+        "peakTempBytes": 11165367,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 222494720,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 8
+        },
+        "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
+          "cpu": true,
+          "fds": true,
+          "file": true,
+          "processes": false
+        },
+        "stdoutBytes": 675,
+        "stderrBytes": 0
+      },
+      "aftermath": {
+        "processGroupSurvived": false,
+        "fileDescriptorsBefore": 5,
+        "fileDescriptorsAfter": 5,
+        "tempResidueBeforeCleanup": [],
+        "tempResidueAfterCleanup": [],
+        "cleanupError": null
+      },
+      "runtime": {
+        "os": "macOS-27.0-arm64-arm-64bit",
+        "python": "3.9.6",
+        "node": "v24.19.0",
+        "platform": "darwin",
+        "architecture": "arm64"
+      },
+      "classification": "pass"
+    },
+    {
+      "attemptId": "controlled-permission-failure#1",
+      "caseId": "controlled-permission-failure",
+      "repetition": 1,
+      "threats": [
+        "T11",
+        "T12"
+      ],
+      "targetedStage": "temporary input creation",
+      "expectedOutcome": "sanitized transport failure and no residue",
+      "outcomeClass": "harness-process-failure",
+      "actualOutcome": {
+        "harness": "EACCES"
+      },
+      "evidenceDisposition": "pass",
+      "inputBytes": 2,
+      "carrierBytes": null,
+      "relevantBytes": null,
+      "presentation": null,
+      "caseObservations": {
+        "diagnostics": {
+          "codec": "permission",
+          "elapsedMs": 0.06591600000001563,
+          "errorCode": "EACCES",
+          "inputBytes": 2,
+          "signal": null,
+          "status": null,
+          "stderrBytes": 0,
+          "stdoutBytes": 0
+        }
+      },
+      "resources": {
+        "wallMilliseconds": 163.076,
+        "cpuUserSeconds": 0.094456,
+        "cpuSystemSeconds": 0.080158,
+        "peakRssBytes": 56508416,
+        "peakTempBytes": 0,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 56508416,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 4
+        },
+        "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
+          "cpu": true,
+          "fds": true,
+          "file": true,
+          "processes": false
+        },
+        "stdoutBytes": 417,
+        "stderrBytes": 0
+      },
+      "aftermath": {
+        "processGroupSurvived": false,
+        "fileDescriptorsBefore": 5,
+        "fileDescriptorsAfter": 5,
+        "tempResidueBeforeCleanup": [
+          "blocked"
+        ],
+        "tempResidueAfterCleanup": [],
+        "cleanupError": null
+      },
+      "runtime": {
+        "os": "macOS-27.0-arm64-arm-64bit",
+        "python": "3.9.6",
+        "node": "v24.19.0",
+        "platform": "darwin",
+        "architecture": "arm64"
+      },
+      "classification": "pass"
+    },
+    {
+      "attemptId": "controlled-launch-failure#1",
+      "caseId": "controlled-launch-failure",
+      "repetition": 1,
+      "threats": [
+        "T12"
+      ],
+      "targetedStage": "child launch",
+      "expectedOutcome": "sanitized ENOENT and no partial success",
+      "outcomeClass": "harness-process-failure",
+      "actualOutcome": {
+        "harness": "ENOENT"
+      },
+      "evidenceDisposition": "pass",
+      "inputBytes": 2,
+      "carrierBytes": null,
+      "relevantBytes": null,
+      "presentation": null,
+      "caseObservations": {
+        "diagnostics": {
+          "codec": "launch",
+          "elapsedMs": 0.756040999999982,
+          "errorCode": "ENOENT",
+          "inputBytes": 2,
+          "signal": null,
+          "status": null,
+          "stderrBytes": 0,
+          "stdoutBytes": 0
+        }
+      },
+      "resources": {
+        "wallMilliseconds": 166.308,
+        "cpuUserSeconds": 0.094636,
+        "cpuSystemSeconds": 0.079431,
+        "peakRssBytes": 55525376,
+        "peakTempBytes": 0,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 55525376,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 4
+        },
+        "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
+          "cpu": true,
+          "fds": true,
+          "file": true,
+          "processes": false
+        },
+        "stdoutBytes": 407,
+        "stderrBytes": 0
+      },
+      "aftermath": {
+        "processGroupSurvived": false,
+        "fileDescriptorsBefore": 5,
+        "fileDescriptorsAfter": 5,
+        "tempResidueBeforeCleanup": [],
+        "tempResidueAfterCleanup": [],
+        "cleanupError": null
+      },
+      "runtime": {
+        "os": "macOS-27.0-arm64-arm-64bit",
+        "python": "3.9.6",
+        "node": "v24.19.0",
+        "platform": "darwin",
+        "architecture": "arm64"
+      },
+      "classification": "pass"
+    },
+    {
+      "attemptId": "controlled-write-cutoff#1",
+      "caseId": "controlled-write-cutoff",
+      "repetition": 1,
+      "threats": [
+        "T06",
+        "T11",
+        "T12"
+      ],
+      "targetedStage": "child file write",
+      "expectedOutcome": "bounded file-size cutoff",
+      "outcomeClass": "harness-process-failure",
+      "actualOutcome": {
+        "child": "status-1"
+      },
+      "evidenceDisposition": "test-safety-cutoff",
+      "inputBytes": 4096,
+      "carrierBytes": null,
+      "relevantBytes": null,
+      "presentation": null,
+      "caseObservations": {
+        "diagnostics": {
+          "stderrBytes": 109,
+          "stdoutBytes": 0
+        }
+      },
+      "resources": {
+        "wallMilliseconds": 198.997,
+        "cpuUserSeconds": 0.112018,
+        "cpuSystemSeconds": 0.093786,
+        "peakRssBytes": 75677696,
+        "peakTempBytes": 0,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 75677696,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 5
+        },
+        "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
+          "cpu": true,
+          "fds": true,
+          "file": true,
+          "processes": false
+        },
+        "stdoutBytes": 299,
+        "stderrBytes": 0
+      },
+      "aftermath": {
+        "processGroupSurvived": false,
+        "fileDescriptorsBefore": 5,
+        "fileDescriptorsAfter": 5,
+        "tempResidueBeforeCleanup": [
+          "tmp0utl_9sx"
+        ],
+        "tempResidueAfterCleanup": [],
+        "cleanupError": null
+      },
+      "runtime": {
+        "os": "macOS-27.0-arm64-arm-64bit",
+        "python": "3.9.6",
+        "node": "v24.19.0",
+        "platform": "darwin",
+        "architecture": "arm64"
+      },
+      "classification": "pass"
+    },
+    {
+      "attemptId": "controlled-output-cutoff#1",
+      "caseId": "controlled-output-cutoff",
+      "repetition": 1,
+      "threats": [
+        "T06",
+        "T12"
+      ],
+      "targetedStage": "child output capture",
+      "expectedOutcome": "bounded output cutoff",
+      "outcomeClass": "harness-process-failure",
+      "actualOutcome": {
+        "child": "ENOBUFS"
+      },
+      "evidenceDisposition": "test-safety-cutoff",
+      "inputBytes": 0,
+      "carrierBytes": null,
+      "relevantBytes": null,
+      "presentation": null,
+      "caseObservations": {
+        "diagnostics": {
+          "capturedOutputLimit": 65536
+        }
+      },
+      "resources": {
+        "wallMilliseconds": 204.229,
+        "cpuUserSeconds": 0.112406,
+        "cpuSystemSeconds": 0.091433,
+        "peakRssBytes": 109576192,
+        "peakTempBytes": 0,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 109576192,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 5
+        },
+        "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
+          "cpu": true,
+          "fds": true,
+          "file": true,
+          "processes": false
+        },
+        "stdoutBytes": 290,
+        "stderrBytes": 0
+      },
+      "aftermath": {
+        "processGroupSurvived": false,
+        "fileDescriptorsBefore": 5,
+        "fileDescriptorsAfter": 5,
+        "tempResidueBeforeCleanup": [],
+        "tempResidueAfterCleanup": [],
+        "cleanupError": null
+      },
+      "runtime": {
+        "os": "macOS-27.0-arm64-arm-64bit",
+        "python": "3.9.6",
+        "node": "v24.19.0",
+        "platform": "darwin",
+        "architecture": "arm64"
+      },
+      "classification": "pass"
+    },
+    {
+      "attemptId": "controlled-cleanup-failure#1",
+      "caseId": "controlled-cleanup-failure",
+      "repetition": 1,
+      "threats": [
+        "T11",
+        "T12"
+      ],
+      "targetedStage": "inner transport cleanup",
+      "expectedOutcome": "cleanup failure surfaced; outer isolation removes residue",
+      "outcomeClass": "harness-process-failure",
+      "actualOutcome": {
+        "harness": "EACCES"
+      },
+      "evidenceDisposition": "pass",
+      "inputBytes": 2,
+      "carrierBytes": null,
+      "relevantBytes": null,
+      "presentation": null,
+      "caseObservations": {
+        "innerResidueCount": 1,
+        "outerCleanup": "complete"
+      },
+      "resources": {
+        "wallMilliseconds": 161.511,
+        "cpuUserSeconds": 0.094181,
+        "cpuSystemSeconds": 0.080503,
+        "peakRssBytes": 56475648,
+        "peakTempBytes": 0,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 56475648,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 4
+        },
+        "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
+          "cpu": true,
+          "fds": true,
+          "file": true,
+          "processes": false
+        },
+        "stdoutBytes": 297,
+        "stderrBytes": 0
+      },
+      "aftermath": {
+        "processGroupSurvived": false,
+        "fileDescriptorsBefore": 5,
+        "fileDescriptorsAfter": 5,
+        "tempResidueBeforeCleanup": [],
+        "tempResidueAfterCleanup": [],
+        "cleanupError": null
+      },
+      "runtime": {
+        "os": "macOS-27.0-arm64-arm-64bit",
+        "python": "3.9.6",
+        "node": "v24.19.0",
+        "platform": "darwin",
+        "architecture": "arm64"
+      },
+      "classification": "pass"
+    },
+    {
+      "attemptId": "controlled-parent-interruption#1",
+      "caseId": "controlled-parent-interruption",
+      "repetition": 1,
+      "threats": [
+        "T11",
+        "T12"
+      ],
+      "targetedStage": "parent/child lifecycle",
+      "expectedOutcome": "interruption surfaced and child reaped",
+      "outcomeClass": "harness-process-failure",
+      "actualOutcome": {
+        "parent": "SIGTERM"
+      },
+      "evidenceDisposition": "pass",
+      "inputBytes": 0,
+      "carrierBytes": null,
+      "relevantBytes": null,
+      "presentation": null,
+      "caseObservations": {
+        "childCleanup": "kill-issued-if-created"
+      },
+      "resources": {
+        "wallMilliseconds": 207.41,
+        "cpuUserSeconds": 0.112845,
+        "cpuSystemSeconds": 0.091362,
+        "peakRssBytes": 117784576,
+        "peakTempBytes": 0,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 117784576,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 5
+        },
+        "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
+          "cpu": true,
+          "fds": true,
+          "file": true,
+          "processes": false
+        },
+        "stdoutBytes": 293,
+        "stderrBytes": 0
+      },
+      "aftermath": {
+        "processGroupSurvived": false,
+        "fileDescriptorsBefore": 5,
+        "fileDescriptorsAfter": 5,
+        "tempResidueBeforeCleanup": [],
+        "tempResidueAfterCleanup": [],
+        "cleanupError": null
+      },
+      "runtime": {
+        "os": "macOS-27.0-arm64-arm-64bit",
+        "python": "3.9.6",
+        "node": "v24.19.0",
+        "platform": "darwin",
+        "architecture": "arm64"
+      },
+      "classification": "pass"
+    },
+    {
+      "attemptId": "controlled-hostile-child#1",
+      "caseId": "controlled-hostile-child",
+      "repetition": 1,
+      "threats": [
+        "T12"
+      ],
+      "targetedStage": "hostile child lifecycle",
+      "expectedOutcome": "inner watchdog cutoff and child reaped",
+      "outcomeClass": "harness-process-failure",
+      "actualOutcome": {
+        "child": "ETIMEDOUT"
+      },
+      "evidenceDisposition": "test-safety-cutoff",
+      "inputBytes": 0,
+      "carrierBytes": null,
+      "relevantBytes": null,
+      "presentation": null,
+      "caseObservations": {
+        "diagnostics": {
+          "wallCutoffMilliseconds": 500
+        }
+      },
+      "resources": {
+        "wallMilliseconds": 685.597,
+        "cpuUserSeconds": 0.140213,
+        "cpuSystemSeconds": 0.200618,
+        "peakRssBytes": 116064256,
+        "peakTempBytes": 0,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 116064256,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 16
+        },
+        "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
+          "cpu": true,
+          "fds": true,
+          "file": true,
+          "processes": false
+        },
+        "stdoutBytes": 293,
+        "stderrBytes": 0
+      },
+      "aftermath": {
+        "processGroupSurvived": false,
+        "fileDescriptorsBefore": 5,
+        "fileDescriptorsAfter": 5,
+        "tempResidueBeforeCleanup": [],
+        "tempResidueAfterCleanup": [],
+        "cleanupError": null
+      },
+      "runtime": {
+        "os": "macOS-27.0-arm64-arm-64bit",
+        "python": "3.9.6",
+        "node": "v24.19.0",
+        "platform": "darwin",
+        "architecture": "arm64"
+      },
+      "classification": "pass"
+    },
+    {
+      "attemptId": "controlled-memory-watchdog-cutoff#1",
+      "caseId": "controlled-memory-watchdog-cutoff",
+      "repetition": 1,
+      "threats": [
+        "T06",
+        "T12"
+      ],
+      "targetedStage": "external process-group memory monitoring",
+      "expectedOutcome": "aggregate RSS cutoff at the controlled 128 MiB ceiling; no semantic classification",
+      "outcomeClass": "harness-process-failure",
+      "actualOutcome": {
+        "watchdog": "aggregate-rss-memory-limit"
+      },
+      "evidenceDisposition": "test-safety-cutoff",
+      "inputBytes": 0,
+      "carrierBytes": null,
+      "relevantBytes": null,
+      "presentation": null,
+      "caseObservations": {
+        "configuredMemoryBytes": 134217728,
+        "syntheticAllocationBytes": 268435456,
+        "cutoff": "aggregate-rss-memory-limit",
+        "monitorSamples": 6
+      },
+      "resources": {
+        "wallMilliseconds": 482.621,
+        "cpuUserSeconds": 0.033145,
+        "cpuSystemSeconds": 0.064498,
+        "peakRssBytes": 144556032,
+        "peakTempBytes": 0,
+        "memoryBudgetBytes": 134217728,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 144556032,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 6
+        },
+        "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
+          "cpu": true,
+          "fds": true,
+          "file": true,
+          "processes": false
+        },
+        "stdoutBytes": 0,
+        "stderrBytes": 0
+      },
+      "aftermath": {
+        "processGroupSurvived": false,
+        "fileDescriptorsBefore": 5,
+        "fileDescriptorsAfter": 5,
+        "tempResidueBeforeCleanup": [],
+        "tempResidueAfterCleanup": [],
+        "cleanupError": null
+      },
+      "runtime": {
+        "os": "macOS-27.0-arm64-arm-64bit",
+        "python": "3.9.6",
+        "node": null,
+        "platform": null,
+        "architecture": null
+      },
+      "classification": "pass"
+    },
+    {
+      "attemptId": "controlled-fd-cutoff#1",
+      "caseId": "controlled-fd-cutoff",
+      "repetition": 1,
+      "threats": [
+        "T06",
+        "T12"
+      ],
+      "targetedStage": "file-descriptor allocation",
+      "expectedOutcome": "EMFILE cutoff and all opened descriptors closed",
+      "outcomeClass": "harness-process-failure",
+      "actualOutcome": {
+        "worker": "EMFILE"
+      },
+      "evidenceDisposition": "test-safety-cutoff",
+      "inputBytes": 0,
+      "carrierBytes": null,
+      "relevantBytes": null,
+      "presentation": null,
+      "caseObservations": {
+        "closedDescriptors": 53,
+        "openedDescriptors": 53
+      },
+      "resources": {
+        "wallMilliseconds": 165.985,
+        "cpuUserSeconds": 0.09594,
+        "cpuSystemSeconds": 0.078688,
+        "peakRssBytes": 59015168,
+        "peakTempBytes": 0,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 59015168,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 4
+        },
+        "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
+          "cpu": true,
+          "fds": true,
+          "file": true,
+          "processes": false
+        },
+        "stdoutBytes": 288,
+        "stderrBytes": 0
+      },
+      "aftermath": {
+        "processGroupSurvived": false,
+        "fileDescriptorsBefore": 5,
+        "fileDescriptorsAfter": 5,
+        "tempResidueBeforeCleanup": [],
+        "tempResidueAfterCleanup": [],
+        "cleanupError": null
+      },
+      "runtime": {
+        "os": "macOS-27.0-arm64-arm-64bit",
+        "python": "3.9.6",
+        "node": "v24.19.0",
+        "platform": "darwin",
+        "architecture": "arm64"
+      },
+      "classification": "pass"
+    },
+    {
+      "attemptId": "platform-process-limit#1",
+      "caseId": "platform-process-limit",
+      "repetition": 1,
+      "threats": [
+        "T12"
+      ],
+      "targetedStage": "process-count enforcement capability",
+      "expectedOutcome": "record hard-limit support separately from serial process cap",
+      "outcomeClass": "harness-process-failure",
+      "actualOutcome": {
+        "orchestrator": "serial-child-count-cap"
+      },
+      "evidenceDisposition": "unsupported-platform",
+      "inputBytes": 0,
+      "carrierBytes": null,
+      "relevantBytes": null,
+      "presentation": null,
+      "caseObservations": {
+        "hardProcessLimit": "reported-by-watchdog"
+      },
+      "resources": {
+        "wallMilliseconds": 165.582,
+        "cpuUserSeconds": 0.092423,
+        "cpuSystemSeconds": 0.078164,
+        "peakRssBytes": 58687488,
+        "peakTempBytes": 0,
+        "memoryBudgetBytes": 2147483648,
+        "aggregateMemoryWatchdogEnforced": true,
+        "hardAddressSpaceLimitEnforced": false,
+        "memoryMonitor": {
+          "method": "ps-process-group-rss",
+          "peakGroupMembers": 2,
+          "peakGroupRssBytes": 58687488,
+          "pollMilliseconds": 25,
+          "psPath": "/bin/ps",
+          "samples": 4
+        },
+        "limitsEnforced": {
+          "addressSpace": false,
+          "aggregateRssMemory": true,
+          "cpu": true,
+          "fds": true,
+          "file": true,
+          "processes": false
+        },
+        "stdoutBytes": 308,
+        "stderrBytes": 0
+      },
+      "aftermath": {
+        "processGroupSurvived": false,
+        "fileDescriptorsBefore": 5,
+        "fileDescriptorsAfter": 5,
+        "tempResidueBeforeCleanup": [],
+        "tempResidueAfterCleanup": [],
+        "cleanupError": null
+      },
+      "runtime": {
+        "os": "macOS-27.0-arm64-arm-64bit",
+        "python": "3.9.6",
+        "node": "v24.19.0",
+        "platform": "darwin",
+        "architecture": "arm64"
+      },
+      "classification": "pass"
+    }
+  ],
+  "summary": {
+    "attempts": 30,
+    "pass": 30,
+    "failure": 0,
+    "inconclusive": 0,
+    "deterministicImplementationDefect": 0,
+    "expectedIncomplete": 1,
+    "testSafetyCutoff": 5,
+    "unsupportedPlatform": 1,
+    "elapsedMilliseconds": 17203
+  }
+}
