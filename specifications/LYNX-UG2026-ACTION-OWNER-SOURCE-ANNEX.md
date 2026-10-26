@@ -1,7 +1,7 @@
 ---
 id: "LYNX-UG2026-ACTION-OWNER-SOURCE-ANNEX"
 title: "Lynx UG2026 Action-owner Common Source Annex"
-version: "0.1-draft.1"
+version: "0.1-draft.2"
 status: "Draft"
 document_type: "Specification"
 category: "Action-owner Source Annex"
@@ -11,22 +11,38 @@ updated: 2026-10-25
 depends_on:
   - "VE-001"
   - "ADR-ENC-001"
-related_documents: []
+related_documents:
+  - "RFC-014"
+  - "ADR-014"
 supersedes: null
 superseded_by: null
 ---
 
 # Lynx UG2026 Action-owner Common Source Annex
 
-Draft proposal status: **DRAFT — INCOMPLETE; NOT APPROVED OR INTEROPERABILITY-CLEARED.** This successor Action-owner proposal is intended for public discussion. Its owner-designated technical baseline, document metadata, exact approved descriptor, sixteen expected interpretation-source selections, scoped roles and fixed-import conflict veto are retained. Owner capacity is a recorded declaration; the accepted Draft provenance basis is not new independent publisher authentication. Independently adopted successor publication bindings, the agreeing context, fixed-import/UTF-8/NFC compatibility and applicable governance remain open. Public availability does not establish formal Review/Approved status, stable compatibility, complete closure, authentic establishment, message/settlement conformance or cryptographic interoperability. Historical publications and review targets remain separate and unchanged.
+Draft status: **DRAFT — INCOMPLETE; NOT APPROVED OR INTEROPERABILITY-CLEARED.** This revision integrates the accepted RFC-014/ADR-014 additive Class B design and the owner-adopted bounded UTF-8/NFC finding recorded in ADR-014. Governance acceptance is not specification approval. The exact technical baseline, approved descriptor, sixteen expected interpretation-source selections, scoped roles and fixed-import conflict veto are retained. Owner capacity remains a declaration; the accepted provenance basis is not new independent publisher authentication. Actual independently selected successor publication/context bindings, claim-specific recursive closure and implementation/interoperability evidence remain separate obligations. Public availability does not establish a frozen review target, stable compatibility, execution authority or settlement truth. Historical publications and reviewer records remain unchanged.
 
 The exact keys and responsibility rules below are the Founder-selected interpretation basis for this Draft. Applying that baseline to actual publications still requires the independently established agreeing pair/context binding. A mutable local filename or title is not an immutable source selection.
 
-## Draft publication and provenance (informative)
+## Draft status and provenance (informative)
 
-The header identifies this proposed document and its Draft revision. Intended repository path: `specifications/LYNX-UG2026-ACTION-OWNER-SOURCE-ANNEX.md`. The creation date records preparation of this successor document, not creation of its historical predecessors or external standards; the update date records its latest editorial change. A-ANNEX is a local role handle for this named document, not a wire value or immutable source key. Identifier/path observations apply to their checked integration base; they are not a registry reservation or an independently governed source selection.
+The header identifies this document and its Draft revision. Intended repository path: `specifications/LYNX-UG2026-ACTION-OWNER-SOURCE-ANNEX.md`. The creation date records preparation of this successor document, not creation of its historical predecessors or external standards; the update date records its latest editorial change. A-ANNEX is a local role handle for this named document, not a wire value or immutable source key. Identifier/path observations apply to their checked integration base; they are not a registry reservation or an independently governed source selection.
 
 The independently selected successor publication bindings and actual agreeing governing context remain to be established. Header identifiers, filenames and observed branch commits alone do not supply those selections. The sixteen expected interpretation-source keys retain the recorded Founder selection and trust basis. This note and separate preparation records add no normative definition dependency and do not certify complete Materials or role closure. Draft publication, an exactly bound Draft review target and cryptographic interoperability remain distinct assurance states; the Approved-canonical-profile prerequisite is not discharged by publishing this proposal. Independently recorded review gates remain unchanged.
+
+## Governance integration and revision history (informative)
+
+The Founder allocated and accepted [RFC-014, revision 0.1](../rfcs/RFC-014-action-owner-successors.md) and [ADR-014, revision 0.1](../adrs/ADR-014-action-owner-successors.md) for the additive Action-owner design. ADR-014 records the owner-adopted bounded UTF-8/NFC source-text finding. The design is Class B at the additional independently selected contract boundary, not a drop-in replacement, old-selector retargeting or historical digest-equivalence claim.
+
+These links and related-document identifiers provide governance/change trace, not new inputs to S, F, framing, normalization or hashing. A claim to establish this revision's authorized governance relies on the corresponding decision evidence; its necessary exact authority/material bindings remain a separate claim-specific responsibility. Informative citation does not close those roles or make required governance evidence dispensable. Existing operative dependency requirements and the fixed-import conflict veto are unchanged.
+
+Repository links provide navigation, not independently adopted immutable publication/context selections. Neither this revision label nor governance acceptance supplies an agreeing context, complete recursive closure, specification approval or interoperability clearance. Conditional conflict/approval clauses in the technical baseline remain safeguards; the adopted finding addresses this bounded pair, not every future claim.
+
+| Preparation date | Prior revision | This revision | Change |
+|---|---|---|---|
+| 25 October 2026, America/Edmonton | `0.1-draft.1` | `0.1-draft.2` | Governance references, status/provenance and revision history only; technical clauses, fixed literals and selected source keys preserved. |
+
+This history records preparation of the revision, not a publication date, source fingerprint or emitted-byte result. Creation/update metadata records 25 October, the preparation date, rather than independent evidence of publication. The separate review gates remain unchanged; Phase B remains closed.
 
 ## 1. Key notation and source authority
 
@@ -255,5 +271,5 @@ An expected length can reject a different-length purported publication before ha
 
 The existing body fingerprints and lengths were carried forward from the retained original manifest/candidate record, not recomputed in this assembly. The original manifest is identified by SHA-256 `d946aec19c90c8298350f66b1c2721e916eabf8c7d302997e8363cbe9949c534`.
 
-No new successor publication pins, canonical Action/schema/package bytes or digest outputs, independent-review findings or authoritative verification results are supplied. The three observed source-body fingerprints above were copied from the completed authorized evidence pass, not recomputed in this update. The Founder Draft-target, sixteen expected-source selections and local metadata decisions are recorded. Actual successor/context bindings, applicable compatibility/governance, Approved/stable lifecycle advancement and full closure are not supplied by this preparation.
+No new successor publication pins, canonical Action/schema/package bytes or digest outputs, independent-review findings or authoritative verification results are supplied. The three observed source-body fingerprints above were copied from the completed authorized evidence pass, not recomputed in this update. The Founder Draft-target, sixteen expected-source selections and local metadata decisions are recorded. The bounded UTF-8/NFC finding is adopted and RFC-014/ADR-014's additive design/classification is accepted within their stated scope. Actual successor/context bindings, remaining claim-specific governance/material roles, Approved/stable lifecycle advancement and full closure are not supplied by public availability alone.
 
