@@ -7,7 +7,7 @@ document_type: Changelog
 category: Governance
 author: Verified Execution Editorial Board
 created: 2026-08-22
-updated: 2026-09-13
+updated: 2026-10-25
 depends_on:
   - SPECIFICATION-GOVERNANCE
 supersedes: null
@@ -17,6 +17,36 @@ superseded_by: null
 # Verified Execution Repository Changelog
 
 This changelog records repository-wide semantic, governance, status, and structural changes. Specification-specific changelogs remain authoritative for changes to their specifications.
+
+## 2026-10-25 — Additive Action-owner governance acceptance and Draft integration preparation
+
+- **Authority:** [Accepted RFC-014](rfcs/RFC-014-action-owner-successors.md) and
+  [Accepted ADR-014](adrs/ADR-014-action-owner-successors.md), governance revisions 0.1.
+- **Classification:** Class B for the additional independently selected Action-owner
+  contract design; not an editorial classification for the entire design or a
+  drop-in replacement guarantee.
+- **Assessed design baseline:** The three draft-1 sources at commit
+  `313a2f3eba707aa901dbeba51a327bc32081fcce`; their historical assessment is retained.
+- **Integration targets:** Canonical successor `0.2-draft.1 → 0.2-draft.2`;
+  Lynx schema successor `0.2-draft.1 → 0.2-draft.2`; common source annex
+  `0.1-draft.1 → 0.1-draft.2`. All three remain **Draft**.
+- **Summary:** Prepared governance metadata/references, bounded UTF-8/NFC adoption
+  status, navigation, provenance and revision history. No technical encoding,
+  admission or equality rule is changed by this integration. The exact
+  descriptor-local version 2 and sixteen selected interpretation keys are retained.
+- **Affected design:** Explicit descriptor/native mapping, selected definition/domain
+  responsibilities, bounded text treatment, scoped Lynx/ISO responsibilities and
+  support/material-role boundaries remain those of the accepted additive design.
+  Definition bodies are not added to the Action semantic frames.
+- **Compatibility:** Old contexts, source selections, Types/selectors and historical
+  records remain separate. No implicit supersession, migration, historical digest
+  equality, general Unicode-edition equivalence or authority-from-serialization claim.
+- **Timing and assurance:** The owner decision and this preparation are dated
+  25 October 2026, America/Edmonton; acceptance was recorded at 02:40:33 UTC on
+  26 October. This entry records governance/preparation, not a publication/release
+  date or permission. Exact successor/context bindings, recursive closure and
+  implementation/interoperability evidence remain separate. Governance acceptance
+  is not Approved specification status or interoperability clearance; Phase B stays closed.
 
 ## 2026-09-13 — Canonical Rule semantic-boundary correction
 
