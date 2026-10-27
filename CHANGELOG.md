@@ -31,6 +31,19 @@ This changelog records repository-wide semantic, governance, status, and structu
   record. No conformance, stable compatibility, cryptographic interoperability,
   lifecycle promotion or reviewer/Phase-B permission follows from publication.
 
+## 2026-10-26 — Bounded Event representation successor Draft proposal
+
+- **Scope:** Added [the representation successor](specifications/BOUNDED-LIFECYCLE-EVENT-REPRESENTATION-PROFILE-SUCCESSOR.md),
+  `0.2-draft.1`, Draft, including the owner-approved exact source-verifier
+  contract and explicit S17 package-governance role through S08.
+- **Compatibility:** Companion semantic selection and the agreeing successor
+  Action annex/canonical/schema remain explicit external responsibilities.
+  No historical selector is retargeted; material carriage and interpretation
+  remain separate. No global octet cap or new universal verifier is introduced.
+- **Governance and assurance:** Draft-only source publication, not formal Event
+  design acceptance, Review/Approved status, completed recursive closure,
+  independent review or interoperability clearance. Phase B remains closed.
+
 ## 2026-10-25 — Additive Action-owner governance acceptance and Draft integration preparation
 
 - **Authority:** [Accepted RFC-014](rfcs/RFC-014-action-owner-successors.md) and
