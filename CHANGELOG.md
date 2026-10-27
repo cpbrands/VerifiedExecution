@@ -7,7 +7,7 @@ document_type: Changelog
 category: Governance
 author: Verified Execution Editorial Board
 created: 2026-08-22
-updated: 2026-10-25
+updated: 2026-10-26
 depends_on:
   - SPECIFICATION-GOVERNANCE
 supersedes: null
@@ -17,6 +17,19 @@ superseded_by: null
 # Verified Execution Repository Changelog
 
 This changelog records repository-wide semantic, governance, status, and structural changes. Specification-specific changelogs remain authoritative for changes to their specifications.
+
+## 2026-10-26 — Bounded Event semantic successor Draft proposal
+
+- **Scope:** Added [the semantic successor](specifications/BOUNDED-LIFECYCLE-EVENT-TYPE-SEMANTIC-PROFILE-SUCCESSOR.md),
+  `0.3-draft.1`, Draft, for seven distinct proposed Type bindings under Route B.
+- **Compatibility:** Fixed core pins and delegated Action ownership are retained;
+  historical Type meanings, sources and results are not replaced or aliased.
+- **Governance:** Draft proposal publication only. Formal Event-level change
+  classification and applicable RFC/ADR acceptance remain pending; Accepted
+  RFC-014/ADR-014 cover the Action-owner design, not this Event proposal.
+- **Assurance:** Exact source selection requires a separate authorized external
+  record. No conformance, stable compatibility, cryptographic interoperability,
+  lifecycle promotion or reviewer/Phase-B permission follows from publication.
 
 ## 2026-10-25 — Additive Action-owner governance acceptance and Draft integration preparation
 
